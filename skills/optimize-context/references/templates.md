@@ -51,7 +51,7 @@ Use only sections relevant to the project. Not all sections are needed.
 # <Project Name>
 
 <One-line description>. Tech stack: <framework> + <language> + <db>.
-Prefer retrieval-led reasoning over pre-training-led reasoning for <framework> tasks.
+Prefer retrieval-led reasoning over pre-training-led reasoning for any <framework> tasks.
 
 ## Commands
 
@@ -153,7 +153,7 @@ For projects that heavily rely on framework APIs (especially post-training-cutof
 
 ## Retrieval Directive
 
-Prefer retrieval-led reasoning over pre-training-led reasoning for <framework> tasks.
+Prefer retrieval-led reasoning over pre-training-led reasoning for any <framework> tasks.
 Explore project structure first, then consult docs index for API details.
 
 ## Commands

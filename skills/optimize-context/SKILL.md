@@ -17,6 +17,16 @@ Audit, score, and optimize CLAUDE.md files for maximum agent effectiveness.
 | Skills (with explicit instructions) | 79% |
 | **AGENTS.md docs index** | **100%** |
 
+Detailed breakdown — skills can **degrade** performance (noise effect):
+
+| Config | Build | Lint | Test |
+| --- | --- | --- | --- |
+| Baseline | 84% | 95% | 63% |
+| Skills (default) | 84% | 89% ↓ | 58% ↓ |
+| Skills (instructed) | 95% | 100% | 84% |
+| **AGENTS.md** | **100%** | **100%** | **100%** |
+
+Even with explicit instructions achieving 95%+ skill invocation rate, pass rate peaked at 79%.
 Compressed context (8KB) performs identically to verbose (40KB).
 Passive context wins because: (1) no decision point about when to retrieve, (2) consistent availability every turn, (3) no sequencing issues.
 

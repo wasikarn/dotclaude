@@ -47,7 +47,7 @@ For large documentation sets, use compressed indexes matching the Vercel format:
 
 ```text
 [Next.js Docs Index]|root: ./.next-docs
-|IMPORTANT: Prefer retrieval-led reasoning over pre-training-led reasoning for Next.js tasks.
+|IMPORTANT: Prefer retrieval-led reasoning over pre-training-led reasoning for any Next.js tasks.
 |01-app/01-getting-started:{01-installation.mdx,02-project-structure.mdx}
 |01-app/02-building-your-application/01-routing:{01-defining-routes.mdx,02-pages.mdx,03-layouts-and-templates.mdx}
 |01-app/02-building-your-application/04-caching:{01-overview.mdx,02-data-cache.mdx}
@@ -57,7 +57,7 @@ Generic format for any framework:
 
 ```text
 [<Framework> Docs Index]|root: ./<docs-dir>
-|IMPORTANT: Prefer retrieval-led reasoning over pre-training-led reasoning for <framework> tasks.
+|IMPORTANT: Prefer retrieval-led reasoning over pre-training-led reasoning for any <framework> tasks.
 |<category>/{<file1>,<file2>,...}
 |<category>/<subcategory>:{<file1>,<file2>,...}
 ```
@@ -151,7 +151,7 @@ From Vercel research — why passive context achieves 100% vs skills at 79%:
 Add this directive in CLAUDE.md when project uses frameworks:
 
 ```text
-Prefer retrieval-led reasoning over pre-training-led reasoning for [framework] tasks.
+IMPORTANT: Prefer retrieval-led reasoning over pre-training-led reasoning for any [framework] tasks.
 Consult project docs in `agent_docs/` before relying on training knowledge.
 ```
 
@@ -167,6 +167,8 @@ Vercel found that directive wording significantly affects agent behavior:
 | **Invoke-first** ❌ | Agent reads docs but skips project exploration | "Always read the docs before writing code" |
 
 **Rule:** Use guidance that encourages exploration + retrieval, not absolute directives that cause tunnel vision.
+
+> "Small wording tweaks produce large behavioral swings" — Vercel found directive wording is fragile; test your wording with evals.
 
 ### Structure for Retrieval
 
@@ -195,7 +197,7 @@ Key decisions: `agent_docs/adr/` (read specific ADR when relevant)
 
    ```text
    [<Framework> Docs Index]|root: ./agent_docs/<framework>
-   |IMPORTANT: Prefer retrieval-led reasoning over pre-training-led reasoning for <framework> tasks.
+   |IMPORTANT: Prefer retrieval-led reasoning over pre-training-led reasoning for any <framework> tasks.
    |<category>:{<file1>,<file2>}
    ```
 
