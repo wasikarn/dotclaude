@@ -142,8 +142,10 @@ Vercel found that irrelevant context can actively hurt agent performance ("unuse
 
 From Vercel research — why passive context achieves 100% vs skills at 79%:
 
+Passive context = static markdown (CLAUDE.md/AGENTS.md) injected into the **system prompt for every turn**. No tool invocation needed — the agent sees it automatically.
+
 1. **No decision point** — info already present, no invocation needed
-2. **Consistent availability** — content exists every turn
+2. **Consistent availability** — content exists every turn, in system prompt
 3. **No ordering issues** — avoids sequencing brittleness
 
 ### Key Directive to Include
@@ -205,6 +207,8 @@ Key decisions: `agent_docs/adr/` (read specific ADR when relevant)
 5. **Focus on post-cutoff** — prioritize indexing docs for APIs released after training cutoff
 
 **Step 3: Verify retrievability** — agent should be able to find and read specific docs from the index
+
+**For framework authors:** Provide an AGENTS.md/CLAUDE.md snippet that users can add to their projects, including the retrieval directive and a pre-built docs index for your framework.
 
 ## Verification Checklist
 

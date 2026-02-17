@@ -228,3 +228,5 @@ From Vercel research: agents ignored available skills 56% of the time.
 | One-time operations (scaffolding, code generation) | **Skills** — explicit invocation makes sense |
 
 **Rule:** If the agent needs this info on every task → passive context. If only for specific user-triggered actions → skill.
+
+> "The gap may close as models get better at tool use, but results matter now." — Vercel. Prefer passive context until skills catch up.

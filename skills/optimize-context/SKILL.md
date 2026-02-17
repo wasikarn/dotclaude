@@ -10,6 +10,8 @@ Audit, score, and optimize CLAUDE.md files for maximum agent effectiveness.
 
 **Why passive context wins** ([Vercel research](https://vercel.com/blog/agents-md-outperforms-skills-in-our-agent-evals)):
 
+> Vercel uses `AGENTS.md`; Claude Code uses `CLAUDE.md` — same concept, same results.
+
 | Configuration | Pass Rate |
 | --- | --- |
 | Baseline (no docs) | 53% |
