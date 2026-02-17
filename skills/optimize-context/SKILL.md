@@ -198,7 +198,7 @@ Projected: Score XX → XX | Size: XX KB → XX KB
 
 Every finding from phase 3 must appear in this table — if no action needed, state why.
 
-**Gate:** User reviews preview before applying.
+**Gate:** User reviews preview before applying. Do NOT apply changes in the same message — stop after showing the table and wait for explicit user approval.
 
 ### 5. Apply & Verify
 
