@@ -101,6 +101,8 @@ Detect framework: check `package.json`, `requirements.txt`, `go.mod`, etc. If of
 
 Example post-cutoff APIs (Next.js 16): `connection()`, `'use cache'`, `cacheLife()`, `cacheTag()`, `forbidden()`, `unauthorized()`, `proxy.ts`, async `cookies()`/`headers()`, `after()`, `updateTag()`, `refresh()`
 
+**Output:** State classification explicitly — e.g. "Classification: Hybrid (Next.js 14 + custom domain). Next.js 14 within training cutoff — no post-cutoff docs needed."
+
 **No CLAUDE.md found?** → Create one using the appropriate template from [references/templates.md](references/templates.md), then continue to phase 2.
 
 ### 2. Quality Assessment
@@ -122,9 +124,28 @@ Quick checklist:
 
 Grades: A (90-100), B (70-89), C (50-69), D (30-49), F (0-29).
 
-**Critical threshold check:** If any criterion from the minimum thresholds table scores below its minimum, mark it `⚠️ CRITICAL` in the report. These must be addressed in phase 4 before the file can pass.
+**Output format per file** (must follow exactly):
 
-Output per file: `./CLAUDE.md — Score: XX/100 (Grade X) | Size: XX KB | Issues: [list]`
+```
+./CLAUDE.md — Score: XX/100 (Grade X) | Size: XX KB
+
+| Criterion | Score | Status | Notes |
+| --- | --- | --- | --- |
+| Commands | XX/15 | ✅ or ⚠️ CRITICAL (if <10) | ... |
+| Architecture | XX/15 | ✅ or ⚠️ CRITICAL (if <10) | ... |
+| Retrieval readiness | XX/15 | ✅ or ⚠️ CRITICAL (if <10, framework only) | ... |
+| Conciseness | XX/15 | ✅ or ⚠️ CRITICAL (if <10) | ... |
+| Non-obvious | XX/10 | ✅ | ... |
+| Novel content | XX/10 | ✅ | ... |
+| Currency | XX/10 | ✅ | ... |
+| Actionability | XX/10 | ✅ | ... |
+
+Critical check: PASS ✅ — all criteria above minimums
+— or —
+Critical check: FAIL ⚠️ — [Criterion] at X/15 (min 10), [Criterion] at X/15 (min 10)
+```
+
+The Status column is **mandatory** — compare each score against the minimum thresholds table and mark `⚠️ CRITICAL` if below. Any `FAIL` criteria must be addressed in phase 4 before the file can pass.
 
 ### 3. Audit
 
@@ -159,7 +180,7 @@ For templates by project type: [references/templates.md](references/templates.md
 **Size targets:** <8KB optimal, 8-15KB acceptable, >15KB needs compression.
 **Size measurement:** Exclude auto-generated sections (`<claude-mem-context>`, plugin-injected blocks) from byte count — score only human-authored content.
 
-Show each change with reason and size impact before applying.
+Show each change with reason and size impact before applying. **Every finding from phase 3 must map to a proposed change** — if a finding has no action, explicitly state why (e.g. "Finding #3: no change needed — already addressed by #1").
 
 **Gate:** User reviews preview before applying.
 
@@ -192,16 +213,18 @@ Report: `Score: XX → XX | Fixed N stale | Added N gaps | Removed N redundant |
 
 ### ./CLAUDE.md — Score: 50/100 (Grade C) | Size: 18.2 KB
 
-| Criterion | Score | Issue |
-| --- | --- | --- |
-| Commands | 12/15 | Missing deploy command |
-| Architecture | 8/15 | No module relationships |
-| Retrieval readiness | 0/15 | No retrieval directive or docs index |
-| Conciseness | 5/15 | 3 verbose sections + noise |
-| Non-obvious | 8/10 | — |
-| Novel content | 3/10 | Post-cutoff APIs not identified |
-| Currency | 7/10 | `src/legacy/` no longer exists |
-| Actionability | 7/10 | Vague "see docs" references |
+| Criterion | Score | Status | Issue |
+| --- | --- | --- | --- |
+| Commands | 12/15 | ✅ | Missing deploy command |
+| Architecture | 8/15 | ⚠️ CRITICAL | No module relationships |
+| Retrieval readiness | 0/15 | ⚠️ CRITICAL | No retrieval directive or docs index |
+| Conciseness | 5/15 | ⚠️ CRITICAL | 3 verbose sections + noise |
+| Non-obvious | 8/10 | ✅ | — |
+| Novel content | 3/10 | ✅ | Post-cutoff APIs not identified |
+| Currency | 7/10 | ✅ | `src/legacy/` no longer exists |
+| Actionability | 7/10 | ✅ | Vague "see docs" references |
+
+Critical check: FAIL ⚠️ — Architecture at 8/15 (min 10), Retrieval readiness at 0/15 (min 10), Conciseness at 5/15 (min 10)
 
 ### Findings
 
