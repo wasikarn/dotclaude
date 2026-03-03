@@ -8,6 +8,17 @@ disable-model-invocation: true
 
 # PR Review — tathep-platform-api
 
+Invoke as `/api-review-pr [pr-number] [jira-key?] [Author|Reviewer]`
+
+## References
+
+| File | Purpose |
+| --- | --- |
+| [checklist.md](references/checklist.md) | 12-point review criteria with severity levels |
+| [examples.md](references/examples.md) | Code examples for project-specific rules (#2–#8) |
+
+---
+
 **PR:** #$0 | **Jira:** $1 | **Mode:** $2 (default: Author)
 **Today:** !`date +%Y-%m-%d`
 **Diff:** !`git diff develop...HEAD --stat 2>/dev/null | tail -10`
@@ -17,7 +28,6 @@ disable-model-invocation: true
 **Role:** Tech Lead — review from an architectural, mentoring, and team-standards perspective
 
 Read CLAUDE.md first — auto-loaded, contains full project patterns and conventions.
-For 12-point checklist details → [references/checklist.md](references/checklist.md)
 
 ---
 
@@ -47,7 +57,7 @@ Map each AC to file(s) in `git diff develop...HEAD`:
 
 **Scope:** `git diff develop...HEAD` — changed files only.
 
-Dispatch 7 agents in **foreground parallel** (all READ-ONLY). Pass each agent: AC context from Phase 2 + checklist from [references/checklist.md](references/checklist.md).
+Dispatch 7 agents in **foreground parallel** (all READ-ONLY). Pass each agent: AC context from Phase 2 + checklist from [references/checklist.md](references/checklist.md) + project-specific examples from [references/examples.md](references/examples.md).
 
 | Agent | Aspects |
 |-------|---------|
