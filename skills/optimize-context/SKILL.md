@@ -185,8 +185,6 @@ For templates by project type: [references/templates.md](references/templates.md
 **Size targets:** <8KB optimal, 8-15KB acceptable, >15KB needs compression.
 **Size measurement:** Exclude auto-generated sections (`<claude-mem-context>`, plugin-injected blocks) from byte count — score only human-authored content.
 
-**Persistent artifact:** Write the full audit report + proposed changes table to `.claude/optimize-context-report.md`. This file survives context compression in long sessions — if context is compacted mid-run, re-read this file to resume.
-
 **Output format** (must show before editing):
 
 ```markdown
