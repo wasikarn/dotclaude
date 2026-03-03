@@ -23,12 +23,15 @@ skills/<name>/
 ```yaml
 ---
 name: skill-name                    # Slash command trigger: /skill-name
-description: "When to invoke (used by Claude to match intent)"
-argument-hint: "[arg1] [arg2?]"    # Optional: shown in autocomplete
-context: fork                       # Optional: isolate skill in fork context
-disable-model-invocation: true      # Optional: prevent nested model calls
+description: "What it does. Use when: X, Y, Z."  # Max 1024 chars — cover what + when + triggers
+argument-hint: "[arg1] [arg2?]"    # Optional: shown in /autocomplete
+compatibility: "Requires gh CLI"   # Optional: prerequisites (CLIs, env, repo context)
+disable-model-invocation: true      # Optional: removes description from context; manual-only
 ---
 ```
+
+Full field reference with description rules, substitutions (`$0`/`$1`/`!`), and context budget:
+[references/skills-best-practices.md](references/skills-best-practices.md)
 
 ## Skills in This Repo
 
@@ -63,7 +66,8 @@ Validate commands per project:
 ## Adding a New Skill
 
 1. Create `skills/<name>/SKILL.md` with YAML frontmatter
-2. Add `references/` docs if the skill needs supporting material
-3. Keep `description:` concise but trigger-complete — Claude uses it to decide when to invoke the skill
-4. Use `context: fork` + `disable-model-invocation: true` for heavy agent-dispatching skills
-5. Install symlink: `bash scripts/link-skill.sh <name>` (or `--list` to check, no args to link all)
+2. Add `argument-hint` if the skill takes arguments; add `compatibility` for prerequisite tools
+3. Add `references/` docs if the skill needs supporting material
+4. Keep `description:` trigger-complete (what + when + keywords) — max 1024 chars
+5. Use `disable-model-invocation: true` for side-effect skills (deploy, PR review)
+6. Install symlink: `bash scripts/link-skill.sh <name>` (or `--list` to check, no args to link all)
