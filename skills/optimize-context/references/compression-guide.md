@@ -107,12 +107,12 @@ Claude knows standard framework patterns **up to its training cutoff**. Prioriti
 Determine what the model knows vs. what it needs to be told:
 
 1. **Detect framework version** — check `package.json`, lockfiles, configs
-2. **Compare to training cutoff** — Claude's cutoff: May 2025. APIs released after this need full documentation
+2. **Compare to training cutoff** — Claude's cutoff: August 2025. APIs released after this need full documentation
 3. **Categorize content:**
 
 | Category | Action | Example |
 | --- | --- | --- |
-| Post-cutoff APIs | Document in detail with usage examples | Next.js 16: `connection()`, `'use cache'`, `cacheLife()` |
+| Post-cutoff APIs | Document in detail with usage examples | Next.js 16: sync `cookies()`/`headers()`/`params` fully removed, `id` now `Promise<string>` in image/sitemap generators |
 | Custom/internal APIs | Document thoroughly — model has zero knowledge | Your `createServiceClient()` wrapper |
 | Non-default configs | Keep as one-liners | Custom Webpack config, non-standard tsconfig |
 | Standard framework behavior | Compress to minimal or remove | Express middleware ordering, React useState |

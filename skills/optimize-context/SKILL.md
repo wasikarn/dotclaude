@@ -1,7 +1,6 @@
 ---
 name: optimize-context
-description: |
-  Audit, score, and optimize CLAUDE.md files for maximum agent effectiveness. Combines quality assessment with codebase-aligned compression. Use when: (1) CLAUDE.md feels outdated or stale, (2) project codebase has changed significantly, (3) CLAUDE.md is too large or verbose (>15KB), (4) agent keeps making mistakes that better context would prevent, (5) new project needs initial CLAUDE.md setup, (6) checking quality of existing CLAUDE.md files, (7) user asks to "optimize context", "improve claude.md", "audit context", "check CLAUDE.md quality", "setup context", "init claude.md", or "bootstrap claude.md"
+description: "Audit, score, and optimize CLAUDE.md files for maximum agent effectiveness. Combines quality assessment with codebase-aligned compression. Use when: (1) CLAUDE.md feels outdated or stale, (2) project codebase has changed significantly, (3) CLAUDE.md is too large or verbose (>15KB), (4) agent keeps making mistakes that better context would prevent, (5) new project needs initial CLAUDE.md setup, (6) checking quality of existing CLAUDE.md files, (7) user asks to 'optimize context', 'improve claude.md', 'audit context', 'check CLAUDE.md quality', 'setup context', 'init claude.md', or 'bootstrap claude.md'"
 ---
 
 # /optimize-context
@@ -70,11 +69,13 @@ Progress:
 
 ### 1. Discovery & Classification
 
-Find all CLAUDE.md files in the project:
+**Run pre-scan first** (saves ~2-4k tokens vs reading files individually):
 
 ```bash
-find . -name "CLAUDE.md" -o -name ".claude.local.md" -o -name ".claude.md" 2>/dev/null | head -50
+bash skills/optimize-context/scripts/pre-scan.sh [project-root]
 ```
+
+Output is compact JSON: `claude_files` (path + bytes), `framework` (name + version), `npm_scripts`, `dir_structure`, `has_agent_docs`, `has_claude_rules`. Use this to skip manual framework detection and file discovery. If script unavailable, use Glob patterns `**/CLAUDE.md`, `**/.claude.local.md`, `**/.claude.md`.
 
 Identify each file's type:
 
@@ -100,11 +101,11 @@ Detect framework: check `package.json`, `requirements.txt`, `go.mod`, etc. If of
 **Novel content detection:**
 
 1. Identify framework + version from lockfiles/configs
-2. Compare against model training cutoff (Claude: May 2025)
+2. Compare against model training cutoff (Claude: August 2025)
 3. List APIs/features that are post-cutoff → these need detailed documentation
 4. List well-known patterns within training data → candidates for compression/removal
 
-Example post-cutoff APIs (Next.js 16): `connection()`, `'use cache'`, `cacheLife()`, `cacheTag()`, `forbidden()`, `unauthorized()`, `proxy.ts`, async `cookies()`/`headers()`, `after()`, `updateTag()`, `refresh()`
+Example post-cutoff APIs (Next.js 16, released late 2025): sync access to `cookies()`/`headers()`/`draftMode()`/`params`/`searchParams` **fully removed** (all must be awaited), `id` in image/sitemap generators now `Promise<string>`; within-cutoff Next.js 15 APIs (`connection()`, `'use cache'`, `cacheLife()`, `cacheTag()`, `forbidden()`, `unauthorized()`, `after()`) the model likely knows
 
 **Output:** State classification explicitly — e.g. "Classification: Hybrid (Next.js 14 + custom domain). Next.js 14 within training cutoff — no post-cutoff docs needed."
 
@@ -238,7 +239,8 @@ Proceed directly to phase 5 after outputting the proposed changes table.
 | 4 | Commands work | ✅ Ran: `cmd1` ✅, `cmd2` ✅ |
 | 5 | Paths verified | ✅ N/N paths exist |
 | 6 | Wording check | ✅ No absolute "MUST" directives / retrieval directive present (if framework) |
-| 7 | Re-score | ✅ XX → XX (Grade X → X) |
+| 7 | Behavior eval | ✅ Tested N post-cutoff APIs (or novel patterns): [result] / N/A (non-framework) |
+| 8 | Re-score | ✅ XX → XX (Grade X → X) |
 ```
 
 Every row must have an actual result — do NOT skip rows or mark as N/A without explanation.
