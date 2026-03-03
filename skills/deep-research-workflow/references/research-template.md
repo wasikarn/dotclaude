@@ -4,6 +4,10 @@
 
 What we're investigating and why. Link to issue/ticket if applicable.
 
+## Summary
+
+_One paragraph TL;DR of key findings. Write last, after all sections below are complete. This is the re-entry point if context is compacted — read this first._
+
 ## Codebase Analysis
 
 ### [Area 1 — e.g. "Authentication middleware"]
@@ -28,6 +32,13 @@ Code and patterns that can be reused or referenced as specification:
 | --- | --- | --- |
 | CRUD endpoint | `src/routes/users.ts` | Template for new endpoint |
 | Validation schema | `src/schemas/user.schema.ts` | Pattern for new schemas |
+
+## Key Decisions
+
+Decisions discovered during research that will directly shape the plan:
+
+- **[Decision topic]:** [What was found and what it implies for the implementation]
+- **[Decision topic]:** ...
 
 ## Constraints & Gotchas
 

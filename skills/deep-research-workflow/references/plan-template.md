@@ -1,5 +1,7 @@
 # Plan: [Feature Name]
 
+_Based on: [research.md](research.md)_
+
 ## Problem
 
 What problem this solves and why it matters now.
