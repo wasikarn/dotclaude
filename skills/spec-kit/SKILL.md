@@ -13,11 +13,11 @@ SDD inverts the coding workflow: specifications are the primary artifact; code i
 |------|---------|--------|----------|
 | 1 | `/speckit.constitution` | `.specify/memory/constitution.md` | Do once; cover code quality, testing, UX, performance + decision governance |
 | 2 | `/speckit.specify <what>` | `spec.md` + `checklists/requirements.md` + git branch | WHAT/WHY only, no tech; be explicit about flows and out-of-scope |
-| 3 | `/speckit.clarify` | Updates `spec.md` Clarifications | Structured first → free-form after; validate Review & Acceptance Checklist; explicitly skip for spikes |
+| 3 | `/speckit.clarify` | Updates `spec.md` Clarifications | Structured first → free-form after; 5 questions per invocation, 10 total across session; each question includes a **recommended answer** (accept with "yes") |
 | 4 | `/speckit.plan <tech stack>` | `plan.md`, `research.md`, `data-model.md`, `quickstart.md`, `contracts/` | NOW specify tech |
 | 4.5 | *(plan validation)* | *(refined plan files)* | Audit for missing sequences + over-engineering; research rapidly-changing tech with parallel tasks |
 | 5 | `/speckit.tasks` | `tasks.md` | Requires `plan.md` to exist |
-| 6 | `/speckit.implement` | Marked `[X]` tasks, working code | Pauses on incomplete checklists; local CLI tools must be installed |
+| 6 | `/speckit.implement` | Marked `[X]` tasks, working code | Pauses on incomplete checklists; creates/verifies ignore files for detected tech; local CLI tools must be installed |
 
 **Optional quality gates** (run between steps 5 and 6):
 
@@ -68,7 +68,7 @@ CLAUDE.md            # Agent instructions (varies by --ai flag)
 ## Common Mistakes to Avoid
 
 - **Specifying tech stack in step 2** — wait until `/speckit.plan` (step 4)
-- **Expecting `/speckit.clarify` to ask unlimited questions** — it's capped at 5 questions per session
+- **Expecting unlimited questions from `/speckit.clarify`** — capped at 5 per invocation and 10 total across the session; run it again if you need more coverage
 - **Skipping `/speckit.clarify` without saying so** — ambiguities compound into plan/task errors; if intentionally skipping for a spike/prototype, explicitly state it so the agent doesn't block
 - **Using free-form clarification before `/speckit.clarify`** — run structured clarify first (sequential, coverage-based, answers recorded in Clarifications); free-form refinement is a follow-up, not a replacement
 - **Skipping plan validation (step 4.5)** — generated plans often include sequences or components not explicitly requested; audit before generating tasks
@@ -100,6 +100,8 @@ When user says "help me write a spec", "create a spec for X", or "I want to buil
 2. Check which of these are missing from their request: what it does, who uses it, why it matters, main flows, explicit out-of-scope
 3. Ask only for what's missing (max 2-3 questions at a time)
 4. Then draft the full `spec.md` using the format in [references/workflow.md](references/workflow.md)
+
+**Note:** `/speckit.specify` validates the spec it generates and may ask up to **3 inline clarification questions** itself (for any [NEEDS CLARIFICATION] markers that remain after validation). This is distinct from `/speckit.clarify` — it happens within the same command invocation. After this, the spec is ready for `/speckit.clarify`.
 
 See [references/spec-quality.md](references/spec-quality.md) for the draft process and anti-patterns.
 

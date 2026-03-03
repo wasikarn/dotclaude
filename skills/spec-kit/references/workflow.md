@@ -119,9 +119,10 @@ T022 depends on: T020
 
 **Task ID format:** `T001` (no hyphen — sequential numbers)
 **Parallel marker:** `[P]` means task touches independent files/modules — safe to run concurrently
-**Story ref:** `[US1]`, `[US2]` links task back to a user story in spec.md
+**Story ref:** `[US1]`, `[US2]` links task back to a user story in spec.md (Setup/Foundational/Polish phases have no story label)
 **File path:** include file path in task description (e.g. `at src/models/user.py`)
 **Completion marker:** `[X]` replaces `[ ]` when `/speckit.implement` finishes a task
+**Tests:** test tasks are **optional** — only generated if explicitly requested in the spec or if TDD is requested
 
 ---
 

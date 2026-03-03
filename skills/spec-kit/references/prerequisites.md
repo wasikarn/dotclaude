@@ -59,6 +59,7 @@ Check these conditions before recommending each command. If prerequisites are mi
 - [ ] All checklists in `.specify/specs/<feature>/checklists/` are complete (command will pause if not)
 - [ ] **Local CLI tools are installed** — the agent will execute tool commands (npm, dotnet, pip, etc.) that appear in `tasks.md`; ensure the correct versions are available
 - Recommended: run `/speckit.analyze` first to catch consistency issues
+- Note: the command automatically creates/verifies ignore files (`.gitignore`, `.dockerignore`, `.eslintignore`, etc.) based on the detected tech stack before starting implementation
 - After implementation: test the running application — runtime errors (e.g., browser console errors) may not appear in CLI output; paste any errors back to the agent for resolution
 
 ## Before `/speckit.checklist`
