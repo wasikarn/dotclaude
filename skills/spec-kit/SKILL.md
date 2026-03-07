@@ -1,6 +1,6 @@
 ---
 name: spec-kit
-description: "Spec-Driven Development (SDD) workflow using spec-kit (github/spec-kit). Use when starting a new SDD project with `specify init`, writing or refining feature specs, navigating the 6-step workflow (/speckit.constitution → /speckit.specify → /speckit.clarify → /speckit.plan → /speckit.tasks → /speckit.implement), choosing the right slash command for the current phase, understanding what artifacts each step produces, or troubleshooting the `specify` CLI. Triggers on: start a spec, write a spec, spec-driven, speckit, specify init, /speckit.*, SDD workflow, create a spec for, plan with spec-kit."
+description: "Spec-Driven Development (SDD) workflow using spec-kit (github/spec-kit). Use this skill whenever the user mentions speckit, SDD, writing a spec, running any /speckit.* command, or wants to plan before coding. Also use when the user seems confused about which phase they're in, asks 'what's next?', or wants to validate spec quality before moving forward. Triggers on: start a spec, write a spec, spec-driven, speckit, specify init, /speckit.*, SDD workflow, create a spec for, plan with spec-kit, where am I in the workflow."
 argument-hint: "[feature-name]"
 compatibility: "Requires specify CLI: npm install -g spec-kit"
 ---
@@ -69,15 +69,15 @@ CLAUDE.md            # Agent instructions (varies by --ai flag)
 
 ## Common Mistakes to Avoid
 
-- **Specifying tech stack in step 2** — wait until `/speckit.plan` (step 4)
+- **Specifying tech stack in step 2** — wait until `/speckit.plan` (step 4); early commitment constrains architecture before research reveals the real constraints
 - **Expecting unlimited questions from `/speckit.clarify`** — capped at 5 per invocation and 10 total across the session; run it again if you need more coverage
 - **Skipping `/speckit.clarify` without saying so** — ambiguities compound into plan/task errors; if intentionally skipping for a spike/prototype, explicitly state it so the agent doesn't block
 - **Using free-form clarification before `/speckit.clarify`** — run structured clarify first (sequential, coverage-based, answers recorded in Clarifications); free-form refinement is a follow-up, not a replacement
 - **Skipping plan validation (step 4.5)** — generated plans often include sequences or components not explicitly requested; audit before generating tasks
 - **Not checking for over-engineering in the plan** — Claude can add unrequested components; always ask for rationale when something wasn't in the spec
-- **Running `/speckit.tasks` without `plan.md`** — it will fail; run `/speckit.plan` first
-- **Ignoring `[P]` markers in tasks.md** — tasks marked `[P]` are safe to parallelize
-- **Re-running `/speckit.constitution` carelessly** — it supports re-runs to update principles, but silently overwrites; export any content you want to keep before re-running
+- **Running `/speckit.tasks` without `plan.md`** — the command reads plan.md to generate granular steps; it will fail without it
+- **Ignoring `[P]` markers in tasks.md** — tasks marked `[P]` have no sequential dependencies; running them serially wastes implementation time
+- **Re-running `/speckit.constitution` carelessly** — it silently overwrites existing principles; export content you want to keep before re-running, overwrites are irreversible
 - **Missing local CLI tools for `/speckit.implement`** — the agent runs tool commands (npm, dotnet, etc.); have them installed and at the correct version before starting
 - **Only checking CLI output after implement** — runtime errors (e.g., browser console errors) may not appear in the terminal; test the running app and paste any errors back to the agent
 

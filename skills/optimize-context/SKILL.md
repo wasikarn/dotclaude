@@ -1,6 +1,6 @@
 ---
 name: optimize-context
-description: "Audit, score, and optimize CLAUDE.md files for maximum agent effectiveness. Combines quality assessment with codebase-aligned compression. Use when: (1) CLAUDE.md feels outdated or stale, (2) project codebase has changed significantly, (3) CLAUDE.md is too large or verbose (>15KB), (4) agent keeps making mistakes that better context would prevent, (5) new project needs initial CLAUDE.md setup, (6) checking quality of existing CLAUDE.md files, (7) user asks to 'optimize context', 'improve claude.md', 'audit context', 'check CLAUDE.md quality', 'setup context', 'init claude.md', or 'bootstrap claude.md'"
+description: "Audit, score, and optimize CLAUDE.md files for maximum agent effectiveness. Use this skill whenever: CLAUDE.md feels outdated or stale, the codebase has changed significantly, CLAUDE.md is too large or verbose (>15KB), the agent keeps making mistakes that better context would prevent, a new project needs initial CLAUDE.md setup, or the user asks to 'optimize context', 'improve CLAUDE.md', 'audit context', 'check CLAUDE.md quality', 'update context', 'fix CLAUDE.md', 'setup context', 'init claude.md', or 'bootstrap claude.md'. When in doubt, use this skill — stale context is worse than no context."
 argument-hint: "[--dry-run?]"
 ---
 
