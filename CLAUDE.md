@@ -113,6 +113,10 @@ Output styles replace the default system prompt's coding instructions unless `ke
 
 Current styles: `thai-tech-lead` (Thai language tech lead mode), `coding-mentor` (explains architecture decisions inline while coding)
 
+## Plugin
+
+Plugin manifest at `.claude-plugin/plugin.json` packages this skills collection for distribution. Install via `gh` or direct clone — see [Claude Code plugins docs](https://code.claude.com/docs/en/plugins.md).
+
 ## Adding a New Skill
 
 1. Create `skills/<name>/SKILL.md` with YAML frontmatter

@@ -36,8 +36,6 @@ Automation:
 Distribution:
 
 - `plugins.md` — <https://code.claude.com/docs/en/plugins.md>
-- `mcp.md` — <https://code.claude.com/docs/en/mcp.md>
-
 Coordination:
 
 - `agent-teams.md` — <https://code.claude.com/docs/en/agent-teams.md>
@@ -68,8 +66,8 @@ Grades: A (90-100), B (70-89), C (50-69), D (30-49), F (0-29).
 
 Score breakdown:
 
-- **Source coverage 15/15:** All 14 sources read, key concepts extracted, no source skipped
-- **10/15:** ≥12 sources, minor gaps. **5/15:** <10 sources or superficial extraction
+- **Source coverage 15/15:** All 13 sources read, key concepts extracted, no source skipped
+- **10/15:** ≥11 sources, minor gaps. **5/15:** <10 sources or superficial extraction
 - **Context verification 15/15:** All dirs/files/configs verified via tool output, zero assumptions
 - **10/15:** Most verified, 1-2 assumptions noted. **5/15:** Multiple unverified claims
 - **Gap analysis depth 15/15:** Every source checked against project, evidence-linked, false negatives caught
@@ -110,7 +108,6 @@ Measures how well the project adopts Claude Code features **relative to what's a
 | Settings | Custom env vars or config needed | Defaults work fine |
 | Scheduled tasks | Recurring monitoring needed | No recurring needs |
 | Plugins | Distribution to others needed | Personal/single-project use |
-| MCP | External tool integration needed | No external tools |
 | Agent teams | Complex parallel coordination needed | Sequential or simple tasks |
 
 **Step 2 — Score applicable features only:**
@@ -166,7 +163,6 @@ Checklist:
 - [ ] hooks.md — all event schemas, input/output formats, exit codes
 - [ ] scheduled-tasks.md — `/loop`, cron scheduling
 - [ ] plugins.md — plugin manifest, packaging, distribution, marketplaces
-- [ ] mcp.md — MCP server config, tool search, scope hierarchy
 - [ ] agent-teams.md — team coordination, shared tasks, messaging
 - [ ] Notion BestPractice — 5 golden rules, skill brief template, anti-patterns
 
@@ -206,7 +202,7 @@ Do NOT proceed to gap analysis until all checks pass:
 
 | Check | Pass Criteria |
 | --- | --- |
-| Sources fetched | ≥12 of 14 sources successfully read |
+| Sources fetched | ≥12 of 13 sources successfully read |
 | CLAUDE.md read | Full file read (not skimmed) |
 | Directory verified | `tree` or `ls` output captured |
 | Settings checked | `.claude/settings.json` content confirmed |
@@ -232,7 +228,6 @@ Checklist:
 - [ ] hooks — all event types vs. currently configured hooks
 - [ ] scheduled-tasks — recurring workflows that could use `/loop`
 - [ ] plugins — packaging opportunity for distribution
-- [ ] mcp — external tool integration gaps
 - [ ] agent-teams — coordination needs (experimental — note stability)
 - [ ] BestPractice — skill quality, description triggers
 
@@ -248,7 +243,6 @@ For each existing configuration, verify it uses the right feature type:
 | Reference docs loaded sometimes | skill | CLAUDE.md (always loaded) |
 | Repeatable workflows | skill with `disable-model-invocation` | CLAUDE.md |
 | Deterministic automation | hook | skill or agent |
-| External service access | MCP | bash scripts |
 
 Flag any misplacement found.
 
@@ -351,7 +345,7 @@ Run the Project Coverage scoring from the Scoring section:
 | ... | ... | ... | ... |
 
 Project Coverage: XX/100 (Grade X)
-Applicable: X/12 categories
+Applicable: X/11 categories
 ```
 
 If project coverage < target → list specific gaps that need fixing to reach target.
