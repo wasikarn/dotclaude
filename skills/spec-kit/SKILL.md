@@ -89,8 +89,8 @@ CLAUDE.md            # Agent instructions (varies by --ai flag)
 When the user asks "where am I?", "what's next?", or seems unsure of their step, run the phase detection script from the project root:
 
 ```bash
-bash ~/.claude/skills/spec-kit/scripts/detect-phase.sh
-# Or with explicit feature: bash ~/.claude/skills/spec-kit/scripts/detect-phase.sh 001-my-feature
+bash ${CLAUDE_SKILL_DIR}/scripts/detect-phase.sh
+# Or with explicit feature: bash ${CLAUDE_SKILL_DIR}/scripts/detect-phase.sh 001-my-feature
 ```
 
 Parse the JSON output: `current_step` tells you the phase, `next_action` is the recommended command, `missing_files` lists what's absent.

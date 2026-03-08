@@ -71,7 +71,7 @@ Progress:
 **Run pre-scan first** (saves ~2-4k tokens vs reading files individually):
 
 ```bash
-bash skills/optimize-context/scripts/pre-scan.sh [project-root]
+bash ${CLAUDE_SKILL_DIR}/scripts/pre-scan.sh [project-root]
 ```
 
 Output is compact JSON: `claude_files` (path + bytes), `framework` (name + version), `npm_scripts`, `dir_structure`, `has_agent_docs`, `has_claude_rules`. Use this to skip manual framework detection and file discovery. If script unavailable, use Glob patterns `**/CLAUDE.md`, `**/.claude.local.md`, `**/.claude.md`.

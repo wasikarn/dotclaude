@@ -3,7 +3,9 @@ name: web-review-pr
 description: "PR review skill for tathep-website (Next.js 14 Pages Router + Chakra UI + React Query v3). Dispatches 7 parallel specialized agents, verifies Jira AC, then fixes issues (Author) or submits inline comments (Reviewer). Triggers: review PR, check PR, code review, /web-review-pr."
 argument-hint: "[pr-number] [jira-key?] [Author|Reviewer]"
 context: fork
+agent: general-purpose
 disable-model-invocation: true
+allowed-tools: Read, Grep, Glob, Bash(gh *), Bash(git *)
 compatibility: "Requires gh CLI and git. Run from within the tathep-website repo."
 ---
 
