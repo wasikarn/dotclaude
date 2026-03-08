@@ -11,6 +11,17 @@
         ]
       }
     ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "FILE=$(cat | jq -r '.tool_input.file_path // empty'); if [ -n \"$FILE\" ] && echo \"$FILE\" | grep -qE '\\.md$'; then npx markdownlint-cli2 --fix \"$FILE\" 2>/dev/null; fi"
+          }
+        ]
+      }
+    ],
     "Notification": [
       {
         "matcher": "",
