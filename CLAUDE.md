@@ -13,6 +13,7 @@ Prefer reading source before editing — key references:
 | Reference | Contents |
 | --- | --- |
 | [`references/skills-best-practices.md`](references/skills-best-practices.md) | Full frontmatter spec, description rules, substitutions (`$0`/`$1`/`!`), context budget |
+| [`references/skill-creation-guide.md`](references/skill-creation-guide.md) | 5 golden rules, creation workflow, skill brief template, anti-patterns |
 | `skills/<name>/references/checklist.md` | Per-skill review criteria with severity markers (review-pr skills) |
 | `skills/<name>/references/examples.md` | Per-skill ✅/❌ code examples for all 12 rules (review-pr skills) |
 
@@ -25,7 +26,6 @@ skills/<name>/
   SKILL.md          # Agent entry point — required; loaded when skill is invoked
   CLAUDE.md         # Contributor context — read by Claude when editing this repo
   references/       # Supporting docs loaded into agent context from SKILL.md
-  assets/           # Static assets (templates, boilerplate)
   scripts/          # Helper scripts referenced from SKILL.md or CLAUDE.md
 ```
 
@@ -53,13 +53,15 @@ Full field reference: [references/skills-best-practices.md](references/skills-be
 ## Skills in This Repo
 
 | Skill |
-| ------- |
+| --- |
 | `optimize-context` |
 | `deep-research-workflow` |
 | `spec-kit` |
 | `api-review-pr` |
 | `web-review-pr` |
 | `admin-review-pr` |
+
+Commands live at `commands/<name>.md` (symlinked to `~/.claude/commands/`). Current: `analyze-claude-features`.
 
 ## PR Review Skills Pattern
 
@@ -87,17 +89,13 @@ Custom subagents live at `agents/<name>.md` with YAML frontmatter. Symlinked to 
 | Field | Purpose |
 | --- | --- |
 | `name` | Unique identifier (lowercase + hyphens) |
-| `description` | When Claude should delegate to this agent (include "proactively" to auto-trigger) |
-| `tools` | Allowlist: `Read, Grep, Glob, Bash` etc. Inherits all if omitted |
-| `disallowedTools` | Denylist: removed from inherited/specified tools |
+| `description` | When Claude should delegate (include "proactively" to auto-trigger) |
+| `tools` / `disallowedTools` | Tool allowlist / denylist. Inherits all if omitted |
 | `model` | `sonnet`, `opus`, `haiku`, or `inherit` (default) |
 | `skills` | Skills to preload into agent context at startup |
 | `memory` | `user`, `project`, or `local` — persistent cross-session memory |
-| `hooks` | Lifecycle hooks scoped to this agent |
-| `permissionMode` | `default`, `acceptEdits`, `dontAsk`, `bypassPermissions`, `plan` |
-| `maxTurns` | Max agentic turns before stop |
-| `background` | `true` to always run as background task |
-| `isolation` | `worktree` for isolated git worktree copy |
+
+Other fields: `hooks`, `permissionMode`, `maxTurns`, `background`, `isolation` (see Claude Code docs).
 
 Current agents: `tathep-reviewer` (code reviewer with persistent memory), `skill-validator` (checks SKILL.md against best practices)
 
@@ -105,14 +103,17 @@ Current agents: `tathep-reviewer` (code reviewer with persistent memory), `skill
 
 Lifecycle hooks automate actions at specific points. Configured in `.claude/settings.json` or `~/.claude/settings.json`.
 
-| Event | Matcher | Common use |
+Active hooks (in `.claude/settings.json`):
+
+| Event | Matcher | What it does |
 | --- | --- | --- |
+| `SessionStart` | `startup` | Inject git state on fresh session |
 | `SessionStart` | `compact` | Re-inject context after compaction |
-| `PostToolUse` | `Edit\|Write` | Auto-format/lint after file edits |
-| `PreToolUse` | `Bash` | Validate commands before execution |
-| `Notification` | `*` | Desktop alerts when Claude needs input |
+| `PostToolUse` | `Edit\|Write` | Auto-lint `.md` files after edits |
 | `Stop` | — | Verify tasks complete before stopping |
-| `SubagentStart/Stop` | agent name | Setup/cleanup for specific agents |
+| `Notification` | `*` | macOS desktop alert when input needed |
+
+Other available events: `PreToolUse`, `SubagentStart/Stop`, `PreCompact`, `SessionEnd`.
 
 Hook types: `command` (shell), `prompt` (single LLM call), `agent` (multi-turn with tools), `http` (POST to URL)
 
@@ -141,7 +142,7 @@ Current styles: `thai-tech-lead` (Thai language tech lead mode), `coding-mentor`
 
 | Task | Command |
 | --- | --- |
-| Lint all markdown | `npx markdownlint-cli2 "skills/**/*.md"` |
+| Lint all markdown | `npx markdownlint-cli2 "**/*.md"` |
 | Link one skill | `bash scripts/link-skill.sh <name>` |
 | Link everything | `bash scripts/link-skill.sh` (skills, agents, hooks, output-styles) |
 | Check all links | `bash scripts/link-skill.sh --list` |
