@@ -148,3 +148,14 @@ Always verify:
 - [ ] **Circular imports**: module-specific imports deferred to `__init__()` or function body
 - [ ] **Formatting**: Black 88-char lines, `uv run black --check .` passes
 - [ ] **Security**: no secrets in code, auth via `auth_required` dependency, no PII in logs
+
+## Positive Signals
+
+Look for these patterns when identifying Strengths:
+
+- `invoke_with_fallback()` used for all LLM calls in production agents
+- `TypedDict` state with clear field definitions
+- Tool docstrings present and descriptive (LLM reads them)
+- `get_model()` centralizes model configuration
+- `Protocol` for duck typing interfaces
+- pytest fixtures with `responses` mock for HTTP calls

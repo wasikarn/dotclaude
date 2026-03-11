@@ -13,10 +13,10 @@ Always output first, before any phase work:
 ```markdown
 ---
 
-## 📋 PR #<number> — <jira-key> | <Author|Reviewer> Mode
+## 📋 PR #<number> — <jira-key> | <Author|Reviewer> Mode | <🟢/🟡/🔴>
 
 **PR:** <title>
-**Author:** <author> | **Files changed:** <count> | **Today:** <date>
+**Author:** <author> | **Files changed:** <count> | **Lines changed:** <count> | **Today:** <date>
 
 ---
 ```
@@ -83,10 +83,10 @@ Output in two parts: agent progress table (update as each agent completes), then
 
 #### Findings
 
-| #  | Sev | Rule | File          | Line | Issue                                |
-| -- | --- | ---- | ------------- | ---- | ------------------------------------ |
-| 1  | 🔴  | #2   | `src/foo.tsx` | 42   | ใช้ `as any` — ควรเป็น type guard    |
-| 2  | 🟡  | #9   | `src/bar.tsx` | 88   | console.log ค้างอยู่                  |
+| #  | Sev | Rule | File          | Line | Agents | Issue                             |
+| -- | --- | ---- | ------------- | ---- | ------ | --------------------------------- |
+| 1  | 🔴  | #2   | `src/foo.tsx` | 42   | 3/7    | ใช้ `as any` — ควรเป็น type guard |
+| 2  | 🟡  | #9   | `src/bar.tsx` | 88   | 1/7    | console.log ค้างอยู่               |
 ```
 
 - **Sev:** 🔴 Critical, 🟡 Warning, 🔵 Info
@@ -116,6 +116,10 @@ If validate fails: `❌ **Validate:** <command> — FAIL` then fix and re-valida
 ```markdown
 ### Phase 4: Review Submitted
 
+**Strengths:**
+- praise: (ดี) <specific good practice> `<file:line>`
+- praise: (ดี) <specific good practice> `<file:line>`
+
 Submitted **<REQUEST_CHANGES|APPROVE>** with <N> inline comments to GitHub.
 ```
 
@@ -130,7 +134,7 @@ Always output last:
 
 ### Final Verdict
 
-✅ **APPROVE** — แก้ไข 🔴 X, 🟡 Y issues | AC: N/N ✅ | Validate: PASS
+✅ **APPROVE** — แก้ไข 🔴 X, 🟡 Y issues | AC: N/N ✅ | Validate: PASS | Signal: X%
 ```
 
 Or:
@@ -140,7 +144,7 @@ Or:
 
 ### Final Verdict
 
-❌ **REQUEST CHANGES** — พบ 🔴 X issues ที่ต้องแก้ | AC: N/N ❌
+❌ **REQUEST CHANGES** — พบ 🔴 X issues ที่ต้องแก้ | AC: N/N ❌ | Signal: X%
 ```
 
 Verdict rules:
@@ -148,3 +152,4 @@ Verdict rules:
 - **Author:** ✅ if all 🔴 fixed + validate passes. ❌ if any 🔴 remains or validate fails.
 - **Reviewer:** ✅ APPROVE if no 🔴. ❌ REQUEST CHANGES if any 🔴 exists.
 - AC counts only shown if Jira key was provided.
+- Signal = (🔴+🟡) / Total findings as percentage.

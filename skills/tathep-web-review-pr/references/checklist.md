@@ -174,3 +174,14 @@ Always verify:
 - [ ] 7 providers order preserved in `_providers/providers.provider.tsx`
 - [ ] OFetch default — Axios only for uploads with progress tracking
 - [ ] `keepPreviousData` disabled when filter params change
+
+## Positive Signals
+
+Look for these patterns when identifying Strengths:
+
+- `ROUTE_PATHS` used instead of hardcoded route strings
+- `QUERY_KEYS` used for React Query cache keys
+- Mapper functions extracted as pure functions with tests
+- Chakra UI responsive arrays/objects used correctly
+- `@/shared/libs/locale` wrapper used instead of direct `next-intl`
+- Components split into container + presentational pattern

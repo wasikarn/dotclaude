@@ -52,6 +52,9 @@ SKILL.md frontmatter controls how Claude invokes this skill:
 
 ## Gotchas
 
+- **Phase 0 (PR Scope Assessment)** runs before ticket fetch — classifies PR size, adapts review behavior for large PRs
+- **Phase 3.5 (Consolidation)** is explicit sub-phase after CHECKPOINT — dedup, verify, remove false positives
+- **Shared conventions** in `references/review-conventions.md` — comment labels, dedup protocol, strengths guidelines, PR size thresholds
 - This CLAUDE.md is **tracked in git** — changes here are shared with the team
 - **Python project** — all code patterns, type hints, and tooling are Python-specific (not TypeScript)
 - **mypy strict mode** — `disallow_untyped_defs=True`, `no_implicit_optional=True`; missing type hints = build failure

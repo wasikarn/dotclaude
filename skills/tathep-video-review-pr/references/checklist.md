@@ -193,3 +193,14 @@ Always verify:
 | Infrastructure Adapter |
 | Presentation Route/Worker/Consumer |
 | Test |
+
+## Positive Signals
+
+Look for these patterns when identifying Strengths:
+
+- Domain layer has zero external dependencies (DDD boundary)
+- Domain exceptions use `transient()` / `permanent()` classification
+- `rethrowOrWrapError()` or `createErrorHandler()` for error handling
+- Drizzle queries are type-safe with proper schema types
+- `LoggerFactory.getLogger()` used for structured logging
+- 85%+ test coverage maintained on changed files

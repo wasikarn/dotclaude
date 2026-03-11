@@ -18,6 +18,7 @@ Invoke as `/tathep-video-review-pr [pr-number] [jira-key?] [Author|Reviewer]`
 | [checklist.md](references/checklist.md) |
 | [examples.md](references/examples.md) |
 | [review-output-format.md](../../references/review-output-format.md) |
+| [review-conventions.md](../../references/review-conventions.md) |
 
 ---
 
@@ -30,11 +31,18 @@ Invoke as `/tathep-video-review-pr [pr-number] [jira-key?] [Author|Reviewer]`
 
 **Args:** `$0`=PR# (required) · `$1`=Jira key or Author/Reviewer · `$2`=Author/Reviewer
 **Modes:** Author = fix code · Reviewer = comment only (in Thai)
-**Role:** Tech Lead — review from an architectural, mentoring, and team-standards perspective
+**Role:** Tech Lead — improve code health via architecture, mentoring, team standards. Not a linter. Explain *why*, cite patterns, respect valid approaches.
 
 Read CLAUDE.md first — auto-loaded, contains full project patterns and conventions.
 For 12-point checklist details → [references/checklist.md](references/checklist.md)
 **Output format:** Follow [review-output-format.md](../../references/review-output-format.md) exactly — output each phase section as it completes for real-time streaming.
+
+---
+
+## Phase 0: PR Scope Assessment 🟢 AUTO
+
+Parse `Diff stat` from header. Classify per [review-conventions.md](../../references/review-conventions.md) size thresholds.
+If 🔴 Massive: warn, limit review to Hard Rules + AC only.
 
 ---
 
@@ -94,7 +102,9 @@ Dispatch 7 agents in **foreground parallel** (all READ-ONLY). Pass each agent: H
 
 **⛔ CHECKPOINT** — collect ALL 7 results before proceeding. Do NOT fix until all complete.
 
-Deduplicate → verify severity → remove false positives → proceed.
+### Phase 3.5: Consolidation
+
+Per [review-conventions.md](../../references/review-conventions.md): dedup by file:line → verify severity → remove false positives → sort 🔴→🟡→🔵
 
 ---
 
@@ -118,6 +128,11 @@ For each issue, explain *why* it matters, not just *what* to change.
 
 **Comment language:** Thai mixed with English technical terms — as natural as possible, like a Thai dev writing to teammates on Slack/PR. Short, direct, no stiff formal phrases.
 Examples: "ใช้ `for...of` แทน `forEach` ด้วยนะครับ Biome จะ fail", "ตรงนี้ใช้ `rethrowOrWrapError()` แทน raw try-catch ดีกว่าครับ", "N+1 อยู่ ลอง batch insert ดูครับ"
+
+**Comment labels:** Per [review-conventions.md](../../references/review-conventions.md) — prefix every comment with `issue:`/`suggestion:`/`nitpick:`/`praise:`.
+
+**Strengths (1-3):** Genuinely good practices only. Evidence required (file:line).
+Examples: "domain layer ไม่ import infrastructure", "domain exception transient/permanent ถูก", "rethrowOrWrapError pattern ครบ"
 
 #### Submit to GitHub
 

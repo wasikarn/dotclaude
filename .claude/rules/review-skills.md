@@ -23,3 +23,4 @@ All five `*-review-pr` skills share the same structure:
 - admin: `npm run ts-check && npm run lint@fix && npm run test` (`lint@fix` uses `@`, not `:`)
 - agent: `uv run black --check . && uv run mypy .`
 - video: `bun run check && bun run test`
+- **Shared conventions:** `references/review-conventions.md` — comment labels, dedup, strengths, PR size, agent focus areas

@@ -156,3 +156,14 @@ Always verify:
 | Repository |
 | Validator |
 | Test |
+
+## Positive Signals
+
+Look for these patterns when identifying Strengths:
+
+- DI via `@inject([InjectPaths.X])` used correctly
+- `XxxException.staticMethod()` factory for typed errors
+- `createStubObj<IInterface>()` in tests — typed mocks
+- Effect-TS `pipe` / `Effect.gen` composition clean and readable
+- Code matches `Sms/` gold standard module patterns
+- `Database.beginGlobalTransaction()` / `rollbackGlobalTransaction()` test isolation

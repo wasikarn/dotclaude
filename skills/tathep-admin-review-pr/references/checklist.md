@@ -176,3 +176,14 @@ Always verify:
 - [ ] `npm run lint@fix` (uses `@` not `:`) for linting
 - [ ] v1/v2 modules: `ad` (v1) and `adV2` — do not mix
 - [ ] Remote images only from: `upslip.sgp1.digitaloceanspaces.com`, `ui-avatars.com`, `placehold.co`
+
+## Positive Signals
+
+Look for these patterns when identifying Strengths:
+
+- `*_STATUS_TEXT` constants used instead of hardcoded Thai text
+- Headless UI components follow project patterns
+- Vitest coverage meets threshold
+- `ROUTE_PATHS` used for route strings
+- Tailwind utility classes consistent with project conventions
+- Mapper functions pure and testable
