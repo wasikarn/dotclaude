@@ -1,0 +1,355 @@
+---
+name: team-dev-loop
+description: "Full development loop with Agent Teams — Research → Plan → Implement → Review → Ship with iterative fix-review loop. Use when: building features, refactoring code, implementing tickets, or any multi-step development task. Supports Full and Quick modes. Triggers: dev loop, build feature, implement ticket, full workflow, /team-dev-loop."
+argument-hint: "[task-description-or-jira-key] [--quick?]"
+compatibility: "Requires gh CLI, git, CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1 (degrades gracefully without)"
+disable-model-invocation: true
+---
+
+# Team Dev Loop — Full Development Workflow
+
+Invoke as `/team-dev-loop [task-description-or-jira-key] [--quick?]`
+
+## References
+
+| File |
+| --- |
+| [phase-gates.md](references/phase-gates.md) |
+| [teammate-prompts.md](references/teammate-prompts.md) |
+| [workflow-modes.md](references/workflow-modes.md) |
+| [../../references/review-conventions.md](../../references/review-conventions.md) |
+| [../../references/review-output-format.md](../../references/review-output-format.md) |
+| [../team-review-pr/references/debate-protocol.md](../team-review-pr/references/debate-protocol.md) |
+
+---
+
+**Task:** $ARGUMENTS | **Today:** !`date +%Y-%m-%d`
+**Git branch:** !`git branch --show-current`
+**Git remote:** !`git remote get-url origin 2>/dev/null | sed 's/.*[:/]\([^/]*\/[^.]*\).*/\1/'`
+
+**Args:** `$0`=task description or Jira key (required) · `$1`=`--quick` (optional, skip research)
+
+Read CLAUDE.md first — auto-loaded, contains project patterns and conventions.
+
+---
+
+## Prerequisite Check
+
+Before anything, verify agent teams are available:
+
+```text
+If TeamCreate tool is not available → check graceful degradation:
+- If Task (subagent) tool is available → "Agent Teams not enabled. Running in subagent mode (no debate, no messaging)."
+- If neither → "Running in solo mode. All phases executed by lead sequentially."
+```
+
+---
+
+## Phase 0: Triage (Lead Only)
+
+### Step 1: Detect Project
+
+Auto-detect from git remote, CLAUDE.md, and directory structure:
+
+| Project | Repo pattern | Hard Rules source | Validate command |
+| --- | --- | --- | --- |
+| tathep-platform-api | `bd-eye-platform-api` | AdonisJS + Effect-TS rules | `npm run validate:all` |
+| tathep-website | `bluedragon-eye-website` | Next.js Pages Router rules | `npm run ts-check && npm run lint:fix && npm test` |
+| tathep-admin | `bluedragon-eye-admin` | Next.js + Tailwind rules | `npm run ts-check && npm run lint@fix && npm run test` |
+| tathep-ai-agent | `tathep-ai-agent-python` | Python + FastAPI rules | `uv run black --check . && uv run mypy .` |
+| tathep-video | `tathep-video-processing` | Bun + Hono + Effect rules | `bun run check && bun run test` |
+| Unknown | — | Generic TypeScript/Python | Project's test command |
+
+Load project-specific Hard Rules from the corresponding `tathep-*-review-pr` skill if available.
+
+### Step 2: Classify Mode
+
+Per [workflow-modes.md](references/workflow-modes.md):
+
+- `--quick` flag or simple bug fix → **Quick mode** (skip Phase 1)
+- Multi-file feature, architectural change → **Full mode**
+- Ambiguous → ask user
+
+### Step 3: Create Context Artifact
+
+Write `dev-loop-context.md` at project root:
+
+```markdown
+# Dev Loop Context
+
+Task: {task_description}
+Mode: {Full|Quick}
+Project: {project_name}
+Validate: {validate_command}
+Started: {date}
+Branch: {branch_name}
+
+## Hard Rules
+{project_hard_rules}
+```
+
+### Step 4: Initialize Progress Tracker
+
+```markdown
+## Dev Loop: {TASK_NAME}
+Mode: {mode} | Project: {project} | Started: {date}
+
+- [x] Phase 0: Triage — {mode} mode, {project} detected
+- [ ] Phase 1: Research [Full only]
+- [ ] Phase 2: Plan
+- [ ] Loop iteration 1/3
+  - [ ] Phase 3: Implement
+  - [ ] Phase 4: Review
+  - [ ] Phase 5: Assess
+- [ ] Phase 6: Ship
+```
+
+**GATE:** User confirms mode → proceed.
+
+---
+
+## Phase 1: Research (Full Mode Only)
+
+Skip this phase entirely in Quick mode → go to Phase 2.
+
+### Step 1: Create Explorer Team
+
+Create team `dev-loop-{branch}` with 2-3 explorer teammates using prompts from [teammate-prompts.md](references/teammate-prompts.md):
+
+- **Explorer 1:** Execution paths + patterns in primary area
+- **Explorer 2:** Data model + dependencies + coupling
+- **Explorer 3:** Reference implementations (spawn only if task area has similar existing features)
+
+### Step 2: Wait for Explorers
+
+All explorers must complete before proceeding. Track:
+
+```markdown
+### Phase 1: Research
+
+| Explorer | Status | Files examined |
+| --- | --- | --- |
+| Execution Paths | ... | ... |
+| Data Model | ... | ... |
+| References | ... | ... |
+```
+
+### Step 3: Merge Findings
+
+Lead merges all explorer findings into `research.md` at project root. Structure: trace execution paths, map data flow, document conventions, identify reusable code, note constraints. Every section must cite file:line references.
+
+**GATE:** `research.md` complete with file:line evidence → proceed.
+
+---
+
+## Phase 2: Plan (Lead Only)
+
+### Step 1: Write Plan
+
+Create `plan.md` at project root. Source material:
+
+- Full mode: `research.md` findings
+- Quick mode: task description + CLAUDE.md conventions
+
+Plan structure:
+
+1. Problem statement
+2. Approach with rationale
+3. File-by-file changes
+4. Trade-offs
+5. Test strategy
+6. Task list — tag each task `[P]` (parallelizable) or `[S]` (sequential)
+
+### Step 2: Annotation Cycle
+
+Present plan to user. User may correct, reject, add constraints, or redirect.
+Write all corrections into `plan.md` `## Annotations` section.
+Repeat until user approves.
+
+**GATE:** User approves plan → proceed to Implement-Review Loop.
+
+---
+
+## Implement-Review Loop (Max 3 Iterations)
+
+Core loop: Implement → Review → Assess → (loop or exit).
+Review scope narrows each iteration. See [phase-gates.md](references/phase-gates.md) for gate details.
+
+| Iter | Implement scope | Review scope | Reviewers | Debate |
+| --- | --- | --- | --- | --- |
+| 1 | Full plan tasks | Full diff | 3 | Full (2 rounds max) |
+| 2 | Fix findings only | Fix commits only | 2 | Focused (1 round) |
+| 3 | Remaining fixes | Specific lines | 1 | None (spot-check) |
+
+---
+
+### Phase 3: Implement
+
+#### Iteration 1: Full Implementation
+
+Create 1-2 worker teammates using prompts from [teammate-prompts.md](references/teammate-prompts.md):
+
+- `[S]` tasks: 1 worker, sequential
+- `[P]` tasks: 2 workers with non-overlapping file assignments
+
+Workers follow TDD: failing test → implement → green → commit.
+Lead validates each commit against plan.
+
+#### Iteration 2+: Fix Findings
+
+Create 1 fixer teammate with the fixer prompt from [teammate-prompts.md](references/teammate-prompts.md).
+Fixer receives ONLY unresolved findings from `review-findings-{N-1}.md`.
+Fix order: Critical → Warning. Each fix = separate commit.
+
+**If a fix introduces a NEW Critical:** fixer reverts the commit and messages lead.
+Lead decides: try different approach or escalate.
+
+**GATE:** All tasks done + validate command passes → proceed to Review.
+
+---
+
+### Phase 4: Review
+
+#### Iteration 1: Full Review + Debate
+
+Reuse team-review-pr pattern (see [teammate-prompts.md](references/teammate-prompts.md) for reviewer prompts):
+
+1. Create 3 reviewer teammates (Correctness, Architecture, DX)
+2. Independent review of full diff
+3. Adversarial debate per [debate-protocol.md](../team-review-pr/references/debate-protocol.md)
+4. Consolidate findings per [review-conventions.md](../../references/review-conventions.md)
+
+#### Iteration 2: Focused Review
+
+- 2 reviewers (Correctness + Architecture)
+- Review ONLY commits after last review point
+- 1 debate round max
+- No DX review (scope too narrow)
+
+#### Iteration 3: Spot-Check
+
+- 1 reviewer (Correctness)
+- Verify specific fixes only — no full review
+- No debate
+- Binary output: pass or fail with specific issues
+
+### Review Output
+
+Write findings to `review-findings-{iteration}.md`:
+
+```markdown
+# Review Findings — Iteration {N}
+
+## Summary
+Critical: X | Warning: Y | Info: Z
+
+## Findings
+| # | Sev | File | Line | Consensus | Issue | Fix |
+| --- | --- | --- | --- | --- | --- | --- |
+| 1 | Critical | ... | ... | ... | ... | ... |
+```
+
+**GATE:** Findings consolidated → proceed to Assess.
+
+---
+
+### Phase 5: Assess (Lead Only)
+
+Count findings from `review-findings-{N}.md`:
+
+```text
+Critical == 0 AND Warning == 0?
+├→ Yes: EXIT LOOP → Phase 6: Ship
+│
+Critical == 0 AND Warning > 0?
+├→ Ask user: "Fix warnings? (Y/N)"
+│   ├→ Yes: LOOP (iteration++)
+│   └→ No: EXIT LOOP → Phase 6: Ship
+│
+Critical > 0 AND iteration < 3?
+├→ LOOP (iteration++)
+│
+Critical > 0 AND iteration == 3?
+└→ STOP — escalate to user per phase-gates.md escalation protocol
+```
+
+Update progress tracker with iteration results:
+
+```markdown
+- [x] Loop iteration {N}/3
+  - [x] Phase 3: Implement — {task_count} tasks
+  - [x] Phase 4: Review — Critical: {X}, Warning: {Y}
+  - [x] Phase 5: Assess — {LOOP|EXIT|STOP}
+```
+
+**GATE:** Loop decision made → proceed accordingly.
+
+---
+
+## Phase 6: Ship (Lead Only)
+
+### Step 1: Present Summary
+
+```markdown
+## Implementation Complete
+
+**Task:** {task_description}
+**Mode:** {Full|Quick}
+**Iterations:** {count}/3
+**Final status:** Critical: 0, Warning: {Y}, Info: {Z}
+
+### Iteration History
+| Iter | Critical | Warning | Action |
+| --- | --- | --- | --- |
+| 1 | ... | ... | ... |
+| 2 | ... | ... | ... |
+```
+
+### Step 2: Completion Options
+
+Present options to user:
+
+1. **Create PR** — auto-generate title + description from plan.md + review summary
+2. **Merge to main** — squash merge current branch
+3. **Keep branch** — leave as-is for manual review
+4. **Restart loop** — return to Phase 3 with additional changes
+
+### Step 3: Cleanup
+
+1. Shut down all remaining teammates
+2. Clean up the team
+3. Optionally archive artifacts (`dev-loop-context.md`, `plan.md`, `research.md`, `review-findings-*.md`)
+
+---
+
+## Graceful Degradation
+
+| Level | Available tools | Behavior |
+| --- | --- | --- |
+| **Agent Teams** | TeamCreate, SendMessage | Full workflow as described |
+| **Subagent** | Task (Agent tool) | Same phases, but: explorers/workers/reviewers as subagents. No debate (can't message). Review = 7-agent parallel (existing tathep-*-review-pr pattern). |
+| **Solo** | None (lead only) | Lead executes all phases sequentially. Research = lead explores. Review = self-review with checklist. Loop still applies. |
+
+Detect at Phase 0 and inform user of mode.
+
+---
+
+## Constraints
+
+- **Max 3 teammates concurrent** — more adds coordination overhead without proportional value
+- **Max 3 loop iterations** — beyond 3 = architectural problem, not fixable by iteration
+- **Max 2 debate rounds** per [debate-protocol.md](../team-review-pr/references/debate-protocol.md)
+- **Workers are READ-ONLY during review** — no workers alive during Phase 4
+- **Reviewers are READ-ONLY always** — no file modifications during review
+- **Hard Rules cannot be dropped** — only reclassified with evidence
+- **Commit per task** — enables clean revert if fix introduces regressions
+- **Artifacts persist on disk** — `dev-loop-context.md`, `plan.md`, `research.md`, `review-findings-*.md` survive context compression
+
+## Context Compression Recovery
+
+If session compacts mid-workflow, re-read in order:
+
+1. `dev-loop-context.md` — task, mode, project, Hard Rules
+2. `plan.md` — task list with checkmarks showing progress
+3. Latest `review-findings-*.md` — current iteration findings (if in loop)
+4. Progress tracker in conversation — iteration count and phase

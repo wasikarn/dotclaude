@@ -64,6 +64,8 @@ Full field reference: [references/skills-best-practices.md](references/skills-be
 | `tathep-video-review-pr` |
 | `env-check` |
 | `env-heal` |
+| `team-review-pr` |
+| `team-dev-loop` |
 
 Commands live at `commands/<name>.md` (symlinked to `~/.claude/commands/`). Current: `analyze-claude-features`.
 
@@ -92,6 +94,10 @@ Active hooks (in `.claude/settings.json`):
 | `PreToolUse` | `Edit\|Write` | Block edits to `.claude/settings.json` |
 | `PostToolUse` | `Edit\|Write` | Auto-lint `.md` files after edits |
 | `Stop` | — | Verify tasks complete before stopping (with `stop_hook_active` guard) |
+| `TaskCompleted` | `review-debate` | Verify evidence in review/debate task completions |
+| `TeammateIdle` | `review-pr` | Nudge idle teammates during debate rounds |
+| `TaskCompleted` | `dev-loop` | Verify evidence in dev-loop task completions |
+| `TeammateIdle` | `dev-loop` | Nudge idle dev-loop teammates to stay on task |
 | `Notification` | `*` | macOS desktop alert when input needed |
 
 Hook scripts live at `hooks/` and are symlinked to `~/.claude/hooks/` via `link-skill.sh`.
