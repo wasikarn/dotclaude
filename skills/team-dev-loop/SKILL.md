@@ -1,6 +1,6 @@
 ---
 name: team-dev-loop
-description: "Full development loop with Agent Teams — Research → Plan → Implement → Review → Ship with iterative fix-review loop. Use when: building features, refactoring code, implementing tickets, or any multi-step development task. Supports Full and Quick modes. Triggers: dev loop, build feature, implement ticket, full workflow, /team-dev-loop."
+description: "Full development loop with Agent Teams — Research → Plan → Implement → Review → Ship with iterative fix-review loop. Pass a Jira key (BEP-XXXX) to auto-extract AC into plan tasks. Use when: building features, refactoring code, implementing tickets, or any multi-step development task. Triggers: dev loop, build feature, implement ticket, /team-dev-loop."
 argument-hint: "[task-description-or-jira-key] [--quick?]"
 compatibility: "Requires gh CLI, git, CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1 (degrades gracefully without)"
 disable-model-invocation: true
@@ -21,6 +21,7 @@ Invoke as `/team-dev-loop [task-description-or-jira-key] [--quick?]`
 | [../../references/review-conventions.md](../../references/review-conventions.md) |
 | [../../references/review-output-format.md](../../references/review-output-format.md) |
 | [../team-review-pr/references/debate-protocol.md](../team-review-pr/references/debate-protocol.md) |
+| [jira-integration.md](../../references/jira-integration.md) — Jira detection, MCP fetch, AC extraction (loaded when Jira key detected) |
 
 ---
 
@@ -63,6 +64,16 @@ Per [workflow-modes.md](references/workflow-modes.md):
 - Multi-file feature, architectural change → **Full mode**
 - Ambiguous → ask user
 
+### Step 2.5: Jira Context (skip if no Jira)
+
+Scan `$ARGUMENTS` for Jira key (`BEP-\d+`). If found, follow [jira-integration.md](../../references/jira-integration.md) §team-dev-loop:
+
+1. Fetch ticket → extract AC and subtasks
+2. AC items become plan task constraints (Phase 2)
+3. Add Jira context to `dev-loop-context.md` (Step 3)
+
+If no Jira key → skip to Step 3.
+
 ### Step 3: Create Context Artifact
 
 Write `dev-loop-context.md` at project root:
@@ -79,6 +90,9 @@ Branch: {branch_name}
 
 ## Hard Rules
 {project_hard_rules}
+
+## Jira Ticket (if provided)
+{jira_context_or_empty}
 ```
 
 ### Step 4: Initialize Progress Tracker
@@ -249,7 +263,7 @@ Critical: X | Warning: Y | Info: Z
 
 ### Phase 5: Assess (Lead Only)
 
-Count findings from `review-findings-{N}.md`:
+Count findings from `review-findings-{N}.md`. If Jira ticket was provided, also verify AC coverage — each AC must have corresponding implementation + test. Unverified AC = Critical finding.
 
 ```text
 Critical == 0 AND Warning == 0?

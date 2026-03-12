@@ -1,7 +1,7 @@
 ---
 name: team-review-pr
-description: "Agent Teams PR review with adversarial debate — 3 reviewer teammates review independently then challenge each other's findings to reduce false positives. Use when: reviewing complex PRs, high-stakes changes where false positive reduction matters, or multi-perspective review with cross-validation. Triggers: team review, debate review, /team-review-pr."
-argument-hint: "[pr-number] [Author|Reviewer?]"
+description: "Agent Teams PR review with adversarial debate — 3 reviewer teammates review independently then challenge each other's findings to reduce false positives. Supports optional Jira ticket (BEP-XXXX) for AC verification. Use when: reviewing complex PRs, high-stakes changes, or multi-perspective review. Triggers: team review, debate review, /team-review-pr."
+argument-hint: "[pr-number] [jira-key?] [Author|Reviewer?]"
 compatibility: "Requires gh CLI, git, and CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1 enabled in settings"
 disable-model-invocation: true
 allowed-tools: Read, Grep, Glob, Bash(gh *), Bash(git *)
@@ -9,7 +9,7 @@ allowed-tools: Read, Grep, Glob, Bash(gh *), Bash(git *)
 
 # Team PR Review — Adversarial Debate
 
-Invoke as `/team-review-pr [pr-number] [Author|Reviewer]`
+Invoke as `/team-review-pr [pr-number] [jira-key?] [Author|Reviewer]`
 
 ## References
 
@@ -19,6 +19,7 @@ Invoke as `/team-review-pr [pr-number] [Author|Reviewer]`
 | [teammate-prompts.md](references/teammate-prompts.md) |
 | [review-output-format.md](../../references/review-output-format.md) |
 | [review-conventions.md](../../references/review-conventions.md) |
+| [jira-integration.md](../../references/jira-integration.md) — Jira detection, MCP fetch, AC verification (loaded when Jira key detected) |
 
 ---
 
@@ -30,7 +31,7 @@ Invoke as `/team-review-pr [pr-number] [Author|Reviewer]`
 **PR title:** !`gh pr view $0 --json title,body,labels,author --jq '{title,body,labels: [.labels[].name],author: .author.login}' 2>/dev/null`
 **Changed files:** !`gh pr diff $0 --name-only 2>/dev/null`
 
-**Args:** `$0`=PR# (required) · `$1`=Author/Reviewer (default: Author)
+**Args:** `$0`=PR# (required) · `$1`=Jira key or Author/Reviewer · `$2`=Author/Reviewer
 **Modes:** Author = fix code · Reviewer = comment only (in Thai)
 **Role:** Tech Lead — improve code health via architecture, mentoring, team standards.
 
@@ -65,6 +66,20 @@ If Massive: skip to simplified single-session review (debate overhead not worth 
 
 ---
 
+## Phase 0.5: Ticket Understanding (skip if no Jira)
+
+Scan `$ARGUMENTS` for Jira key (`BEP-\d+`). If found, follow [jira-integration.md](../../references/jira-integration.md) §team-review-pr:
+
+1. Fetch ticket → summarize Problem / Value / Scope
+2. Parse AC → numbered checklist
+3. Map each AC to PR diff files — flag missing implementation or tests as Critical
+4. Pass AC summary to Phase 2 teammate prompts
+5. Include AC verification table in Phase 4 output
+
+If no Jira key → skip to Phase 1.
+
+---
+
 ## Phase 1: Project Detection
 
 Use the `Project` JSON from the header (output of `detect-project.sh`). It contains: `project`, `repo`, `validate`, `review_skill`, `base_branch`, `branch`.
@@ -91,7 +106,7 @@ Create an agent team named `review-pr-$0` with 3 reviewer teammates using prompt
 - **Teammate 2 — Architecture & Performance:** Focus on N+1 (#3), DRY (#4), flatten (#5), SOLID (#6), elegance (#7)
 - **Teammate 3 — DX & Testing:** Focus on naming (#8), docs (#9), testability (#11), debugging (#12)
 
-Insert project Hard Rules (from Phase 1) and PR number into each prompt. All teammates are READ-ONLY.
+Insert project Hard Rules (from Phase 1) and PR number into each prompt. If Jira AC was parsed (Phase 0.5), include AC summary so teammates can verify coverage in their focus area. All teammates are READ-ONLY.
 
 ### Step 2: Wait for all reviews
 
@@ -190,9 +205,10 @@ Replace the "Agents" column with "Consensus":
 
 ### Author Mode
 
-1. Fix all Critical findings first, then Warning, then Info
+1. Fix AC-related Critical findings first (if Jira), then other Critical, Warning, Info
 2. Run project validate command (detected in Phase 1)
 3. Output fixes table per [review-output-format.md](../../references/review-output-format.md)
+4. If Jira: show AC checklist with pass/fail status
 
 ### Reviewer Mode
 

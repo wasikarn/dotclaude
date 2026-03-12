@@ -1,7 +1,7 @@
 ---
 name: team-debug
-description: "Agent Teams debugging with parallel DX analysis — Investigator traces root cause while DX Analyst audits observability, error handling, and test coverage. Fixer implements both bug fix and DX improvements. Use when: debugging complex bugs, production incidents, bugs with poor error messages, or when you want to harden the affected area. Triggers: debug, team debug, investigate bug, /team-debug."
-argument-hint: "[bug-description] [--quick?]"
+description: "Agent Teams debugging with parallel DX analysis — Investigator traces root cause while DX Analyst audits observability, error handling, and test coverage. Pass a Jira key (BEP-XXXX) to enrich bug context from ticket details. Use when: debugging complex bugs, production incidents, or when you want to harden the affected area. Triggers: debug, team debug, investigate bug, /team-debug."
+argument-hint: "[bug-description-or-jira-key] [--quick?]"
 compatibility: "Requires gh CLI, git, and CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1 (degrades gracefully without)"
 disable-model-invocation: true
 allowed-tools: Read, Grep, Glob, Bash(git *), Bash(gh *)
@@ -9,7 +9,7 @@ allowed-tools: Read, Grep, Glob, Bash(git *), Bash(gh *)
 
 # Team Debug — Systematic Debugging with DX
 
-Invoke as `/team-debug [bug-description] [--quick?]`
+Invoke as `/team-debug [bug-description-or-jira-key] [--quick?]`
 
 ## References
 
@@ -19,6 +19,7 @@ Invoke as `/team-debug [bug-description] [--quick?]`
 | [dx-checklist.md](references/dx-checklist.md) |
 | [phase-gates.md](references/phase-gates.md) |
 | [../../references/review-conventions.md](../../references/review-conventions.md) |
+| [jira-integration.md](../../references/jira-integration.md) — Jira detection, MCP fetch, bug enrichment (loaded when Jira key detected) |
 
 ---
 
@@ -53,6 +54,17 @@ If TeamCreate tool is not available → check graceful degradation:
 Use the `Project` JSON from the header (output of `detect-project.sh`). It contains: `project`, `repo`, `validate`, `review_skill`, `base_branch`, `branch`.
 
 If `review_skill` is non-empty, load project-specific Hard Rules from the corresponding `tathep-*-review-pr` skill.
+
+### Step 1.5: Jira Context (skip if no Jira)
+
+Scan `$ARGUMENTS` for Jira key (`BEP-\d+`). If found, follow [jira-integration.md](../../references/jira-integration.md) §team-debug:
+
+1. Fetch ticket — enrich bug description with ticket details
+2. Check linked issues — related bugs may share root cause
+3. Use ticket priority to inform severity classification (Step 2)
+4. Add Jira context to `debug-context.md` (Step 4) and Investigator prompt (Phase 1)
+
+If no Jira key — skip to Step 2.
 
 ### Step 2: Classify Severity
 
