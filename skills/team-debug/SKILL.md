@@ -242,7 +242,7 @@ If session compacts mid-workflow, re-read in order:
 - **No debate phase** — debugging needs speed, not consensus
 - **Investigator is READ-ONLY** — no file modifications during Phase 1
 - **DX Analyst is READ-ONLY** — no file modifications during Phase 1
-- **Fixer follows Fix Plan** — no scope creep beyond investigation findings
+- **Fixer follows Fix Plan** — no scope creep beyond investigation findings. Fix with the simplest correct approach; do not introduce abstractions or refactors not in the Fix Plan
 - **DX scope = affected area only** — not codebase-wide improvements
 - **3 fix attempts max** — beyond that is an architectural problem, escalate to user
 - **Hard Rules from project detection** — loaded dynamically, cannot be skipped

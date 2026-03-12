@@ -159,8 +159,9 @@ Plan structure:
 2. Approach with rationale
 3. File-by-file changes
 4. Trade-offs
-5. Test strategy
-6. Task list — tag each task `[P]` (parallelizable) or `[S]` (sequential)
+5. Simplicity check — is this the simplest approach? Flag speculative features or abstractions not required by the task
+6. Test strategy
+7. Task list — tag each task `[P]` (parallelizable) or `[S]` (sequential)
 
 ### Step 2: Annotation Cycle
 
@@ -357,6 +358,7 @@ If session compacts mid-workflow, re-read in order:
 - **Hard Rules cannot be dropped** — only reclassified with evidence
 - **Commit per task** — enables clean revert if fix introduces regressions
 - **Artifacts persist on disk** — `dev-loop-context.md`, `plan.md`, `research.md`, `review-findings-*.md` survive context compression
+- **YAGNI** — implement only what the task requires; speculative abstractions and "just in case" code are review findings
 
 ## Success Criteria
 

@@ -81,10 +81,11 @@ RESEARCH: Read research.md for codebase patterns (if exists).
 
 RULES:
 1. Follow the plan exactly — no scope creep
-2. TDD: write failing test → implement → green (for non-trivial logic)
-3. Commit after each completed task
-4. Run validate command after each commit: {validate_command}
-5. If blocked, message the team lead with specifics — do not guess
+2. Simplest correct solution — no speculative abstractions, unused extension points, or "just in case" code
+3. TDD: write failing test → implement → green (for non-trivial logic)
+4. Commit after each completed task
+5. Run validate command after each commit: {validate_command}
+6. If blocked, message the team lead with specifics — do not guess
 
 CONVENTIONS:
 {project_conventions}

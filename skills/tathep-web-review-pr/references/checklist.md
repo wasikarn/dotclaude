@@ -57,6 +57,7 @@ For ✅/❌ code examples → [examples.md](examples.md)
 - No redundant conditions (`if (x === true)` → `if (x)`) → 🟡
 - Derive state — no `useEffect` just to sync computed values → 🟡
 - No premature abstraction for single-use logic → 🟡
+- Simplest correct solution — no over-engineering → 🟡
 
 ### #5 Flatten Structure
 

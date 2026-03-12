@@ -9,6 +9,7 @@ Shared conventions for all `tathep-*-review-pr` skills.
 - Mentor: show better patterns, cite reference modules as examples
 - Respect author's approach when valid — don't impose preference
 - Flag scope creep, suggest splitting large PRs
+- Prefer simplest correct solution — flag over-engineering (unnecessary abstraction, speculative generality) and under-engineering (missing error handling, inadequate tests) equally
 
 ## PR Size
 
