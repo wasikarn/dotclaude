@@ -5,6 +5,7 @@ context: fork
 agent: general-purpose
 argument-hint: "[--quick?] [--dry-run?]"
 compatibility: "Run from within the tathep-platform-api repo"
+model: haiku
 ---
 
 # Self-Healing Env Validation

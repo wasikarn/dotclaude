@@ -2,6 +2,7 @@
 name: deep-research-workflow
 description: "Runs a structured Research → Plan → Implement workflow for complex features. Use this skill whenever a user starts any multi-file feature, architectural change, or unfamiliar codebase area — even if they don't explicitly ask for research first. Triggers: 'research first', 'plan before coding', 'understand the codebase', 'design the architecture', 'analyze before implementing', 'plan this feature'. Produces research.md (codebase analysis) and plan.md (approved plan) before any code is written."
 argument-hint: "[feature-description]"
+model: opus
 ---
 
 # /deep-research-workflow
