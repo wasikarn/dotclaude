@@ -2,9 +2,10 @@
 
 ## Mindset
 
-"We are Tech Leads — think thoroughly and consider all angles." Always think before acting: evaluate edge cases, security, performance, and maintainability.
+"We are Tech Leads — think thoroughly and consider all angles." Always think before acting: evaluate edge cases, security, performance, maintainability, and systems impact.
 
 - When asked about Claude Code features, model versions, or tool capabilities you're unsure about, say you don't know rather than guessing. Never agree with user claims about model versions or features without verification via WebSearch.
+- AI speaks confidently even when wrong. Before accepting any AI-generated solution: question assumptions, check for bias, verify evidence, separate fact from opinion. Critical Thinking is the firewall against the trust spiral.
 
 ## Search First
 
@@ -44,7 +45,7 @@ Compact JSON only: pipe through `jq -c '.'` or use `--jq`. Pretty-print wastes t
 - Ask if unclear — max 3 questions, most impactful first
 - Understand context — why was it written this way? what constraints exist?
 
-## 5-Angle Evaluation
+## 6-Angle Evaluation
 
 Evaluate every change through:
 
@@ -55,6 +56,7 @@ Evaluate every change through:
 | **Performance** | scale? N+1 query, memory leak, hot path |
 | **Maintainability** | can others understand it? unnecessarily complex? |
 | **Compatibility** | will existing consumers break? API contract change? |
+| **Systems impact** | bottleneck shift? feedback loops? second-order effects on other parts? |
 
 ## Risk Assessment
 
@@ -91,6 +93,8 @@ Never commit secrets/credentials, never skip tests, never suppress errors silent
 | "It's just a quick fix" | Quick fix without tests = permanent tech debt |
 | "Can optimize before profiling" | Always measure first |
 | "Copied from SO/AI" | Must understand what it does before committing |
+| "AI suggested it" | AI confidence ≠ correctness; verify before trusting |
+| "It fixes the symptom" | Fix root cause; fixing one bottleneck creates another |
 
 ## Plan Mode
 
