@@ -13,7 +13,8 @@ REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 ASSET_TYPES="skills:$HOME/.claude/skills agents:$HOME/.claude/agents output-styles:$HOME/.claude/output-styles hooks:$HOME/.claude/hooks commands:$HOME/.claude/commands scripts:$HOME/.claude/scripts"
 
 # Dotfiles: individual repo_file:claude_target pairs (space-separated, pipe-delimited entries)
-DOTFILES="statusline.sh:$HOME/.claude/statusline.sh|global-CLAUDE.md:$HOME/.claude/CLAUDE.md|zshrc:$HOME/.zshrc"
+# Note: zshrc is intentionally excluded — use link-skill.sh --zshrc to opt-in
+DOTFILES="statusline.sh:$HOME/.claude/statusline.sh|global-CLAUDE.md:$HOME/.claude/CLAUDE.md"
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
 link_item() {
@@ -124,6 +125,10 @@ link_one_skill() {
 case "${1:-}" in
   --list)
     list_status
+    ;;
+  --zshrc)
+    echo "Linking zshrc → ~/.zshrc"
+    link_item "$REPO_ROOT/zshrc" "$HOME/.zshrc"
     ;;
   "")
     echo "Linking all assets → ~/.claude/"

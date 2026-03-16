@@ -36,7 +36,7 @@ check_prereqs() {
     fi
   done
 
-  for cmd in gh node npm bun; do
+  for cmd in gh node npm bun shellcheck; do
     if command -v "$cmd" &>/dev/null; then
       info "$cmd — $(command -v "$cmd")"
     else
@@ -150,8 +150,30 @@ create_dirs
 section "settings.json"
 generate_settings "$USERNAME" "$ALLOWED_DOMAINS"
 
+section "QMD"
+if command -v qmd &>/dev/null; then
+  info "qmd — already installed ($(command -v qmd))"
+elif command -v bun &>/dev/null; then
+  echo "  Installing qmd via bun..."
+  bun install -g qmd && info "qmd — installed" || warn "qmd — install failed, run: bun install -g qmd"
+else
+  warn "qmd — skipped (bun not found). Install bun first, then: bun install -g qmd"
+fi
+
 section "Symlinks"
 bash "$REPO_ROOT/scripts/link-skill.sh"
+
+section "zshrc (optional)"
+echo ""
+echo "  dotclaude includes an optimized ~/.zshrc (atuin, fzf-tab, lazy NVM, ~0.11s startup)."
+echo "  WARNING: This will REPLACE your existing ~/.zshrc."
+echo ""
+read -r -p "  Link dotclaude zshrc → ~/.zshrc? [y/N]: " LINK_ZSHRC
+if [[ "${LINK_ZSHRC,,}" == "y" ]]; then
+  bash "$REPO_ROOT/scripts/link-skill.sh" --zshrc
+else
+  info "zshrc — skipped (run 'bash scripts/link-skill.sh --zshrc' later to opt-in)"
+fi
 
 echo ""
 echo "╔══════════════════════════════════════╗"
@@ -160,5 +182,5 @@ echo "╚═══════════════════════�
 echo ""
 echo "  Next steps:"
 echo "  • Restart Claude Code to pick up new settings"
-echo "  • Run 'qmd embed' in project directories to index local codebases"
+echo "  • Run 'qmd update && qmd embed' in each project directory to index codebases"
 echo ""
