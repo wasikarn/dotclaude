@@ -208,7 +208,12 @@ Lead merges all explorer findings into `research.md` at project root. Structure:
 
 ## Phase 2: Plan (Lead Only)
 
-### Step 1: Write Plan
+### Step 1: Enter Plan Mode (Full mode only)
+
+**Full mode:** Call `EnterPlanMode` — uses Opus model for higher-quality planning.
+**Quick/Hotfix mode:** Skip — write `plan.md` directly without entering plan mode.
+
+### Step 2: Write Plan
 
 Create `plan.md` at project root. Source material:
 
@@ -226,11 +231,13 @@ Plan structure:
 7. Task list — tag each task `[P]` (parallelizable) or `[S]` (sequential)
 8. Task granularity — each task must specify: exact file(s) to modify, what to change (specific — not "update the logic"), expected behavior after change, how to verify (test to run or output to check). Each task must be completable in one worker turn — if not, split further.
 
-### Step 2: Annotation Cycle
+### Step 3: Annotation Cycle
 
 Present plan to user. User may correct, reject, add constraints, or redirect.
 Write all corrections into `plan.md` `## Annotations` section.
 Repeat until user approves.
+
+**Full mode:** After user approves — call `ExitPlanMode` before proceeding.
 
 **GATE:** User approves plan → proceed to Implement-Review Loop.
 
