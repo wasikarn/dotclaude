@@ -57,6 +57,27 @@ Use the `Project` JSON from the header (output of `detect-project.sh`). It conta
 
 If `review_skill` is non-empty, load project-specific Hard Rules from the corresponding `tathep-*-review-pr` skill.
 
+### Step 1.5: Pending PRs Check
+
+```bash
+gh pr list --author @me --state open --json number,title,headRefName,createdAt \
+  --jq '.[] | "#\(.number) \(.headRefName) — \(.title)"'
+```
+
+If open PRs exist from current user:
+
+```text
+Open PRs found:
+  #1941 feature/BEP-3407 — feat: billboard visibility override
+  #1938 fix/BEP-3210 — fix: coupon double-decrement
+
+Continue with new task, or switch to one of these?
+```
+
+- User picks existing PR → stop, suggest `/team-respond-review {pr}` or `/team-review-pr {pr} Author` instead
+- User confirms new task → proceed (note: stale PRs may need cleanup later)
+- No open PRs → proceed silently
+
 ### Step 2: Classify Mode
 
 Per [workflow-modes.md](references/workflow-modes.md):

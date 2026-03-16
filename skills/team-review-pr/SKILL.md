@@ -53,7 +53,34 @@ If TeamCreate tool is not available → check graceful degradation:
 
 ---
 
-## Phase 0: PR Scope Assessment
+## Phase 0: Worktree Setup (Reviewer mode only)
+
+In **Reviewer mode**, check out the PR in an isolated worktree to avoid disrupting the current working tree:
+
+```bash
+# Check if PR branch already checked out somewhere
+git worktree list
+
+# If not, create worktree
+gh pr checkout $0 --worktree /tmp/review-pr-$0
+cd /tmp/review-pr-$0
+```
+
+```text
+Worktree already exists for this PR? → use it, skip creation
+On the PR branch already? → skip (no worktree needed)
+Author mode? → skip entirely (fixes happen in-place on current branch)
+```
+
+Clean up after Phase 6:
+
+```bash
+git worktree remove /tmp/review-pr-$0
+```
+
+---
+
+## Phase 0.1: PR Scope Assessment
 
 Parse `Diff stat` from header. Classify per [review-conventions.md](../../references/review-conventions.md) size thresholds:
 
@@ -67,7 +94,7 @@ If Massive: skip to simplified single-session review (debate overhead not worth 
 
 ---
 
-## Phase 0.5: Ticket Understanding (skip if no Jira)
+## Phase 0.6: Ticket Understanding (skip if no Jira)
 
 Scan `$ARGUMENTS` for Jira key (`BEP-\d+`). If found, follow [jira-integration.md](../../references/jira-integration.md) §team-review-pr:
 

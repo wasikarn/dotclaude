@@ -177,7 +177,7 @@ Always verify:
 - [ ] `*.page.tsx` naming for all page files
 - [ ] OFetch used for HTTP (not Axios unless upload with progress)
 - [ ] `keepPreviousData` disabled when filter params change
-- [ ] `npm run lint@fix` (uses `@` not `:`) for linting
+- [ ] `npm run lint:fix` for linting
 - [ ] v1/v2 modules: `ad` (v1) and `adV2` — do not mix
 - [ ] Remote images only from: `upslip.sgp1.digitaloceanspaces.com`, `ui-avatars.com`, `placehold.co`
 

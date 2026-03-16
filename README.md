@@ -20,13 +20,13 @@ bash scripts/link-skill.sh --list
 
 ## Contents
 
-### Skills (23)
+### Skills (24)
 
 | Category | Skills | Description |
 | --- | --- | --- |
 | **PR Review** | `tathep-api-review-pr`, `tathep-web-review-pr`, `tathep-admin-review-pr`, `tathep-video-review-pr`, `tathep-agent-review-pr` | Project-specific PR review — 7 parallel agents, Jira AC verification, 12-point checklist, QG scoring |
 | **Spec-Driven Dev** | `spec-kit`, `speckit-constitution`, `speckit-specify`, `speckit-clarify`, `speckit-plan`, `speckit-tasks`, `speckit-implement`, `speckit-analyze`, `speckit-checklist`, `speckit-taskstoissues` | 6-step SDD workflow from requirements to working code |
-| **Team Workflows** | `team-debug`, `team-dev-loop`, `team-review-pr` | Multi-agent team patterns — debugging, dev loop, review |
+| **Team Workflows** | `team-debug`, `team-dev-loop`, `team-review-pr`, `team-respond-review` | Multi-agent team patterns — debugging, dev loop, review, respond to review comments |
 | **Thinking** | `systems-thinking` | Causal Loop Diagram analysis for architecture decisions and bottleneck diagnosis |
 | **Database** | `postgresql-schema-design` | Schema design, data types, indexing strategies, FK gotchas |
 | **Utilities** | `deep-research-workflow`, `optimize-context`, `env-heal` | Research-first workflow, CLAUDE.md optimizer, env var healing |
@@ -40,15 +40,23 @@ bash scripts/link-skill.sh --list
 | `tathep-reviewer` | sonnet | Code reviewer with persistent memory + preloaded skills |
 | `skill-validator` | sonnet | Validates SKILL.md against best practices |
 
-### Hooks (9)
+### Hooks (15)
+
+> **Critical:** `skill-routing.sh` is required for reliable skill auto-triggering. Without it, skills activate only ~20% of the time. `install.sh` sets this up automatically via `settings.json`.
 
 | Hook | Event | Purpose |
 | --- | --- | --- |
+| `skill-routing.sh` | UserPromptSubmit | **Critical** — Forces Claude to evaluate all skills before responding (~84% trigger rate) |
 | `session-start-context.sh` | SessionStart | Inject git state + project detection |
 | `post-compact-context.sh` | SessionStart[compact] | Re-inject context after compaction |
 | `auto-test-env.sh` | PostToolUse[Edit\|Write] | Auto-detect test framework after file edits |
 | `protect-files.sh` | PreToolUse[Edit\|Write] | Block edits to protected config files |
 | `session-summary-hook.sh` | PostToolUse[Bash] | Track session activity |
+| `rtk-rewrite.sh` | PreToolUse[Bash] | Rewrite bash commands through RTK for token savings |
+| `qmd-pre-search.sh` | PreToolUse[Grep] | Inject QMD semantic search results before grep |
+| `shellcheck-written-scripts.sh` | PostToolUse[Write] | Auto-validate shell scripts after writing |
+| `patch-plugin-skills.sh` | — | Patch plugin skill files after updates |
+| `play-sound.sh` | Notification/Stop | macOS sound feedback (CS:S sounds) |
 | `dev-loop-idle-nudge.sh` | Stop | Nudge dev-loop team to continue |
 | `dev-loop-task-gate.sh` | Stop | Gate dev-loop completion |
 | `review-debate-idle-nudge.sh` | Stop | Nudge review-debate to continue |

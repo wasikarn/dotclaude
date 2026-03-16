@@ -10,6 +10,7 @@ Shared conventions for all `tathep-*-review-pr` skills.
 - Respect author's approach when valid — don't impose preference
 - Flag scope creep, suggest splitting large PRs
 - Prefer simplest correct solution — flag over-engineering (unnecessary abstraction, speculative generality) and under-engineering (missing error handling, inadequate tests) equally
+- YAGNI: code for the ticket, not hypothetical future requirements — flag "just in case" abstractions, extension points, and unused parameters as over-engineering
 
 ## PR Size
 
