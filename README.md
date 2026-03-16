@@ -20,16 +20,15 @@ bash scripts/link-skill.sh --list
 
 ## Contents
 
-### Skills (24)
+### Skills (13)
 
 | Category | Skills | Description |
 | --- | --- | --- |
-| **PR Review** | `tathep-api-review-pr`, `tathep-web-review-pr`, `tathep-admin-review-pr`, `tathep-video-review-pr`, `tathep-agent-review-pr` | Project-specific PR review — 7 parallel agents, Jira AC verification, 12-point checklist, QG scoring |
-| **Spec-Driven Dev** | `spec-kit`, `speckit-constitution`, `speckit-specify`, `speckit-clarify`, `speckit-plan`, `speckit-tasks`, `speckit-implement`, `speckit-analyze`, `speckit-checklist`, `speckit-taskstoissues` | 6-step SDD workflow from requirements to working code |
-| **Team Workflows** | `team-debug`, `team-dev-loop`, `team-review-pr`, `team-respond-review` | Multi-agent team patterns — debugging, dev loop, review, respond to review comments |
+| **PR Review** | `tathep-api-review-pr`, `tathep-web-review-pr`, `tathep-admin-review-pr`, `tathep-video-review-pr`, `tathep-agent-review-pr` | Project-specific Hard Rules source — auto-loaded by `team-review-pr` via `detect-project.sh` |
+| **Team Workflows** | `team-debug`, `team-dev-loop`, `team-review-pr`, `team-respond-review` | Full DLC — debug, feature dev (`--quick`/`--hotfix`), adversarial PR review, respond to review comments |
 | **Thinking** | `systems-thinking` | Causal Loop Diagram analysis for architecture decisions and bottleneck diagnosis |
 | **Database** | `postgresql-schema-design` | Schema design, data types, indexing strategies, FK gotchas |
-| **Utilities** | `deep-research-workflow`, `optimize-context`, `env-heal` | Research-first workflow, CLAUDE.md optimizer, env var healing |
+| **Utilities** | `optimize-context`, `env-heal` | CLAUDE.md optimizer, env var healing |
 
 ### Agents (4)
 

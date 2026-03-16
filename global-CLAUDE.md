@@ -116,6 +116,17 @@ Never commit secrets/credentials, never skip tests, never suppress errors silent
 - Extremely concise; sacrifice grammar.
 - End with unresolved questions, if any.
 
+## DLC Workflows
+
+| Task | Command |
+| --- | --- |
+| Feature / bug fix | `/team-dev-loop BEP-XXXX` |
+| Urgent production fix | `/team-dev-loop BEP-XXXX --hotfix` |
+| PR review (as reviewer) | `/team-review-pr {pr} Reviewer` |
+| PR review (as author) | `/team-review-pr {pr} Author` |
+| Address review comments | `/team-respond-review {pr}` |
+| Debug production issue | `/team-debug` |
+
 ## PR Reviews
 
 - Read each changed file's diff ONCE, take structured notes, then synthesize
