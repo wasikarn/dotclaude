@@ -1,7 +1,7 @@
 ---
 name: team-dev-loop
-description: "Full development loop with Agent Teams — Research → Plan → Implement → Review → Ship with iterative fix-review loop. Pass a Jira key (BEP-XXXX) to auto-extract AC into plan tasks. Use when: building features, refactoring code, implementing tickets, or any multi-step development task. Triggers: dev loop, build feature, implement ticket, /team-dev-loop."
-argument-hint: "[task-description-or-jira-key] [--quick?]"
+description: "Full development loop with Agent Teams — Research → Plan → Implement → Review → Ship with iterative fix-review loop. Pass a Jira key (BEP-XXXX) to auto-extract AC into plan tasks. Use when: building features, refactoring code, implementing tickets, or any multi-step development task. Use --hotfix for urgent production fixes that branch from main and auto-create backport PR. Triggers: dev loop, build feature, implement ticket, hotfix, /team-dev-loop."
+argument-hint: "[task-description-or-jira-key] [--quick?] [--hotfix?]"
 compatibility: "Requires gh CLI, git, CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1 (degrades gracefully without)"
 disable-model-invocation: true
 allowed-tools: Read, Grep, Glob, Bash(git *), Bash(gh *)
@@ -9,7 +9,7 @@ allowed-tools: Read, Grep, Glob, Bash(git *), Bash(gh *)
 
 # Team Dev Loop — Full Development Workflow
 
-Invoke as `/team-dev-loop [task-description-or-jira-key] [--quick?]`
+Invoke as `/team-dev-loop [task-description-or-jira-key] [--quick?] [--hotfix?]`
 
 ## References
 
@@ -31,7 +31,7 @@ Invoke as `/team-dev-loop [task-description-or-jira-key] [--quick?]`
 **Recent commits:** !`git log --oneline -5 2>/dev/null`
 **Project:** !`bash "${CLAUDE_SKILL_DIR}/../../scripts/detect-project.sh" 2>/dev/null`
 
-**Args:** `$0`=task description or Jira key (required) · `$1`=`--quick` (optional, skip research)
+**Args:** `$0`=task description or Jira key (required) · `$1`=`--quick` (skip research) · `$1`=`--hotfix` (urgent production fix)
 
 Read CLAUDE.md first — auto-loaded, contains project patterns and conventions.
 
@@ -82,6 +82,7 @@ Continue with new task, or switch to one of these?
 
 Per [workflow-modes.md](references/workflow-modes.md):
 
+- `--hotfix` flag → **Hotfix mode** (skip Phase 1, branch from `main`, PR to `main` + backport)
 - `--quick` flag or simple bug fix → **Quick mode** (skip Phase 1)
 - Multi-file feature, architectural change → **Full mode**
 - Ambiguous → ask user
@@ -101,7 +102,12 @@ If no Jira key → skip to Step 3.
 Check `branch` from the Project JSON against `base_branch`:
 
 ```text
-Already on a feature/fix branch (not base)?
+--hotfix mode?
+├→ Switch to main first: git checkout main && git pull
+├→ Jira key found? → create: hotfix/BEP-XXX-{slug}
+└→ No Jira key?   → create: hotfix/{slug}
+
+Already on a feature/fix/hotfix branch (not base)?
 └→ Proceed as-is — assume intentional
 
 On base branch (main/develop)?
@@ -116,7 +122,8 @@ On base branch (main/develop)?
 
 Run: `git checkout -b {branch_name}`
 
-**GATE:** Branch is a non-base branch → proceed.
+**GATE (Hotfix):** On `hotfix/*` branch branched from `main` → proceed.
+**GATE (Normal):** Branch is a non-base branch → proceed.
 
 ### Step 3: Create Context Artifact
 
@@ -126,7 +133,7 @@ Write `dev-loop-context.md` at project root:
 # Dev Loop Context
 
 Task: {task_description}
-Mode: {Full|Quick}
+Mode: {Full|Quick|Hotfix}
 Project: {project_name}
 Validate: {validate_command}
 Started: {date}
@@ -146,7 +153,7 @@ Branch: {branch_name}
 Mode: {mode} | Project: {project} | Started: {date}
 
 - [x] Phase 0: Triage — {mode} mode, {project} detected
-- [ ] Phase 1: Research [Full only]
+- [ ] Phase 1: Research [Full only — skip for Quick/Hotfix]
 - [ ] Phase 2: Plan
 - [ ] Loop iteration 1/3
   - [ ] Phase 3: Implement
@@ -393,6 +400,25 @@ Present options to user:
 
 Run: `gh pr create --title "{title}" --body "{description}" --base {base_branch}`
 
+#### Hotfix Backport (--hotfix mode only)
+
+After the hotfix PR is created (targeting `main`), create a backport PR to `develop`:
+
+```bash
+# Create backport branch from develop
+git checkout develop && git pull
+git checkout -b backport/{hotfix-branch-name}
+git cherry-pick {fix_commit_sha(s)}
+
+# Push and open backport PR
+gh pr create \
+  --title "backport: {original_hotfix_title}" \
+  --body "Backport of #{hotfix_pr_number} to develop.\n\nOriginal: #{hotfix_pr_number}" \
+  --base develop
+```
+
+If cherry-pick conflicts → note the conflict in backport PR description, assign to author.
+
 ### Step 3: Cleanup
 
 1. Shut down all remaining teammates
@@ -412,6 +438,8 @@ Run: `gh pr create --title "{title}" --body "{description}" --base {base_branch}
 - **Commit per task** — enables clean revert if fix introduces regressions
 - **Artifacts persist on disk** — `dev-loop-context.md`, `plan.md`, `research.md`, `review-findings-*.md` survive context compression
 - **YAGNI** — implement only what the task requires; speculative abstractions and "just in case" code are review findings
+- **Hotfix scope** — `--hotfix` touches only the broken code path; no refactoring, no unrelated improvements
+- **Hotfix backport** — every hotfix to `main` MUST have a backport PR to `develop`; skip only if `develop` already has the fix
 
 ---
 
