@@ -45,6 +45,7 @@ Every phase transition has explicit gate conditions. No phase proceeds until its
 - [ ] Project validate command passes (e.g. `npm run validate:all`)
 - [ ] Each task has at least 1 commit
 - [ ] No uncommitted changes in working tree
+- [ ] All workers shut down (TeamDelete executed or confirmed idle) — reviewers must not spawn while workers are alive
 
 Lead verifies with: `git diff {base_branch}...HEAD --stat` (scope) + `git log --oneline {base_branch}..HEAD` (commit-per-task). See Verification Gate in operational.md.
 

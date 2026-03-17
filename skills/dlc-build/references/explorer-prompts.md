@@ -11,6 +11,8 @@ TASK: {task_description}
 PROJECT: {project_name}
 PROJECT HINTS: {project_hints}
 BOOTSTRAP CONTEXT: {bootstrap_context}
+ASSIGNED SCOPE: {assigned_files_or_dirs}
+(Stay within your assigned scope — other explorers cover the rest to prevent overlap.)
 
 YOUR FOCUS: Trace execution paths in the primary area this task will touch.
 
@@ -21,7 +23,23 @@ INSTRUCTIONS:
 4. Note patterns: naming conventions, error handling, validation
 5. Identify reusable code that solves similar problems
 
-OUTPUT: Structured findings with file:line references for every claim.
+OUTPUT FORMAT:
+## Files Read
+{list of files with line ranges}
+
+## Findings
+### Execution Paths
+{findings with file:line for every claim}
+
+### Patterns & Conventions
+{findings with file:line for every claim}
+
+### Reusable Code
+{findings with file:line for every claim}
+
+### Open Questions
+{anything unclear that the plan phase should address}
+
 Send your findings to the team lead when done.
 ```
 
@@ -34,6 +52,8 @@ TASK: {task_description}
 PROJECT: {project_name}
 PROJECT HINTS: {project_hints}
 BOOTSTRAP CONTEXT: {bootstrap_context}
+ASSIGNED SCOPE: {assigned_files_or_dirs}
+(Stay within your assigned scope — other explorers cover the rest to prevent overlap.)
 
 YOUR FOCUS: Data model, dependencies, and coupling in the area this task touches.
 
@@ -45,7 +65,23 @@ INSTRUCTIONS:
 5. Check for existing tests that cover this area
 6. DB performance risks: identify unbounded queries, missing indexes on query conditions, and tables with large data volumes — flag these as constraints in findings
 
-OUTPUT: Structured findings with file:line references for every claim.
+OUTPUT FORMAT:
+## Files Read
+{list of files with line ranges}
+
+## Findings
+### Data Model
+{findings with file:line for every claim}
+
+### Dependencies & Coupling
+{findings with file:line for every claim}
+
+### Constraints & Risks
+{findings with file:line for every claim}
+
+### Open Questions
+{anything unclear that the plan phase should address}
+
 Send your findings to the team lead when done.
 ```
 
@@ -58,6 +94,8 @@ TASK: {task_description}
 PROJECT: {project_name}
 PROJECT HINTS: {project_hints}
 BOOTSTRAP CONTEXT: {bootstrap_context}
+ASSIGNED SCOPE: {assigned_files_or_dirs}
+(Stay within your assigned scope — other explorers cover the rest to prevent overlap.)
 
 YOUR FOCUS: Find similar implementations in the codebase that can serve as reference.
 
@@ -68,7 +106,23 @@ INSTRUCTIONS:
 4. Identify test patterns used for similar features
 5. List specific files to use as templates
 
-OUTPUT: Structured findings with file:line references for every claim.
+OUTPUT FORMAT:
+## Files Read
+{list of files with line ranges}
+
+## Findings
+### Reference Implementations
+{findings with file:line for every claim}
+
+### Test Patterns
+{findings with file:line for every claim}
+
+### Template Files
+{specific files recommended as implementation templates}
+
+### Open Questions
+{anything unclear that the plan phase should address}
+
 Send your findings to the team lead when done.
 ```
 
@@ -80,4 +134,5 @@ When constructing explorer prompts:
 2. Insert project-specific `PROJECT HINTS` from CLAUDE.md conventions
 3. Insert validate command from [phase-gates.md](phase-gates.md) project detection (for reference context)
 4. Explorer 3 is optional — spawn only if similar existing features exist
-5. All explorer findings are merged by lead into `.claude/dlc-build/research.md` — every section must cite file:line references
+5. **Assign non-overlapping scopes** — set `{assigned_files_or_dirs}` for each explorer. Example: Explorer 1 → `src/controllers/`, Explorer 2 → `src/models/ + migrations/`, Explorer 3 → `src/services/`. Prevents duplicate reads and conflicting findings.
+6. All explorer findings are merged by lead into `.claude/dlc-build/research.md` — every section must cite file:line references

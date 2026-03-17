@@ -62,6 +62,25 @@ If TeamCreate tool is not available → check graceful degradation:
 
 ## Phase 0: Triage (Lead Only)
 
+```text
+Phase 0 Flow:
+Step 0: Resume check ──→ existing context? ──→ Yes: ask to resume / No: proceed
+    ↓
+Step 1: Parallel triage (all concurrent)
+  1a: Detect project + domain lenses
+  1b: Check pending PRs
+  1c: Fetch Jira context (if Jira key)
+    ↓
+Step 2: Classify mode (decision tree → Full/Quick/Hotfix)
+GATE: User confirms mode ──────────────────────────────────────────┐
+    ↓                                                              │
+Step 2.5: Branch setup                                             │
+    ↓                                                              │
+Step 3: Create dev-loop-context.md artifact                        │
+    ↓                                                              │
+Step 4: Initialize progress tracker ←─────────────────────────────┘
+```
+
 ### Step 0: Resume Check
 
 Check if `.claude/dlc-build/dev-loop-context.md` exists in the current project:
@@ -72,7 +91,7 @@ Check if `.claude/dlc-build/dev-loop-context.md` exists in the current project:
 │   "Resume from Phase {N} — {task_description}? (Y/N)"
 │   ├→ Yes: Skip to the recorded phase. Re-read artifacts in order:
 │   │       1. .claude/dlc-build/dev-loop-context.md
-│   │       2. ~/.claude/plans/ — most recently modified .md
+│   │       2. Plan file: read plan_file: from YAML; fallback to ~/.claude/plans/ most recently modified .md
 │   │       3. .claude/dlc-build/review-findings-*.md (if exists)
 │   └→ No: Overwrite context file with new task.
 └→ No: Proceed with triage normally.
@@ -83,6 +102,8 @@ Check if `.claude/dlc-build/dev-loop-context.md` exists in the current project:
 Run steps 1a, 1b, 1c concurrently — all are read-only and independent:
 
 **1a — Detect Project:** Use the `Project` JSON from the header (output of `detect-project.sh`). It contains: `project`, `repo`, `validate`, `base_branch`, `branch`.
+
+After detecting the project, also **detect domain lenses** from the task description and file extensions: if task mentions auth/API/security → load [review-lenses/security.md](references/review-lenses/security.md); SQL/DB/migration → [review-lenses/database.md](references/review-lenses/database.md); React/Next.js/frontend → [review-lenses/frontend.md](references/review-lenses/frontend.md); performance/bundle/query → [review-lenses/performance.md](references/review-lenses/performance.md); TypeScript types → [review-lenses/typescript.md](references/review-lenses/typescript.md). Multiple lenses can stack. Inject into `{domain_lenses}` placeholder in reviewer prompts at Phase 4.
 
 - If `validate` is empty → add to confirmation prompt: "No validate command detected. What should I run to verify? (e.g. `npm test`)"
 - Check for project-specific Hard Rules at `{project_root}/.claude/skills/review-rules/hard-rules.md`:
@@ -140,17 +161,16 @@ project: "{project_name}"
 validate: "{validate_command}"
 started: "{YYYY-MM-DD}"
 jira: "{JIRA-KEY-or-empty}"
+plan_file: ""
 tasks_completed: []
 ---
 ```
 
-Markdown body below frontmatter: Hard Rules summary, Jira context (AC items). Update `phase:` field at every gate transition. Append completed task IDs to `tasks_completed:` list after each worker commit (enables granular crash recovery).
+Markdown body below frontmatter: Hard Rules summary, Jira context (AC items). Update `phase:` field at every gate transition. **Lead is sole writer of this file** — update `tasks_completed:` when workers send completion messages (prevents YAML race from parallel workers). Update `plan_file:` with the plan path immediately after Phase 2 EnterPlanMode returns the plan file path.
 
 ### Step 4: Initialize Progress Tracker
 
 Post a checkbox list in conversation: Phase 0 (done), Phase 1 (Full only), Phase 2, Loop iterations 1-3 with nested Phase 3/4/5, Phase 6. Update checkboxes as each phase completes.
-
-**GATE:** User confirms mode → proceed.
 
 ---
 
@@ -205,7 +225,7 @@ Source material:
 7. Task list — tag each task `[P]` (parallelizable) or `[S]` (sequential)
 8. Task granularity — each task must specify: exact file(s) to modify, what to change (specific — not "update the logic"), expected behavior after change, how to verify (test to run or output to check). Each task must be completable in one worker turn — if not, split further.
 
-Present plan to user — iterate via annotations until approved. Call `ExitPlanMode` after user approves.
+Present plan to user — iterate via annotations until approved. Call `ExitPlanMode` after user approves. **Immediately update `plan_file:` in `.claude/dlc-build/dev-loop-context.md`** with the path returned by the plan system.
 
 **GATE:** User approves plan → proceed to Implement-Review Loop.
 
@@ -235,7 +255,7 @@ Load [worker-prompts.md](references/worker-prompts.md) now. Create 1-2 worker te
 - `[S]` tasks: 1 worker, sequential
 - `[P]` tasks: 2 workers with non-overlapping file assignments
 
-**Controller provides full task text** — copy task descriptions into the worker creation prompt. Workers follow TDD: failing test → implement → green → commit. After each commit, worker appends task ID to `tasks_completed:` in dev-loop-context.md.
+**Lead provides full task text** — copy task descriptions into the worker creation prompt. Workers follow TDD: failing test → implement → green → commit. After each commit, worker sends completion message to lead; lead updates `tasks_completed:` in dev-loop-context.md.
 
 Per-commit spot-check: after each worker task commit, lead runs `git show HEAD --stat` — verify file scope matches task, no unintended files touched.
 
@@ -248,7 +268,9 @@ Load [fixer-prompts.md](references/fixer-prompts.md) now. Create 1 fixer. Fixer 
 If fixer introduces a NEW Critical: revert + message lead.
 If same finding fails 3× → see 3-Fix Rule in [operational.md](references/operational.md).
 
-**GATE:** All tasks done + validate passes → run Verification Gate (see operational.md) → update `Phase: implement` → proceed to Review.
+**Worker shutdown (before Phase 4):** Verify all workers have sent final completion messages. Then shut down the worker team (TeamDelete or confirm idle). Workers and reviewers must never be alive simultaneously.
+
+**GATE:** All tasks done + validate passes + all workers shut down → run Verification Gate (see operational.md) → update `Phase: implement` → proceed to Review.
 
 ---
 
@@ -267,6 +289,8 @@ Determine diff size first: `git diff {base_branch}...HEAD --stat | tail -1`
 | 201–400 | 3 (full set) | Full (2 rounds max) | Standard review |
 | 400+ | 3 (full set) | Full (2 rounds max) | Flag PR size to user |
 
+> **Quick mode override:** In Quick mode, use lead self-review (Solo Self-Review Checklist) for diffs ≤100 lines — no teammate spawning. Only spawn reviewers for Quick mode diffs >100 lines. (This threshold is authoritative here; the ≤50 threshold above applies to Full mode only.)
+
 Load [debate-protocol.md](../dlc-review/references/debate-protocol.md) only for 2-round debate cases.
 
 #### Iteration 2: Focused Review
@@ -281,11 +305,19 @@ Load [debate-protocol.md](../dlc-review/references/debate-protocol.md) only for 
 - Verify specific fixes only — no full review, no debate
 - Binary output: pass or fail with specific issues
 
-**Confidence filter (all iterations):** Drop any finding with confidence < 80 before consolidation. Hard Rule violations bypass this filter — always report.
+**Confidence filter (all iterations):** Drop findings below the role threshold before consolidation. Hard Rule violations bypass this filter — always report.
+
+| Reviewer role | Confidence threshold |
+| --- | --- |
+| Correctness & Security | 75 |
+| Architecture & Performance | 80 |
+| DX & Testing | 85 |
+
+**Debate early-exit:** After debate round 1, if ≥90% of findings have consensus (all reviewers agree) → skip round 2. Only run round 2 when genuine disagreement remains.
 
 ### Review Output
 
-Write findings to `.claude/dlc-build/review-findings-{iteration}.md` per [review-output-format.md](../../references/review-output-format.md). Full mode iter 1 with 3 reviewers: delegate consolidation + dedup to a Haiku subagent receiving ONLY the raw findings tables — removes main context bias from ranking.
+Write findings to `.claude/dlc-build/review-findings-{iteration}.md` per [review-output-format.md](../../references/review-output-format.md). Full mode iter 1 with 3 reviewers: load [consolidation-prompt.md](references/consolidation-prompt.md) and delegate consolidation + dedup to a Haiku subagent — removes main context bias from ranking and saves Sonnet tokens on mechanical dedup work.
 
 **GATE:** Findings consolidated → update `Phase: review` in dev-loop-context.md → proceed to Assess.
 

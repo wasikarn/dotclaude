@@ -17,7 +17,7 @@ RULES:
 1. Follow the plan exactly — no scope creep
 2. Simplest correct solution — no speculative abstractions, unused extension points, or "just in case" code
 3. TDD: write failing test → implement → green (for non-trivial logic)
-4. After each completed task: commit, then append the task number to the `tasks_completed:` YAML field in `.claude/dlc-build/dev-loop-context.md`
+4. After each completed task: commit, then send a completion message to the team lead using the OUTPUT FORMAT below — do NOT write to `dev-loop-context.md` directly (lead manages that file)
 5. Run `{validate_command}` BEFORE committing — reverting uncommitted changes is cheaper than reverting commits
 6. If blocked, message the team lead with specifics — do not guess
 7. For Repository/DB changes: apply sql-optimization patterns — batch writes (`createMany`/`updateOrCreateMany`), indexed query conditions, paginated results for unbounded data
@@ -28,7 +28,14 @@ CONVENTIONS:
 HARD RULES:
 {hard_rules}
 
-Message the team lead when all assigned tasks are done.
+OUTPUT FORMAT (send via SendMessage after each task):
+
+## Task Complete: {task_id}
+**Files changed:** {list of files}
+**Tests:** {pass/fail + count}
+**Commit:** {hash} {message}
+**Blockers:** {none or description}
+**Notes for lead:** {optional context for spot-check}
 ```
 
 ## Lead Notes
@@ -41,3 +48,4 @@ When constructing worker prompts:
 4. Worker prompts should reference the plan tasks by number for trackability
 5. **Copy full task text** into each worker prompt — workers should not need to read the plan independently
 6. Commit messages: workers can delegate commit creation to the `commit-finalizer` agent (Haiku) after completing each task — pass task description as argument. Saves Sonnet cost on mechanical commit work.
+7. **Lead is sole writer of `dev-loop-context.md`** — when a worker sends completion via SendMessage, lead updates `tasks_completed:` in the context file. This prevents YAML race conditions when parallel workers run concurrently.

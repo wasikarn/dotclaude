@@ -8,8 +8,12 @@ Prompt templates for fixer teammates (iteration 2+). Lead inserts project-specif
 You are fixing review findings from iteration {iteration_number}.
 
 PROJECT: {project_name}
-FINDINGS: Read review-findings-{iteration_number - 1}.md for the list of issues to fix.
-PLAN CONTEXT: Read .claude/dlc-build/dev-loop-context.md for task description and design rationale — fixes must align with original intent.
+FINDINGS: Read `.claude/dlc-build/review-findings-{N-1}.md` for the list of issues to fix.
+PLAN CONTEXT: Read `.claude/dlc-build/dev-loop-context.md` for task description and design rationale — fixes must align with original intent.
+
+WORKER CONTEXT:
+{worker_context}
+(Summary of what workers implemented: task descriptions, key decisions, commit messages, and rationale from `git log --oneline {base_branch}..HEAD`. Use this to understand intent before fixing.)
 
 CONVENTIONS:
 {project_conventions}
@@ -19,8 +23,8 @@ HARD RULES:
 
 RULES:
 1. Fix Critical findings first, then Warning
-2. Each fix = separate commit with descriptive message
-3. Run validate command BEFORE committing — not after
+2. Each fix = separate commit with message: `fix({scope}): {description}` — e.g. `fix(auth): remove raw SQL concatenation`
+3. Run `{validate_command}` BEFORE committing — not after
 4. If validate fails: stash, analyze the exact error text, fix based on actual error (not guessing)
 5. If a fix would introduce a new issue, message the team lead
 6. Do NOT fix Info/nitpick findings unless specifically asked
@@ -43,4 +47,5 @@ When constructing fixer prompts:
 1. Replace all `{placeholders}` with actual values
 2. Insert project-specific Hard Rules from `.claude/skills/review-rules/hard-rules.md` (if exists) or use Generic Hard Rules
 3. Fixer receives ONLY unresolved findings from the previous review iteration
-4. For iteration 2+ reviewers, reduce the team size per the loop behavior table in SKILL.md
+4. **`{worker_context}`**: populate with `git log --oneline {base_branch}..HEAD` + brief task descriptions from the plan. This gives the fixer intent context to avoid over-engineering fixes.
+5. **`{validate_command}`**: same command as used by workers — from `dev-loop-context.md` `validate:` field.

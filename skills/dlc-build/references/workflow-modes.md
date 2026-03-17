@@ -10,31 +10,37 @@ Classification criteria for Full, Quick, and Hotfix mode. Lead auto-classifies a
 | **Quick** | Bug fix, small refactor, fix PR comments, single-file change | Skip Phase 1 | 6-10 |
 | **Hotfix** | Urgent production bug, `--hotfix` flag | Skip Phase 1, branch from `main` | 4-8 |
 
-## Auto-Classification Rules
+## Mode Decision Tree
 
-**Full mode** — any of:
+Use this deterministic tree to classify mode. Apply top-to-bottom; first match wins.
 
-- Task mentions "new feature", "add endpoint", "new module", "redesign", "migration"
-- Task references a Jira epic or multi-story ticket
-- Task requires touching 3+ files across different layers
-- Task involves schema change or API contract change
-- User explicitly passes `--full`
+```text
+--hotfix flag OR task mentions "production"/"P0"/"urgent fix"/"hotfix"/"incident"?
+└─ YES → HOTFIX mode
 
-**Quick mode** — all of:
+--quick flag?
+└─ YES → QUICK mode
 
-- Task is a bug fix, refactor, or PR comment fix
-- Scope is 1-2 files in the same layer
-- No schema or API contract changes
-- No new domain concepts introduced
-- User explicitly passes `--quick`
+--full flag?
+└─ YES → FULL mode
 
-**Hotfix mode** — any of:
+Task involves ANY of:
+  - "new feature" / "add endpoint" / "new module" / "redesign"
+  - Schema change (migration) or API contract change
+  - Jira epic or multi-story ticket
+  - Touching 3+ files across different architectural layers?
+└─ YES → FULL mode
 
-- User explicitly passes `--hotfix`
-- Task mentions "production", "P0", "urgent fix", "hotfix", "incident"
-- Bug is actively impacting users in production
+Task is ALL of:
+  - Bug fix, refactor, or PR comment fix
+  - Scope is 1-2 files in the same layer
+  - No schema or API contract changes
+  - No new domain concepts?
+└─ YES → QUICK mode
 
-**Ambiguous** — ask user: "This could be Full or Quick. Full adds a research phase (~2-3 explorer sessions). Which do you prefer?"
+Otherwise → AMBIGUOUS: ask user
+  "This could be Full or Quick. Full adds a research phase (~2-3 explorer sessions). Which do you prefer?"
+```
 
 ## Mode Differences
 
@@ -49,6 +55,8 @@ Classification criteria for Full, Quick, and Hotfix mode. Lead auto-classifies a
 | Artifacts | research.md + plan.md | plan.md only | plan.md only |
 
 ## Branch Setup (Phase 0 Step 2.5)
+
+> **base_branch note:** This skill assumes `develop` as the default base for feature/fix branches (PR target). If `detect-project.sh` returns `base_branch: main` and mode is not Hotfix, inform the user: "base_branch detected as `main`. Feature branches will target `main` directly. Is that correct, or should I use `develop`?"
 
 Check `branch` from Project JSON against `base_branch`:
 
