@@ -47,5 +47,5 @@ When constructing worker prompts:
 3. Insert validate command from [phase-gates.md](phase-gates.md) project detection
 4. Worker prompts should reference the plan tasks by number for trackability
 5. **Copy full task text** into each worker prompt — workers should not need to read the plan independently
-6. Commit messages: workers can delegate commit creation to the `commit-finalizer` agent (Haiku) after completing each task — pass task description as argument. Saves Sonnet cost on mechanical commit work.
+6. Commit messages: workers can delegate commit creation to the `commit-finalizer` agent (Haiku) after completing each task. Commit message format: `{type}({scope}): {description}` — e.g. `feat(auth): add JWT refresh token endpoint`, `fix(users): handle null profile on first login`. Types: feat, fix, refactor, test, chore. Saves Sonnet cost on mechanical commit work.
 7. **Lead is sole writer of `dev-loop-context.md`** — when a worker sends completion via SendMessage, lead updates `tasks_completed:` in the context file. This prevents YAML race conditions when parallel workers run concurrently.

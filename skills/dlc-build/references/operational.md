@@ -54,6 +54,35 @@ Lead MUST independently verify — never trust worker reports:
 
 If worker claims "done" but verify fails → send back with the specific failing evidence.
 
+### Regression Gate (iteration 2+, before Phase 4)
+
+After fixer iteration, lead runs regression check before proceeding to review:
+
+```bash
+git diff dlc-checkpoint-iter-{N-1}..HEAD --stat
+```
+
+Verify: no files modified that were NOT part of the findings being fixed. If unintended changes found → revert and re-scope the fix. This prevents fixer from introducing regressions in previously-passing code.
+
+### Solo Mode Self-Review Output
+
+When running in Solo mode (no Agent Teams or subagents), lead performs self-review and MUST produce a `review-findings-{N}.md` file using this template so Phase 5 Assess works the same regardless of mode:
+
+```markdown
+## Summary
+- Total findings: {N} (Critical: {C}, Warning: {W}, Info: {I})
+- Reviewer: Lead (Solo mode)
+- Mode: Self-review
+
+## Findings
+| # | Sev | File | Line | Confidence | Reviewer | Issue | Fix |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+
+## Dismissed
+```
+
+Apply Solo Self-Review Checklist above when populating findings.
+
 ### Teammate Crash Recovery
 
 If a teammate stops responding or crashes mid-phase:

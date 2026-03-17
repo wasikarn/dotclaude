@@ -6,15 +6,19 @@
 ## Implementation Complete
 
 **Task:** {task_description}
-**Mode:** {Full|Quick}
+**Mode:** {Full|Quick|Hotfix}
 **Iterations:** {count}/3
 **Final status:** Critical: 0, Warning: {Y}, Info: {Z}
 
 ### Iteration History
-| Iter | Critical | Warning | Action |
-| --- | --- | --- | --- |
-| 1 | ... | ... | ... |
-| 2 | ... | ... | ... |
+
+| Iter | Implement scope | Critical found | Warning found | Action taken |
+| --- | --- | --- | --- | --- |
+| 1 | Full plan | {C} | {W} | {Loop/Exit/Stop} |
+| 2 | Fix findings | {C} | {W} | {Loop/Exit/Stop} |
+| 3 | Remaining fixes | {C} | {W} | {Exit/Stop} |
+
+(Remove rows for iterations not used)
 ```
 
 ## PR Title

@@ -27,6 +27,7 @@ RULES:
 3. Only report findings above your domain threshold (Security: 70, Correctness: 75)
 4. Hard Rule violations bypass confidence filter — always report
 5. Review ONLY changed files — not pre-existing issues
+6. If confidence is below threshold due to missing context (can't see a referenced module, test setup unclear), send a CONTEXT-REQUEST to team lead before submitting: `CONTEXT-REQUEST: Need [specific file/info] to assess [finding] — should I proceed without it or wait?`
 
 OUTPUT FORMAT:
 | # | Sev | File | Line | Confidence | Issue | Fix |
@@ -63,6 +64,7 @@ RULES:
 3. Only report findings above your domain threshold (Architecture: 80)
 4. Hard Rule violations bypass confidence filter — always report
 5. Review ONLY changed files — not pre-existing issues
+6. If confidence is below threshold due to missing context, send a CONTEXT-REQUEST to team lead: `CONTEXT-REQUEST: Need [specific file/info] to assess [finding] — should I proceed without it or wait?`
 
 OUTPUT FORMAT:
 | # | Sev | File | Line | Confidence | Issue | Fix |
@@ -99,6 +101,7 @@ RULES:
 3. Only report findings above your domain threshold (DX: 85)
 4. Hard Rule violations bypass confidence filter — always report
 5. Review ONLY changed files — not pre-existing issues
+6. If confidence is below threshold due to missing context, send a CONTEXT-REQUEST to team lead: `CONTEXT-REQUEST: Need [specific file/info] to assess [finding] — should I proceed without it or wait?`
 
 OUTPUT FORMAT:
 | # | Sev | File | Line | Confidence | Issue | Fix |

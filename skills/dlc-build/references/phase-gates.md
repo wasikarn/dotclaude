@@ -46,6 +46,7 @@ Every phase transition has explicit gate conditions. No phase proceeds until its
 - [ ] Each task has at least 1 commit
 - [ ] No uncommitted changes in working tree
 - [ ] All workers shut down (TeamDelete executed or confirmed idle) — reviewers must not spawn while workers are alive
+- [ ] **Iteration 2+ only:** Regression check passed — `git diff dlc-checkpoint-iter-{N-1}..HEAD` shows no unintended file modifications outside of finding fixes (see Regression Gate in operational.md)
 
 Lead verifies with: `git diff {base_branch}...HEAD --stat` (scope) + `git log --oneline {base_branch}..HEAD` (commit-per-task). See Verification Gate in operational.md.
 

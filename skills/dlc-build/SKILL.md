@@ -13,18 +13,13 @@ Invoke as `/dlc-build [task-description-or-jira-key] [--quick?] [--full?] [--hot
 
 ## References
 
-**Always loaded:**
-
-| File | Purpose |
-| --- | --- |
-| [phase-gates.md](references/phase-gates.md) | Gate conditions for every phase transition |
-| [workflow-modes.md](references/workflow-modes.md) | Full/Quick/Hotfix classification criteria |
-| [operational.md](references/operational.md) | Graceful Degradation, Crash Recovery, Solo Checklist, Success Criteria |
-
-**Load on demand (note when to load each):**
+**Load on demand (load only what each phase needs):**
 
 | File | Load when |
 | --- | --- |
+| [workflow-modes.md](references/workflow-modes.md) | Phase 0 only — mode classification, branch setup |
+| [operational.md](references/operational.md) | Phase 0 (degradation levels) + Phase 3 end (Verification Gate) + on crash |
+| [phase-gates.md](references/phase-gates.md) | At each phase transition — load only to check the relevant gate, then discard |
 | [explorer-prompts.md](references/explorer-prompts.md) | Entering Phase 1 — explorer prompt templates |
 | [worker-prompts.md](references/worker-prompts.md) | Entering Phase 3 iter 1 — worker implementation template |
 | [fixer-prompts.md](references/fixer-prompts.md) | Entering Phase 3 iter 2+ — fixer template |
@@ -33,6 +28,7 @@ Invoke as `/dlc-build [task-description-or-jira-key] [--quick?] [--full?] [--hot
 | [../../references/review-output-format.md](../../references/review-output-format.md) | Entering Phase 4 — findings table format |
 | [../dlc-review/references/debate-protocol.md](../dlc-review/references/debate-protocol.md) | Entering Phase 4 iteration 1 debate only |
 | [../../references/jira-integration.md](../../references/jira-integration.md) | Jira key detected in `$ARGUMENTS` |
+| [references/consolidation-prompt.md](references/consolidation-prompt.md) | Phase 4 iter 1 with 3 reviewers — Haiku consolidation |
 | [references/pr-template.md](references/pr-template.md) | Entering Phase 6 option 1 (Create PR) |
 
 ---
@@ -180,7 +176,9 @@ Skip this phase entirely in Quick mode → go to Phase 2.
 
 ### Step 0: Bootstrap (before explorers)
 
-Dispatch `dev-loop-bootstrap` agent (Haiku) with the task description as argument. Wait for completion — output written to `.claude/dlc-build/bootstrap-context.md`. Read that file and inject its contents into ALL explorer prompts as a `BOOTSTRAP CONTEXT:` section. This eliminates redundant project-structure reads across explorers.
+Dispatch `dev-loop-bootstrap` agent (Haiku) with the task description as argument. Wait for completion (timeout: 60s) — output written to `.claude/dlc-build/bootstrap-context.md`. Read that file and inject its contents into ALL explorer prompts as a `BOOTSTRAP CONTEXT:` section. This eliminates redundant project-structure reads across explorers.
+
+**Bootstrap fallback:** If bootstrap doesn't complete within 60s or crashes: proceed without it. Set `BOOTSTRAP CONTEXT: (not available — explorers gather context independently)` in explorer prompts. Explorers are self-sufficient; bootstrap is an optimization, not a requirement.
 
 ### Step 1: Create Explorer Team
 
@@ -255,9 +253,9 @@ Load [worker-prompts.md](references/worker-prompts.md) now. Create 1-2 worker te
 - `[S]` tasks: 1 worker, sequential
 - `[P]` tasks: 2 workers with non-overlapping file assignments
 
-**Lead provides full task text** — copy task descriptions into the worker creation prompt. Workers follow TDD: failing test → implement → green → commit. After each commit, worker sends completion message to lead; lead updates `tasks_completed:` in dev-loop-context.md.
+**Lead provides full task text** — copy task descriptions into the worker creation prompt. Workers follow TDD: failing test → implement → green → commit. After each commit, worker sends completion message to lead (structured OUTPUT FORMAT from worker-prompts.md); lead updates `tasks_completed:` in dev-loop-context.md.
 
-Per-commit spot-check: after each worker task commit, lead runs `git show HEAD --stat` — verify file scope matches task, no unintended files touched.
+Per-commit spot-check (async): worker continues to next task immediately after sending the completion message — do NOT wait for lead acknowledgement. Lead processes spot-checks asynchronously: run `git show {commit_hash} --stat` to verify file scope matches task. If unintended files found: SendMessage to worker to revert and re-implement scoped to assigned files. If worker already moved to next task, lead reverts via `git revert {hash}` and re-queues the task.
 
 On validate failure: see Checkpoint Recovery in [operational.md](references/operational.md).
 
@@ -293,6 +291,8 @@ Determine diff size first: `git diff {base_branch}...HEAD --stat | tail -1`
 
 Load [debate-protocol.md](../dlc-review/references/debate-protocol.md) only for 2-round debate cases.
 
+**CONTEXT-REQUEST handling:** If a reviewer sends a `CONTEXT-REQUEST:` message before submitting findings, lead reads the requested file and sends the relevant section back via SendMessage. Reviewer proceeds after receiving context. If context unavailable, respond: "Proceed without it — note low-confidence in the finding."
+
 #### Iteration 2: Focused Review
 
 - 2 reviewers (Correctness + Architecture)
@@ -325,7 +325,7 @@ Write findings to `.claude/dlc-build/review-findings-{iteration}.md` per [review
 
 ### Phase 5: Assess (Lead Only)
 
-Count findings from `.claude/dlc-build/review-findings-{N}.md`. If Jira: verify each AC has implementation + test (unverified AC = Critical). Apply decision tree from [phase-gates.md](references/phase-gates.md) §Assess→Loop Decision. Update progress tracker checkboxes (iteration N: Implement tasks, Review Critical/Warning, Assess outcome). When dropping a finding (false positive, accepted risk), append it to a `## Dismissed` section in `review-findings-{N}.md` with a one-line reason — prevents re-raising in subsequent iterations.
+Read ONLY `.claude/dlc-build/review-findings-{N}.md` (the consolidated file) — do not re-read raw reviewer outputs. Raw findings are available on-demand if a specific finding needs deeper investigation. Count Critical/Warning/Info from the `## Summary` header. If Jira: verify each AC has implementation + test (unverified AC = Critical). Apply decision tree from [phase-gates.md](references/phase-gates.md) §Assess→Loop Decision. Update progress tracker checkboxes (iteration N: Implement tasks, Review Critical/Warning, Assess outcome). When dropping a finding (false positive, accepted risk), append it to the `## Dismissed` section in `review-findings-{N}.md` using the table format — prevents re-raising in subsequent iterations.
 
 **GATE:** Loop decision made → update `Phase: assess` (or `Phase: ship` if exiting) in dev-loop-context.md → proceed accordingly.
 
