@@ -226,6 +226,8 @@ Review scope narrows each iteration. See [phase-gates.md](references/phase-gates
 
 ### Phase 3: Implement
 
+Before starting each iteration: `git tag dlc-checkpoint-iter-{N}` — enables instant rollback via `git checkout dlc-checkpoint-iter-{N}`.
+
 #### Iteration 1: Full Implementation
 
 Load [worker-prompts.md](references/worker-prompts.md) now. Create 1-2 worker teammates:
