@@ -36,11 +36,11 @@ When DX Analyst is skipped (`--quick` mode), append these 5 checks to the Fixer 
 
 ```text
 DX QUICK CHECK — while fixing, also look for these in the affected area:
-1. Silent failures: empty catch blocks or swallowed errors near the bug
-2. Unhelpful errors: generic messages that would make this bug harder to find
-3. Missing logging: no structured log at the key decision point where bug occurs
-4. Type safety: `as any` or unvalidated input near the bug
-5. Missing test: no existing test covers the code path that broke
+1. Silent failures: empty catch blocks or swallowed errors near the bug (→ E1 Critical)
+2. Unhelpful errors: generic messages that would make this bug harder to find (→ E2 Critical)
+3. Missing logging: no structured log at the key decision point where bug occurs (→ O1 Warning)
+4. Type safety: `as any` or unvalidated input near the bug (→ P1 Critical)
+5. Missing test: no existing test covers the code path that broke (→ P3 Warning)
 If you find any Critical items (1, 2, 4), fix them. Warning items are optional in Quick mode.
 ```
 
@@ -51,3 +51,14 @@ If you find any Critical items (1, 2, 4), fix them. Warning items are optional i
 | Critical | Actively hides bugs or causes silent data corruption | Must fix |
 | Warning | Makes debugging harder or allows bugs to slip through | Fix if scope reasonable |
 | Info | Nice to have, improves DX but not urgent | Skip unless user requests |
+
+## Remediation Quick-Reference
+
+Use these patterns when writing the Recommendation column for Critical findings:
+
+| Code | Concrete Remediation |
+| --- | --- |
+| E1 | Re-throw with context: `throw new AppError('msg', { cause: err })` or `logger.error({ err, input }, 'context'); throw err` |
+| E2 | Replace generic message with context: `'Failed to process ${entity.id}: ${err.message}'` — include entity ID, operation, and input shape |
+| P1 | Replace `as T` cast with: branded type, generic constraint `<T extends Schema>`, or runtime validation (zod/valibot parse at boundary) |
+| P2 | Add boundary validation: schema parse on entry, explicit null/undefined guard, or guard function before processing |

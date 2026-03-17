@@ -33,6 +33,8 @@ Every phase transition has explicit gate conditions. No phase proceeds until its
 - [ ] Root cause cites file:line evidence with **confidence >= Medium (50%)**
   - **Low confidence** → escalate to user before proceeding; present alternative hypotheses and ask for guidance
   - High/Medium confidence → proceed automatically
+- [ ] Primary hypothesis tested: at least one reproduction step confirmed — cite the command run and actual output observed
+  - If bug cannot be reproduced → note "unreproducible" in investigation.md and ask user for clarification before proceeding
 - [ ] DX Analyst completed with findings table (Full mode only)
 - [ ] `investigation.md` written with merged findings and Fix Plan
 - [ ] Investigator + DX Analyst shut down

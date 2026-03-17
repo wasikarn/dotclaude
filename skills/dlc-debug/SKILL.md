@@ -13,14 +13,21 @@ Invoke as `/dlc-debug [bug-description-or-jira-key] [--quick?]`
 
 ## References
 
+**Load immediately** (needed for Phase 0–1):
+
 | File |
 | --- |
 | [teammate-prompts.md](references/teammate-prompts.md) |
 | [dx-checklist.md](references/dx-checklist.md) |
-| [phase-gates.md](references/phase-gates.md) |
-| [../../references/review-conventions.md](../../references/review-conventions.md) |
-| [jira-integration.md](../../references/jira-integration.md) — Jira detection, MCP fetch, bug enrichment (loaded when Jira key detected) |
-| [references/operational.md](references/operational.md) — Graceful Degradation, Context Compression Recovery, Success Criteria |
+
+**Load on-demand:**
+
+| File | When |
+| --- | --- |
+| [phase-gates.md](references/phase-gates.md) | At gate transitions — if unsure about conditions |
+| [../../references/review-conventions.md](../../references/review-conventions.md) | If adding Fix Review pass |
+| [jira-integration.md](../../references/jira-integration.md) | When Jira key detected in arguments |
+| [references/operational.md](references/operational.md) | On graceful degradation or context compression recovery |
 
 ---
 
@@ -66,6 +73,8 @@ Scan `$ARGUMENTS` for Jira key (`BEP-\d+`). If found, follow [jira-integration.m
 3. Use ticket priority to inform severity classification (Step 2)
 4. Add Jira context to `debug-context.md` (Step 4) and Investigator prompt (Phase 1)
 
+If Jira unreachable → proceed with user-provided description only; note "Jira unavailable" in debug-context.md Jira Context section.
+
 If no Jira key — skip to Step 2.
 
 ### Step 2: Classify Severity
@@ -105,10 +114,14 @@ Branch: {branch_name}
 ## Hard Rules
 {project_hard_rules}
 
+## Jira Context
+{ticket title, priority, and key description — leave blank if no Jira key}
+
 ## Progress
 - [ ] Phase 0: Triage
 - [ ] Phase 1: Investigation
 - [ ] Phase 2: Fix + Harden
+- [ ] Phase 2.5: Fix Review (if --review or P0)
 - [ ] Phase 3: Ship
 ```
 
@@ -119,6 +132,19 @@ Lead updates the progress checkboxes at the start of each phase.
 ---
 
 ## Phase 1: Investigate + DX Audit
+
+### Bootstrap (Lead — before spawning teammates)
+
+Pre-gather shared context to eliminate duplicate reads across Investigator and DX Analyst:
+
+1. `git log --oneline -10` — identify recent changes near the affected area
+2. From bug description + triage, list primary affected files (max 5) based on error messages, stack traces, or area described
+3. Read key sections of each file: class/function names, relevant code paths (scan structure — do NOT read entire files)
+4. Append `## Shared Context` to `debug-context.md` with:
+   - Recent commits relevant to the bug
+   - Affected files: `{file:line-range}` — brief description of relevant part
+   - Code notes: key function signatures, patterns in affected area
+5. Add this instruction to both Investigator and DX Analyst prompts when constructing them (see Lead Notes in teammate-prompts.md item 9)
 
 ### Step 1: Create Team
 

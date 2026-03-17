@@ -17,13 +17,14 @@ YOUR METHODOLOGY — follow these steps IN ORDER:
 3. Check recent changes: git log, git diff
 4. Trace data flow backward from symptom to source
 5. Find working examples of similar code — compare differences
-6. Generate hypotheses across these 6 failure mode categories (use as a checklist):
+6. Generate hypotheses across these 7 failure mode categories (use as a checklist):
    - **Logic Error**: wrong conditional, off-by-one, missing edge case, wrong algorithm
    - **Data Issue**: unexpected input, type mismatch, null/undefined, encoding/serialization, truncation/overflow
    - **State Problem**: race condition, stale cache, wrong initialization, unintended mutation, state machine error
    - **Integration Failure**: API contract mismatch, version incompatibility, config mismatch, missing env var, network timeout
-   - **Resource Issue**: memory leak, connection pool exhaustion, file descriptor leak, disk quota, CPU saturation
+   - **Resource Issue**: memory leak, connection pool exhaustion, file descriptor leak, disk quota, CPU saturation — for this category, include profiling evidence (timing data, memory snapshot, query timing) before classifying confidence as High or Medium
    - **Environment**: missing dependency, wrong library version, platform-specific behavior, permission issue, timezone/locale
+   - **Security Failure**: auth bypass, improper authorization, injection vulnerability, privilege escalation, data exposure
 7. **Rank your top 3 hypotheses** by evidence strength. Test primary hypothesis minimally: "X is root cause because Y"
    - If primary test is inconclusive, test #2 before declaring Low confidence
    - Report all 3 ranked hypotheses even if primary is High confidence — alternatives are used as fallback if fix fails
@@ -61,23 +62,24 @@ BUG: {bug_description}
 PROJECT: {project_name}
 AFFECTED AREA: {files/directories identified in triage}
 
-YOUR FOCUS — audit these categories in the affected area:
+YOUR FOCUS — audit these categories in the affected area (codes reference dx-checklist.md):
 
 1. ERROR HANDLING:
-   - Silent failures (empty catch, swallowed errors)
-   - Unhelpful error messages (generic "something went wrong")
-   - Missing error context (no stack trace, no input data logged)
+   - Silent failures: empty catch, swallowed errors (→ E1 Critical)
+   - Unhelpful error messages: generic "something went wrong" (→ E2 Critical)
+   - Missing error context: no stack trace, no input data logged (→ E3 Warning)
+   - Inconsistent error handling: some paths throw, others return null (→ E4 Warning)
 
 2. OBSERVABILITY:
-   - Missing/insufficient logging at key decision points
-   - No structured logging (console.log vs project logger)
-   - Missing metrics/traces for debugging
+   - Missing logging at key decision points: auth, data mutation, external calls (→ O1 Warning)
+   - Unstructured logging: console.log instead of project's structured logger (→ O2 Warning)
+   - Missing traces for cross-service debugging (→ O3 Info)
 
 3. PREVENTION:
-   - Type safety holes (as any, unvalidated input)
-   - Missing validation at boundaries
-   - Test coverage gaps in affected area
-   - Missing edge case tests
+   - Type safety holes: as any, as unknown as T, unvalidated external input (→ P1 Critical)
+   - Missing validation at API/service boundaries (→ P2 Warning)
+   - Test coverage gaps in affected code path (→ P3 Warning)
+   - Missing edge case tests: null, empty, concurrent, malformed input (→ P4 Info)
 
 RULES:
 - READ-ONLY — do not modify any files
@@ -152,12 +154,12 @@ FIX ORDER — follow strictly:
 1. Fix root cause — separate commit
 2. Add regression test — separate commit
 3. DX QUICK CHECK — while fixing, also look for these in the affected area:
-   a. Silent failures: empty catch blocks or swallowed errors near the bug
-   b. Unhelpful errors: generic messages that would make this bug harder to find
-   c. Missing logging: no structured log at the key decision point where bug occurs
-   d. Type safety: `as any` or unvalidated input near the bug
-   e. Missing test: no existing test covers the code path that broke
-   If you find any Critical items (a, b, d), fix them as separate commits.
+   1. Silent failures: empty catch blocks or swallowed errors near the bug (→ E1 Critical)
+   2. Unhelpful errors: generic messages that would make this bug harder to find (→ E2 Critical)
+   3. Missing logging: no structured log at the key decision point where bug occurs (→ O1 Warning)
+   4. Type safety: `as any` or unvalidated input near the bug (→ P1 Critical)
+   5. Missing test: no existing test covers the code path that broke (→ P3 Warning)
+   If you find any Critical items (1, 2, 4), fix them as separate commits.
 
 COMMIT CONVENTION:
 - fix(area): {root cause fix description}
@@ -235,3 +237,4 @@ When constructing prompts:
 6. Investigator and DX Analyst receive the same `{bug_description}` and `{project_name}`
 7. Fix Reviewer receives: commit hashes from `git log --oneline -N` + root cause summary from `investigation.md`
 8. During verification loop: send exact validate output (not paraphrase) to Fixer — copy the error text verbatim
+9. For both Investigator and DX Analyst: prepend "Read `debug-context.md` → Shared Context section first — skip files already fully described there unless you need deeper detail."

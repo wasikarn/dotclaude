@@ -1,125 +1,134 @@
 {
-	"hooks": {
-		"TaskCompleted": [
-			{
-				"matcher": "review-debate",
-				"hooks": [
-					{
-						"type": "command",
-						"command": "\"$CLAUDE_PROJECT_DIR\"/hooks/review-debate-task-gate.sh"
-					}
-				]
-			},
-			{
-				"matcher": "dev-loop",
-				"hooks": [
-					{
-						"type": "command",
-						"command": "\"$CLAUDE_PROJECT_DIR\"/hooks/dev-loop-task-gate.sh"
-					}
-				]
-			},
-			{
-				"matcher": "respond",
-				"hooks": [
-					{
-						"type": "command",
-						"command": "\"$CLAUDE_PROJECT_DIR\"/hooks/respond-task-gate.sh"
-					}
-				]
-			}
-		],
-		"TeammateIdle": [
-			{
-				"matcher": "review-pr",
-				"hooks": [
-					{
-						"type": "command",
-						"command": "\"$CLAUDE_PROJECT_DIR\"/hooks/review-debate-idle-nudge.sh"
-					}
-				]
-			},
-			{
-				"matcher": "dev-loop",
-				"hooks": [
-					{
-						"type": "command",
-						"command": "\"$CLAUDE_PROJECT_DIR\"/hooks/dev-loop-idle-nudge.sh"
-					}
-				]
-			},
-			{
-				"matcher": "respond",
-				"hooks": [
-					{
-						"type": "command",
-						"command": "\"$CLAUDE_PROJECT_DIR\"/hooks/respond-idle-nudge.sh"
-					}
-				]
-			}
-		],
-		"SessionStart": [
-			{
-				"matcher": "compact",
-				"hooks": [
-					{
-						"type": "command",
-						"command": "\"$CLAUDE_PROJECT_DIR\"/hooks/post-compact-context.sh"
-					}
-				]
-			},
-			{
-				"matcher": "startup",
-				"hooks": [
-					{
-						"type": "command",
-						"command": "\"$CLAUDE_PROJECT_DIR\"/hooks/session-start-context.sh"
-					}
-				]
-			}
-		],
-		"PreToolUse": [
-			{
-				"matcher": "Edit|Write",
-				"hooks": [
-					{
-						"type": "command",
-						"command": "\"$CLAUDE_PROJECT_DIR\"/hooks/protect-files.sh"
-					}
-				]
-			}
-		],
-		"PostToolUse": [
-			{
-				"matcher": "Edit|Write",
-				"hooks": [
-					{
-						"type": "command",
-						"command": "FILE=$(cat | jq -r '.tool_input.file_path // empty'); if [ -n \"$FILE\" ] && echo \"$FILE\" | grep -qE '\\.md$'; then npx markdownlint-cli2 --fix \"$FILE\" 2>/dev/null; fi"
-					}
-				]
-			}
-		],
-		"Stop": [
-			{
-				"hooks": [
-					{
-						"type": "prompt",
-						"prompt": "If stop_hook_active is true in the input, respond {\"ok\": true} immediately. Otherwise: Check if the assistant's response completed all tasks the user requested. Look at the todo list if present — are there pending or in-progress items? Did the assistant leave any work unfinished or promise to do something it didn't do? If everything is done, respond {\"ok\": true}. If work remains, respond {\"ok\": false, \"reason\": \"Brief description of what's incomplete\"}."
-					}
-				]
-			}
-		],
-		"Notification": [
-			{
-				"matcher": "",
-				"hooks": [
-					{
-						"type": "command",
-						"command": "osascript -e 'display notification \"Claude Code needs your attention\" with title \"Claude Code\"'"
-					}
-				]
-			}
-		]
-	}
+  "hooks": {
+    "TaskCompleted": [
+      {
+        "matcher": "review-debate",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/hooks/review-debate-task-gate.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "dev-loop",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/hooks/dev-loop-task-gate.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "respond",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/hooks/respond-task-gate.sh"
+          }
+        ]
+      }
+    ],
+    "TeammateIdle": [
+      {
+        "matcher": "review-pr",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/hooks/review-debate-idle-nudge.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "dev-loop",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/hooks/dev-loop-idle-nudge.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "respond",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/hooks/respond-idle-nudge.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "debug-",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/hooks/debug-idle-nudge.sh"
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "matcher": "compact",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/hooks/post-compact-context.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "startup",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/hooks/session-start-context.sh"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/hooks/protect-files.sh"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "FILE=$(cat | jq -r '.tool_input.file_path // empty'); if [ -n \"$FILE\" ] && echo \"$FILE\" | grep -qE '\\.md$'; then npx markdownlint-cli2 --fix \"$FILE\" 2>/dev/null; fi"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "If stop_hook_active is true in the input, respond {\"ok\": true} immediately. Otherwise: Check if the assistant's response completed all tasks the user requested. Look at the todo list if present \u2014 are there pending or in-progress items? Did the assistant leave any work unfinished or promise to do something it didn't do? If everything is done, respond {\"ok\": true}. If work remains, respond {\"ok\": false, \"reason\": \"Brief description of what's incomplete\"}."
+          }
+        ]
+      }
+    ],
+    "Notification": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "osascript -e 'display notification \"Claude Code needs your attention\" with title \"Claude Code\"'"
+          }
+        ]
+      }
+    ]
+  }
 }
