@@ -56,7 +56,25 @@ Challenges without evidence are ignored.
 | 3/3 agree | Keep finding at reported severity |
 | 2/3 agree, 1 challenges | Keep finding; note the challenge in debate summary |
 | 1/3 raised, 2 challenge | Drop finding |
-| Split (no majority) | Lead decides — reads code, picks based on evidence quality |
+| Split (no majority) | Lead decides — reads code, picks based on evidence quality. Use template below. |
+
+## Lead Decision Template
+
+When the lead decides a disputed finding (after Round 2 or split consensus), use this format in the Debate Summary table's Outcome column:
+
+```text
+Lead decided [keep|drop|change severity to X]:
+Evidence: [file:line] — [code snippet or pattern description]
+Reasoning: [why this evidence is more convincing than the opposing argument]
+```
+
+Example:
+
+```text
+Lead decided keep (Critical):
+Evidence: src/auth.ts:42 — `jwt.verify()` without error handling
+Reasoning: Correctness's challenge ("covered by middleware") is unverifiable — middleware at line 10 only runs on `/api/*` routes, this handler is under `/internal/*`
+```
 
 ## Hard Rule Exception
 

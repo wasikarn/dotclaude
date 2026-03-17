@@ -94,7 +94,7 @@ Capture output: {bootstrap_context} — includes diff summary, file groupings, A
 
 Inject `{bootstrap_context}` into all 3 teammate prompts in Phase 2.
 
-If bootstrap fails → fallback: each teammate gathers its own context (current behavior). Do not block on this.
+If bootstrap fails → fallback: instruct Teammate 1 (Correctness) to fetch the full PR diff and post a lightweight context summary to the team before all 3 begin review. Teammates 2 and 3 use that summary instead of fetching independently. Do not block on this.
 
 ---
 

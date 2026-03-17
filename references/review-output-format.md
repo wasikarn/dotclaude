@@ -4,6 +4,8 @@ Shared output format for `dlc-*` review skills. Each phase outputs its section a
 
 Output language: Thai mixed with English technical terms. Templates below use English for readability; actual output must be in Thai.
 
+> **Note:** Phase numbers in this file (Phase 1-4) refer to **output sections**, not workflow phases. Workflow phases (Phase 0–6) are defined in the skill's SKILL.md.
+
 ---
 
 ## Header
@@ -79,7 +81,7 @@ Output in two parts: reviewer progress table (update as each reviewer completes)
 
 #### Findings
 
-| #  | Sev | Rule | File          | Line | Agreement | Issue                             |
+| #  | Sev | Rule | File          | Line | Consensus | Issue                             |
 | -- | --- | ---- | ------------- | ---- | --------- | --------------------------------- |
 | 1  | 🔴  | #2   | `src/foo.tsx` | 42   | 2/3       | Uses `as any` — should use type guard |
 | 2  | 🟡  | #9   | `src/bar.tsx` | 88   | 1/3       | Leftover console.log                  |

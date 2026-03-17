@@ -43,7 +43,7 @@ From the issue response, extract and summarize:
 
 ## dlc-review: AC Verification
 
-**Phase 0.5: Ticket Understanding** (between Phase 0: Scope Assessment and Phase 1: Project Detection)
+**Phase 0.6: Ticket Understanding** (between Phase 0.1: PR Scope Assessment and Phase 1: Project Detection)
 
 1. Fetch ticket per Detection & Fetch above
 2. Summarize ticket context:
@@ -51,10 +51,11 @@ From the issue response, extract and summarize:
    - **Value:** Why does this matter?
    - **Scope:** What's in/out of scope?
 3. Parse AC into numbered checklist items
-4. Map each AC to file(s) in the PR diff:
-   - Code not found → `[Critical] AC not implemented`
-   - Code found but incomplete → `[Critical] AC partially implemented`
-   - No test covering the AC → `[Critical] Missing test for AC`
+4. Map each AC to file(s) in the PR diff using this heuristic:
+   - **Single-file AC** (e.g., "validate email format on input"): search changed files semantically for the behavior. If not found → `[Critical] AC not implemented`
+   - **Multi-file AC** (e.g., "user can login"): map to all relevant layers (route + service + repo + test). Flag `[Critical] AC partially implemented` if any layer is missing from the diff.
+   - **Architectural AC** (e.g., "domain layer must not import from infra"): map to CLAUDE.md or project architecture docs as evidence. Cannot be Critical if no concrete implementation was expected in this PR — flag as `[Warning] AC architectural — verify at integration review`
+   - **Test coverage**: for every functional AC, confirm at least one test file covers it. No test → `[Critical] Missing test for AC`
 5. Pass AC summary to Phase 2 teammate prompts — teammates should verify AC coverage in their review area
 6. Include AC verification table in final output (Phase 4)
 

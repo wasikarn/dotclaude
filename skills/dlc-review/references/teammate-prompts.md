@@ -18,6 +18,13 @@ RULES:
 - Hard Rules: [insert project Hard Rules here]
 - Non-Hard-Rule findings require confidence >= 80 (scale 0-100)
 
+CONFIDENCE CALIBRATION (0-100 scale):
+- 95: N+1 query in visible loop with no batch alternative — verifiable, pattern is unambiguous
+- 90: `as any` without type guard — code is directly readable, violation is clear
+- 80: Missing null check with no caller guard visible in diff — possible but caller not inspected
+- 70: Naming unclear — subjective, context-dependent (do not report)
+- 60: Preference-based style without convention evidence — do not report
+
 KNOWN FALSE POSITIVES (do not re-raise without new evidence):
 {dismissed_patterns}
 
@@ -38,6 +45,24 @@ After review, message your findings to the team lead.
 You are reviewing PR #[PR_NUMBER] for correctness and security issues.
 
 YOUR FOCUS: Functional correctness (#1, #2), type safety (#10), error handling (#12), and all Hard Rules.
+
+SECURITY: If the PR diff contains auth, API, middleware, or session handling code:
+1. Check OWASP Top 10 — flag any matches at Critical severity:
+   - A01: Broken Access Control (missing RBAC, missing authorization check)
+   - A02: Cryptographic Failures (HTTP instead of HTTPS, hardcoded secrets, weak hashing)
+   - A03: Injection (unsanitized input, string concatenation in queries)
+   - A05: Security Misconfiguration (exposed debug endpoints, default credentials)
+   - A07: Authentication Failures (no rate limiting on auth, weak session tokens)
+   - A08: Data Integrity Failures (no CSRF protection on state-changing endpoints)
+2. Flag insecure JWT patterns: no expiry, no rotation, secret in code
+3. Flag rate limiting absence on public auth endpoints
+4. Include security findings using standard severity format
+
+TYPE SAFETY (#10): Beyond `as any`, flag:
+- Prefer `unknown` over `any` for external inputs — forces explicit narrowing
+- Prefer discriminated union over boolean flag proliferation (e.g., `{ status: 'loading' | 'success' | 'error' }` > `{ isLoading, isError }`)
+- Prefer type guard functions (`value is T`) over bare `as T` type assertions
+- Prefer assertion functions (`asserts value is T`) over unchecked casts from external data
 
 [INSERT SHARED RULES BLOCK]
 ```

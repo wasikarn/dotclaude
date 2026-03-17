@@ -34,12 +34,16 @@ Prefix every inline comment with a label:
 | 🟡 | `suggestion:` | (แนะนำ) | Better approach exists — should fix |
 | 🔵 | `nitpick:` | (เล็กน้อย) | Style, minor naming — non-blocking |
 | ✅ | `praise:` | (ดี) | Good practice to reinforce |
+| ❓ | `question:` | (สงสัย) | Uncertainty that needs clarification — non-blocking, may dissolve on author's reply |
+
+`question:` ใช้เมื่อ reviewer ไม่แน่ใจว่าเป็น issue จริงหรือเปล่า เช่น "ทำไมถึงทำแบบนี้?" หรือ "ตรงนี้มี test ครอบคลุมไหม?" — ไม่ block merge และไม่นับใน signal ratio
 
 Examples:
 
 - `issue: (ต้องแก้) ตรงนี้ใช้ as any — runtime error slip past compiler ได้ ลอง type guard แทนนะครับ`
 - `suggestion: (แนะนำ) logic ซ้ำ 3 ที่ extract เป็น util ดีกว่าครับ`
 - `praise: (ดี) error handling ตรงนี้ structured ดีมาก มี context ครบ`
+- `question: (สงสัย) retry logic ตรงนี้ไม่มี backoff — ตั้งใจไหมครับ หรือมี rate limit จาก caller แล้ว?`
 
 ## Consolidation (Phase 4 — after all reviewers complete, before Assess)
 
