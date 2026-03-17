@@ -85,7 +85,7 @@ Run the project test suite:
 ```bash
 rtk test node ace test   # AdonisJS
 # or
-rtk bun run test         # Next.js projects
+rtk test bun run test    # Next.js projects
 ```
 
 If tests fail:
