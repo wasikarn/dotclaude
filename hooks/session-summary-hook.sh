@@ -12,7 +12,7 @@ fi
 INPUT=$(cat)
 
 # Check if this was a git commit command
-COMMAND=$(echo "$INPUT" | jq -r '.command // empty' 2>/dev/null)
+COMMAND=$(echo "$INPUT" | jq -r '.tool_input.command // empty' 2>/dev/null)
 if [ -z "$COMMAND" ]; then
   exit 0
 fi

@@ -13,18 +13,36 @@ MCP_PATTERNS=(
 )
 
 for pattern in "${MCP_PATTERNS[@]}"; do
-    while IFS= read -r pid; do
-        # macOS ps uses etime= (e.g. "01:23:45" or "1-02:03:04"), convert to seconds via Python
-        age=$(python3 -c "
+    PIDS=$(pgrep -f "$pattern" 2>/dev/null | tr '\n' ' ')
+    [ -z "$PIDS" ] && continue
+
+    # Batch: one Python call per pattern handles all matching PIDs
+    read -ra pid_array <<< "$PIDS"
+    python3 - "${pid_array[@]}" <<'PYEOF' 2>/dev/null
 import subprocess, sys
-t = subprocess.check_output(['ps', '-p', '$pid', '-o', 'etime='], text=True).strip()
-if not t: sys.exit(1)
-parts = t.replace('-', ':').split(':')
-m = [1, 60, 3600, 86400]
-print(sum(int(p) * m[i] for i, p in enumerate(reversed(parts))))
-" 2>/dev/null)
-        if [ -n "$age" ] && [ "$age" -gt 600 ]; then
-            kill "$pid" 2>/dev/null || true
-        fi
-    done < <(pgrep -f "$pattern" 2>/dev/null)
+
+pids = sys.argv[1:]
+if not pids:
+    sys.exit(0)
+
+try:
+    result = subprocess.check_output(
+        ['ps', '-p', ','.join(pids), '-o', 'pid=,etime='],
+        text=True, stderr=subprocess.DEVNULL
+    )
+except subprocess.CalledProcessError:
+    sys.exit(0)
+
+for line in result.strip().splitlines():
+    parts = line.split(None, 1)
+    if len(parts) != 2:
+        continue
+    pid, t = parts[0], parts[1].strip()
+    # etime format: [[dd-]hh:]mm:ss
+    segs = t.replace('-', ':').split(':')
+    weights = [1, 60, 3600, 86400]
+    age = sum(int(s) * weights[i] for i, s in enumerate(reversed(segs)))
+    if age > 600:
+        subprocess.run(['kill', pid], capture_output=True)
+PYEOF
 done

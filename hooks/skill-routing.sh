@@ -12,16 +12,19 @@ INPUT=$(cat)
 PROMPT=$(echo "$INPUT" | jq -r '.user_prompt // empty' 2>/dev/null) || exit 0
 [ -z "$PROMPT" ] && exit 0
 
+# Lowercase once for case-insensitive matching (Thai chars unaffected)
+PROMPT_LOWER="${PROMPT,,}"
+
 emit_hint() {
   jq -n --arg ctx "$1" '{"hookSpecificOutput": {"additionalContext": $ctx}}'
   exit 0
 }
 
 # --- fix-bug (priority 1) ---
-if echo "$PROMPT" | grep -qiE 'bug|broken|failing|error|crash|test fail' \
-   || echo "$PROMPT" | grep -qE 'พัง|ไม่ทำงาน|แก้ bug'; then
-  if echo "$PROMPT" | grep -qiE 'parallel' \
-     || echo "$PROMPT" | grep -qE 'ยาก|หา root cause ไม่เจอ'; then
+if [[ $PROMPT_LOWER =~ bug|broken|failing|error|crash|test\ fail ]] \
+   || [[ $PROMPT =~ พัง|ไม่ทำงาน|แก้\ bug ]]; then
+  if [[ $PROMPT_LOWER =~ parallel ]] \
+     || [[ $PROMPT =~ ยาก|หา\ root\ cause\ ไม่เจอ ]]; then
     emit_hint "[skill-hint:fix-bug]
 Sequence: systematic-debugging → TDD → verification-before-completion
 Skip systematic-debugging: root cause already stated explicitly (not a guess)
@@ -34,16 +37,16 @@ Alt (complex): dlc-debug — parallel root cause + DX analysis"
 fi
 
 # --- finish-feature (priority 2) ---
-if echo "$PROMPT" | grep -qiE 'ready to merge|feature complete|ready for PR|ready for review' \
-   || echo "$PROMPT" | grep -qE 'พร้อม merge|พร้อม PR|ทำเสร็จแล้ว พร้อม'; then
+if [[ $PROMPT_LOWER =~ ready\ to\ merge|feature\ complete|ready\ for\ pr|ready\ for\ review ]] \
+   || [[ $PROMPT =~ พร้อม\ merge|พร้อม\ PR|ทำเสร็จแล้ว\ พร้อม ]]; then
   emit_hint "[skill-hint:finish-feature]
 Sequence: verification-before-completion → requesting-code-review → finishing-a-development-branch
 Skip verification: tests already passing / already verified"
 fi
 
 # --- review-pr (priority 3) ---
-if echo "$PROMPT" | grep -qiE 'review PR|review pull request|review code|TATHEP-' \
-   || echo "$PROMPT" | grep -qE 'ดู PR'; then
+if [[ $PROMPT_LOWER =~ review\ pr|review\ pull\ request|review\ code|tathep- ]] \
+   || [[ $PROMPT =~ ดู\ PR ]]; then
   emit_hint "[skill-hint:review-pr]
 Run IN PARALLEL (all independent):
   code quality    → dlc-review
@@ -56,14 +59,14 @@ fi
 
 # --- start-feature (priority 4) ---
 # 'build' and 'create' require feature/component modifier to reduce false positives
-if echo "$PROMPT" | grep -qiE 'implement|add feature|build.*(feature|service|component|api)|create.*(feature|service|component|page)' \
-   || echo "$PROMPT" | grep -qE 'สร้าง|เพิ่ม feature|ทำ feature|อยากทำ'; then
-  if echo "$PROMPT" | grep -qiE 'unfamiliar|research' \
-     || echo "$PROMPT" | grep -qE 'ไม่คุ้น|ศึกษา|ไม่รู้'; then
+if [[ $PROMPT_LOWER =~ implement|add\ feature|build.*(feature|service|component|api)|create.*(feature|service|component|page) ]] \
+   || [[ $PROMPT =~ สร้าง|เพิ่ม\ feature|ทำ\ feature|อยากทำ ]]; then
+  if [[ $PROMPT_LOWER =~ unfamiliar|research ]] \
+     || [[ $PROMPT =~ ไม่คุ้น|ศึกษา|ไม่รู้ ]]; then
     emit_hint "[skill-hint:start-feature]
 Alt (unfamiliar/complex): dlc-build → writing-plans → using-git-worktrees → TDD"
-  elif echo "$PROMPT" | grep -qiE 'team|parallel' \
-       || echo "$PROMPT" | grep -qE 'ช่วยกัน'; then
+  elif [[ $PROMPT_LOWER =~ team|parallel ]] \
+       || [[ $PROMPT =~ ช่วยกัน ]]; then
     emit_hint "[skill-hint:start-feature]
 Alt (team): dlc-build — full development loop with agent teams"
   fi
