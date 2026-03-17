@@ -114,7 +114,7 @@
         "hooks": [
           {
             "type": "prompt",
-            "prompt": "If stop_hook_active is true in the input, respond {\"ok\": true} immediately. Otherwise: Check if the assistant's response completed all tasks the user requested. Look at the todo list if present \u2014 are there pending or in-progress items? Did the assistant leave any work unfinished or promise to do something it didn't do? If everything is done, respond {\"ok\": true}. If work remains, respond {\"ok\": false, \"reason\": \"Brief description of what's incomplete\"}."
+            "prompt": "If stop_hook_active is true in the input, respond {\"ok\": true} immediately. Otherwise: Focus ONLY on the most recent user message and the assistant's immediate response to it. Do NOT treat previous stop hook feedback messages in conversation history as evidence of pending work — those are historical records. Check: (1) Did the assistant directly answer what the user just asked? (2) Are there TodoWrite items in-progress that were promised this turn but not completed? (3) Did the assistant explicitly promise something this turn and not deliver it? If all pass, respond {\"ok\": true}. If work from THIS TURN is genuinely unfinished, respond {\"ok\": false, \"reason\": \"what specifically remains from this turn\"}."
           }
         ]
       }
