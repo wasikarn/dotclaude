@@ -12,7 +12,7 @@ Step 1: Parallel triage (all concurrent)
 Step 2: Classify mode (decision tree → Full/Quick/Hotfix)
 GATE: User confirms mode ──────────────────────────────────────────┐
     ↓                                                              │
-Step 2.5: Branch setup                                             │
+Step 2.5: Load Mode File                                            │
     ↓                                                              │
 Step 3: Create dev-loop-context.md artifact                        │
     ↓                                                              │
