@@ -17,37 +17,7 @@ A **Skill** is a reusable prompt workflow stored as `SKILL.md` that Claude loads
 | Trigger | Manual | Auto-detected from description |
 | Maintainability | None | Version-controlled |
 
-## Skill File Structure
-
-```text
-skill-name/
-├── SKILL.md          # Required — agent entry point
-├── references/       # Supporting docs (loaded on demand)
-├── scripts/          # Executable helpers (no context cost)
-└── assets/           # Templates, fonts, static files
-```
-
-### Loading Levels (Progressive Disclosure)
-
-| Level | Content | When Loaded |
-| --- | --- | --- |
-| 1 — Metadata | `name` + `description` (~100 tokens) | Always in context |
-| 2 — Body | `SKILL.md` content | On skill trigger |
-| 3 — Resources | `references/`, `scripts/`, `assets/` | On demand only |
-
-**Rule:** Keep body under 500 lines. Move anything beyond that to `references/`.
-
-**Concise example — omit what Claude already knows:**
-
-```text
-# Bad (~150 tokens — Claude already knows what PDF is)
-"PDF (Portable Document Format) files are a common file format
-that contains text, images... blah blah... To extract text you need
-a library... there are many libraries available..."
-
-# Good (~50 tokens — 3x reduction)
-"Use pdfplumber for text extraction:" + code example
-```
+See [skills-best-practices.md](skills-best-practices.md) for: frontmatter field spec, file structure, loading levels, description rules, content principles, and string substitutions.
 
 ## Creation Workflow
 
@@ -148,32 +118,9 @@ Emoji in summary, hashtags in body, closing with CTA.
 
 #### `description` field
 
-The description is the **primary trigger mechanism**. Claude auto-invokes a Skill based on it.
+The description is the **primary trigger mechanism**. See `skills-best-practices.md` for full rules.
 
-```text
-# Bad — too vague
-"Helps with documents"
-
-# Good — trigger-complete
-"Creates long-form Facebook content in the brand's style.
-Use when the user asks to write content, create a post,
-write a caption, or mentions Facebook post."
-```
-
-**Rules for description:**
-
-- Write in third person (not "I can help...")
-- Include both **what it does** and **when to use it**
-- Include keywords users are likely to type
-- Lean slightly **pushy** — Claude has a natural undertrigger bias (Anthropic observation)
-- Max 1024 characters
-
-#### Body content
-
-- Every token must earn its place — omit what Claude already knows
-- Prefer tables and one-liners over prose
-- Explain **why** behind rules, not just what — Claude has theory of mind and performs better with reasoning than commands
-- Avoid `ALWAYS`/`NEVER` in all-caps — that's a signal to reframe as reasoning instead
+Key: lean slightly **pushy** — Claude has a natural undertrigger bias (Anthropic observation).
 
 #### Degrees of Freedom
 
@@ -234,14 +181,6 @@ If modifying existing → follow path B
 **Core loop:** Draft → Run real prompts → Observe → Revise → Repeat
 
 **Critical:** Generalize from test cases, don't overfit to them. A Skill must work across thousands of prompts, not just the 3 you tested.
-
-**Signs of over-constraining:**
-
-- `ALWAYS`/`NEVER` in all-caps throughout
-- Rigid structures that don't adapt to context
-- Instructions the model follows mechanically without understanding intent
-
-> **Anthropic's note:** If you find yourself writing `ALWAYS` or `NEVER` in all-caps — that's a yellow flag. Try explaining the *why* instead. Claude has theory of mind; it performs better when it understands the reason behind a rule than when it's just commanded.
 
 ### Step 6 — Optimize Description
 

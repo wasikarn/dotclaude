@@ -63,20 +63,23 @@ Lifecycle hooks automate actions at specific points. Configured in `.claude/sett
 
 Active hooks (in `.claude/settings.json`):
 
-| Event | Matcher | What it does |
-| --- | --- | --- |
-| `SessionStart` | `startup` | Inject git state on fresh session |
-| `SessionStart` | `compact` | Re-inject context after compaction |
-| `PreToolUse` | `Edit\|Write` | Block edits to `.claude/settings.json` |
-| `PostToolUse` | `Edit\|Write` | Auto-lint `.md` files after edits |
-| `Stop` | — | Verify tasks complete before stopping (with `stop_hook_active` guard) |
-| `TaskCompleted` | `review-debate` | Verify evidence in review/debate task completions |
-| `TeammateIdle` | `review-pr` | Nudge idle teammates during debate rounds |
-| `TaskCompleted` | `dev-loop` | Verify evidence in dev-loop task completions |
-| `TeammateIdle` | `dev-loop` | Nudge idle dev-loop teammates to stay on task |
-| `Notification` | `*` | macOS desktop alert when input needed |
+| Event | Matcher | Script | What it does |
+| --- | --- | --- | --- |
+| `SessionStart` | `startup` | `session-start-context.sh` | Inject git state on fresh session |
+| `SessionStart` | `compact` | `post-compact-context.sh` | Re-inject context after compaction |
+| `PreToolUse` | `Edit\|Write` | `protect-files.sh` | Block edits to `.claude/settings.json` |
+| `PostToolUse` | `Edit\|Write` | _(inline)_ | Auto-lint `.md` files after edits |
+| `Stop` | — | _(prompt)_ | Verify tasks complete before stopping (with `stop_hook_active` guard) |
+| `TaskCompleted` | `review-debate` | `task-gate.sh` | Verify file:line evidence in review/debate task completions |
+| `TaskCompleted` | `dev-loop` | `task-gate.sh` | Verify file:line evidence in dev-loop task completions |
+| `TaskCompleted` | `respond` | `task-gate.sh` | Verify file:line evidence in respond task completions |
+| `TeammateIdle` | `review-pr` | `idle-nudge.sh` | Nudge idle teammates during debate rounds |
+| `TeammateIdle` | `dev-loop` | `idle-nudge.sh` | Nudge idle dev-loop teammates to stay on task |
+| `TeammateIdle` | `respond` | `idle-nudge.sh` | Nudge idle Fixer teammates |
+| `TeammateIdle` | `debug-` | `idle-nudge.sh` | Nudge idle Investigator teammates |
+| `Notification` | `*` | _(inline)_ | macOS desktop alert when input needed |
 
-Hook scripts live at `hooks/` and are symlinked to `~/.claude/hooks/` via `link-skill.sh`.
+Hook scripts live at `hooks/` and are symlinked to `~/.claude/hooks/` via `link-skill.sh`. `task-gate.sh` and `idle-nudge.sh` are parameterized via env vars in each matcher's command string.
 
 ## Output Styles
 

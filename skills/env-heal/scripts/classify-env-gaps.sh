@@ -3,7 +3,7 @@
 # Usage: bash classify-env-gaps.sh [project-root] [schema-file] [example-file]
 # Output: {"schema_vars":[...],"example_vars":[...],"code_vars":[...],"gaps":{...},"gap_count":N}
 #
-# Extends scan-env-refs.sh by adding schema + example parsing and gap analysis.
+# Phase 1 delegates to scan-env-refs.sh (same directory) to avoid duplicating grep patterns.
 # Compatible with bash 3.x (macOS default).
 
 set -euo pipefail
@@ -17,36 +17,14 @@ SCHEMA_PATH="$PROJECT_ROOT/$SCHEMA_FILE"
 EXAMPLE_PATH="$PROJECT_ROOT/$EXAMPLE_FILE"
 
 # --- Phase 1: Scan code for env var references ---
-EXCLUDE_DIRS="node_modules|dist|build|\.next"
-CODE_TMPFILE=$(mktemp)
-trap 'rm -f "$CODE_TMPFILE" "$SCHEMA_TMPFILE" "$EXAMPLE_TMPFILE"' EXIT
-
-# Pattern 1: process.env.VAR_NAME
-grep -rn 'process\.env\.\w\+' "$PROJECT_ROOT" \
-  --include='*.ts' --include='*.tsx' --include='*.js' --include='*.jsx' 2>/dev/null \
-  | grep -vE "$EXCLUDE_DIRS" \
-  | sed 's/.*process\.env\.\([A-Za-z_][A-Za-z0-9_]*\).*/\1/' \
-  >> "$CODE_TMPFILE" || true
-
-# Pattern 2: Env.get('VAR_NAME')
-grep -rn "Env\.get(" "$PROJECT_ROOT" \
-  --include='*.ts' --include='*.tsx' --include='*.js' --include='*.jsx' 2>/dev/null \
-  | grep -vE "$EXCLUDE_DIRS" \
-  | sed "s/.*Env\.get(['\"][[:space:]]*\([A-Za-z_][A-Za-z0-9_]*\).*/\1/" \
-  >> "$CODE_TMPFILE" || true
-
-# Pattern 3: env('VAR_NAME')
-grep -rn "env(" "$PROJECT_ROOT" \
-  --include='*.ts' --include='*.tsx' --include='*.js' --include='*.jsx' 2>/dev/null \
-  | grep -vE "$EXCLUDE_DIRS" \
-  | grep -v "Env\.get" \
-  | sed "s/.*env(['\"][[:space:]]*\([A-Za-z_][A-Za-z0-9_]*\).*/\1/" \
-  >> "$CODE_TMPFILE" || true
-
-CODE_VARS=$(sort -u "$CODE_TMPFILE" | grep -E '^[A-Z_][A-Z0-9_]*$' || true)
+SCAN_RESULT=$(bash "$(dirname "$0")/scan-env-refs.sh" "$PROJECT_ROOT")
+CODE_VARS=$(echo "$SCAN_RESULT" | jq -r '.vars[]' 2>/dev/null | sort -u || true)
 
 # --- Phase 2: Parse schema file ---
 SCHEMA_TMPFILE=$(mktemp)
+EXAMPLE_TMPFILE=$(mktemp)
+trap 'rm -f "$SCHEMA_TMPFILE" "$EXAMPLE_TMPFILE"' EXIT
+
 if [ -f "$SCHEMA_PATH" ]; then
   grep -oE "['\"]?[A-Z_][A-Z0-9_]*['\"]?\s*:" "$SCHEMA_PATH" 2>/dev/null \
     | sed "s/['\": ]//g" \
@@ -56,7 +34,6 @@ fi
 SCHEMA_VARS=$(cat "$SCHEMA_TMPFILE")
 
 # --- Phase 3: Parse .env.example ---
-EXAMPLE_TMPFILE=$(mktemp)
 if [ -f "$EXAMPLE_PATH" ]; then
   grep -E '^[A-Z_][A-Z0-9_]*=' "$EXAMPLE_PATH" 2>/dev/null \
     | sed 's/=.*//' \
