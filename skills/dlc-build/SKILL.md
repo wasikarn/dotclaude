@@ -141,9 +141,13 @@ Post a checkbox list in conversation: Phase 0 (done), Phase 1 (Full only), Phase
 
 Skip this phase entirely in Quick mode → go to Phase 2.
 
+### Step 0: Bootstrap (before explorers)
+
+Dispatch `dev-loop-bootstrap` agent (Haiku) with the task description as argument. Wait for completion — output written to `.claude/dlc-build/bootstrap-context.md`. Read that file and inject its contents into ALL explorer prompts as a `BOOTSTRAP CONTEXT:` section. This eliminates redundant project-structure reads across explorers.
+
 ### Step 1: Create Explorer Team
 
-Load [explorer-prompts.md](references/explorer-prompts.md) now. Create team `dev-loop-{branch}` with 2-3 explorer teammates:
+Load [explorer-prompts.md](references/explorer-prompts.md) now. Read `bootstrap-context.md` and inject into each explorer's `BOOTSTRAP CONTEXT` section. Create team `dev-loop-{branch}` with 2-3 explorer teammates:
 
 - **Explorer 1:** Execution paths + patterns in primary area
 - **Explorer 2:** Data model + dependencies + coupling
