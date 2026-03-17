@@ -25,6 +25,7 @@ Common patterns that waste context tokens or degrade agent performance. Use duri
 | Outdated version pin | Version in CLAUDE.md ≠ version in `package.json`/lockfile | Update to actual version |
 | Renamed module/dir | Old name doesn't appear in `find` output | Update to current name |
 | Removed dependency | Listed in CLAUDE.md but not in `package.json` | Remove reference |
+| Pointer to missing `agent_docs/` | CLAUDE.md says "consult `agent_docs/`" but `has_agent_docs: false` in pre-scan | Document inline instead — a pointer to nothing is worse than no pointer |
 
 ## Category: Redundant (can reduce)
 
