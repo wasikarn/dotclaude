@@ -20,13 +20,12 @@ bash scripts/link-skill.sh --list
 
 ## Contents
 
-### Skills (8)
+### Skills (7)
 
 | Category | Skills | Description |
 | --- | --- | --- |
 | **DLC Workflows** | `dlc-build`, `dlc-review`, `dlc-respond`, `dlc-debug` | Full DLC — feature dev (`--quick`/`--hotfix`), adversarial PR review, respond to review comments, debug |
 | **Thinking** | `systems-thinking` | Causal Loop Diagram analysis for architecture decisions and bottleneck diagnosis |
-| **Database** | `postgresql-schema-design` | Schema design, data types, indexing strategies, FK gotchas |
 | **Utilities** | `optimize-context`, `env-heal` | CLAUDE.md optimizer, env var healing |
 
 ### Agents (4)
