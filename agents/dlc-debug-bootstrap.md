@@ -47,7 +47,10 @@ fd -t f "{keyword}" {project_root}/src --max-depth 5 | head -5
 Fallback if `fd` unavailable:
 
 ```bash
-# Using Glob tool: search for files matching the keyword pattern
+# Using Glob tool (fd unavailable):
+# Construct a glob pattern from the keyword extracted from the bug description.
+# Example: Glob("{project_root}/src/**/*{keyword}*.ts")
+# Review results and select the most relevant files (max 5).
 ```
 
 If no files found: note "affected files unknown — Investigator must determine".
@@ -79,35 +82,43 @@ rtk grep -n "^export|^class|^function|^const.*=.*=>" --include="*.ts" {affected_
 ### Step 5: Append to debug-context.md
 
 `debug-context.md` is created by dlc-debug Phase 0 Step 4 before this agent runs.
-Append the following section using Bash:
 
-```bash
-cat >> {project_root}/debug-context.md << 'EOF'
+Build the `## Shared Context` section from your gathered data (Steps 1–4), then
+append it to `debug-context.md` using `Bash`. Construct each section with real values —
+do NOT write placeholder text like `{timestamp}` or `{description}`.
 
+Required structure (include only sections with data; see Required Sections below):
+
+```text
 ## Shared Context
-**Gathered:** {timestamp}
+**Gathered:** 2026-03-18T10:30:00Z
 
 ### Recent Build Context (from dlc-build)
-{include only if Step 1 found relevant artifacts; omit section entirely otherwise}
+(include only if Step 1 found relevant artifacts)
+- plan item 1: description
+- modified: src/foo.ts
 
 ### Affected Files
-{list each file with line range and one-line description}
+- src/UserService.ts:42-80 — findById method where error occurs
 
 ### Recent Commits
-{git log output from Step 3}
+abc1234 fix: update validation in UserService
+def5678 feat: add UserService.findById
 
 ### Code Structure Notes
-{function signatures and key class names from Step 4}
-EOF
+function findById(id: string): User | null (line 42)
+class UserService (line 1)
 ```
 
-If `debug-context.md` does not exist (crash recovery path): create a skeleton first:
+Append the constructed section using Bash (one `printf` or multiple `echo >>` calls).
+
+If `debug-context.md` does not exist (crash recovery): create a skeleton first:
 
 ```bash
 printf '# Debug Context\n**Bug:** %s\n' "{bug_description}" > {project_root}/debug-context.md
 ```
 
-Then append as above.
+Then append the `## Shared Context` section as above.
 
 ## Required Sections in Output
 
