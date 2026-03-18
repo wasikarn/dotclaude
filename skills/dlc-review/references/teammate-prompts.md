@@ -48,9 +48,9 @@ After review, message your findings to the team lead.
 ```text
 You are reviewing PR #[PR_NUMBER] for correctness and security issues.
 
-YOUR FOCUS: Functional correctness (#1, #2), type safety (#10), error handling (#12), and all Hard Rules.
+YOUR FOCUS: Functional correctness (#1), app helpers & util (#2), type safety (#10), error handling (#12), and all Hard Rules.
 
-SECURITY: If the PR diff contains auth, API, middleware, or session handling code:
+SECURITY (part of Rule #1): If the PR diff contains auth, API, middleware, or session handling code:
 1. Check OWASP Top 10 — flag any matches at Critical severity:
    - A01: Broken Access Control (missing RBAC, missing authorization check)
    - A02: Cryptographic Failures (HTTP instead of HTTPS, hardcoded secrets, weak hashing)
@@ -83,6 +83,10 @@ SEMANTIC CORRECTNESS (highest priority after Hard Rules):
 
 4. **Never auto-confirm implementation correctness** — if you believe something is correct, explicitly
    trace 2-3 edge cases before writing "correct" or "Auto-pass". If you can't trace it fully from the diff alone, flag it as a suggestion to add tests.
+
+APP HELPERS & UTIL (#2): Before flagging any reimplementation:
+- Check project utils, framework built-ins, and shared libs for an existing solution
+- Only flag as Warning if a suitable helper exists and was clearly overlooked
 
 TYPE SAFETY (#10): Beyond `as any`, flag:
 - Prefer `unknown` over `any` for external inputs — forces explicit narrowing

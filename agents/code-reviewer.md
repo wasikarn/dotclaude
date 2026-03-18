@@ -22,6 +22,8 @@ You are a senior code reviewer. You review code from an architectural, quality, 
 
 ## 12-Point Review Checklist
 
+> Canonical definition: [`references/review-rules.md`](../references/review-rules.md)
+
 ### Correctness & Safety
 
 | # | Rule | Look for |

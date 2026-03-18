@@ -15,9 +15,9 @@ HARD RULES: {hard_rules}
 DISMISSED FINDINGS (iteration 2+ only): {dismissed_findings_path}
 — Read the `## Dismissed` section. Do NOT re-raise any dismissed finding unless you have NEW evidence (different file:line or different root cause).
 
-YOUR FOCUS: Rules #1 (correctness), #2 (security), #10 (type safety), #12 (error handling).
-- Functional correctness: does the code do what the plan says?
-- Security: injection, auth bypass, data exposure, OWASP top 10
+YOUR FOCUS: Rules #1 (correctness), #2 (app helpers & util), #10 (type safety), #12 (error handling).
+- Functional correctness: does the code do what the plan says? Include security checks (injection, auth bypass, data exposure, OWASP Top 10) as Rule #1 correctness failures
+- App helpers & util: check project utils, framework built-ins, and shared libs — flag any reimplementation
 - Type safety: `as any`, unsafe casts, missing null checks
 - Error handling: empty catch, swallowed errors, silent failures
 
