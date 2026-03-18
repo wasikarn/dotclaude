@@ -1,25 +1,55 @@
+<div align="center">
+
 # claude-code-skills
 
-A Claude Code plugin — 8 workflow skills, 7 custom agents, lifecycle hooks, and 2 output styles for structured development and PR review workflows.
+**A Claude Code plugin for structured development, PR review, and debugging — powered by Agent Teams.**
 
-**Plugin name:** `claude-code-skills` · **Repo:** `wasikarn/claude-code-skills`
+[![Version](https://img.shields.io/badge/version-1.0.0-blue?style=flat-square)](https://github.com/wasikarn/claude-code-skills/releases)
+[![License](https://img.shields.io/badge/license-MIT-green?style=flat-square)](LICENSE)
+[![Skills](https://img.shields.io/badge/skills-8-blue?style=flat-square)](#skills)
+[![Agents](https://img.shields.io/badge/agents-7-purple?style=flat-square)](#agents)
+[![Hooks](https://img.shields.io/badge/hooks-8-orange?style=flat-square)](#hooks)
+
+<p>
+  <a href="#quick-start">Quick Start</a> •
+  <a href="#skills">Skills</a> •
+  <a href="#agents">Agents</a> •
+  <a href="#hooks">Hooks</a> •
+  <a href="#jira-integration">Jira</a> •
+  <a href="#troubleshooting">Troubleshooting</a> •
+  <a href="CONTRIBUTING.md">Contributing</a>
+</p>
+
+</div>
+
+---
+
+## What's Inside
+
+| Component | Count | Purpose |
+| --- | --- | --- |
+| **Skills** | 8 | Workflow automation — dev loop, PR review, debugging, utilities |
+| **Agents** | 7 | Specialized subagents for bootstrapping, reviewing, and committing |
+| **Hooks** | 8 | Lifecycle automation — dependency checks, skill routing, quality gates |
+| **Output Styles** | 2 | Thai Tech Lead, Coding Mentor |
+| **Commands** | 1 | `analyze-claude-features` |
 
 ---
 
 ## Quick Start
 
 ```bash
-# 1. Install prerequisites (macOS)
+# 1. Install prerequisites
 brew install jq gh rtk && gh auth login
 
 # 2. Install the plugin
 claude plugin install wasikarn/claude-code-skills
 
-# 3. Enable Agent Teams (required for DLC skills)
+# 3. Enable Agent Teams (required for all DLC skills)
 claude config set env.CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS 1
 ```
 
-Then restart Claude Code. On the next session start, the plugin will warn you if any tools are still missing.
+Restart Claude Code. On next session start, the plugin warns you about any missing tools automatically.
 
 ---
 
@@ -29,41 +59,13 @@ Then restart Claude Code. On the next session start, the plugin will warn you if
 | --- | --- | --- |
 | `jq` | Yes — all workflow hooks | `brew install jq` / `apt install jq` |
 | `git` | Yes — all DLC skills | pre-installed on most systems |
-| `gh` CLI | Yes — dlc-build, dlc-review, dlc-respond, dlc-debug, merge-pr | `brew install gh` then `gh auth login` |
-| `rtk` | Yes — token-optimized output in DLC skills | `brew install rtk` |
-| `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` | Yes — enables Agent Teams for all DLC skills | `claude config set env.CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS 1` |
-| `shellcheck` | Optional — auto-validates shell scripts you write | `brew install shellcheck` |
-| `node` / `npx` | Optional — auto-lints markdown files | `brew install node` |
+| `gh` CLI | Yes — DLC skills + merge-pr | `brew install gh` → `gh auth login` |
+| `rtk` | Yes — token-optimized output | `brew install rtk` |
+| `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` | Yes — enables Agent Teams | `claude config set env.CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS 1` |
+| `shellcheck` | Optional | `brew install shellcheck` |
+| `node` / `npx` | Optional — auto markdown lint | `brew install node` |
 
-> Hooks degrade gracefully — missing optional tools are skipped silently, not blocked.
-
----
-
-## Installation
-
-```bash
-claude plugin install wasikarn/claude-code-skills
-```
-
-Verify:
-
-```bash
-claude plugin list
-# Expected: claude-code-skills appears in the list
-```
-
-Skills are namespaced after plugin install:
-
-```bash
-/claude-code-skills:dlc-build
-/claude-code-skills:dlc-review
-/claude-code-skills:dlc-debug
-/claude-code-skills:dlc-respond
-/claude-code-skills:merge-pr
-/claude-code-skills:optimize-context
-/claude-code-skills:env-heal
-/claude-code-skills:systems-thinking
-```
+> Hooks degrade gracefully — missing optional tools are skipped silently.
 
 ---
 
@@ -71,47 +73,88 @@ Skills are namespaced after plugin install:
 
 ### DLC Workflow Skills
 
-These four skills form a complete development loop powered by Agent Teams.
+The four DLC skills form a complete development loop. Each runs a team of specialized agents that work in parallel, debate findings, and produce structured output.
+
+```text
+┌─────────────────────────────────────────────────────────────────┐
+│                     DLC Workflow Overview                       │
+├──────────────┬──────────────┬──────────────┬───────────────────┤
+│  dlc-build   │  dlc-review  │ dlc-respond  │     dlc-debug     │
+│              │              │              │                   │
+│ Research     │ Reviewer A   │ Fetch open   │ Investigator      │
+│ → Plan       │ Reviewer B   │ threads      │ (root cause)      │
+│ → Implement  │ Reviewer C   │ → Fix each   │ + DX Analyst      │
+│ → Review     │ ↓ Debate     │ → Commit     │ (observability)   │
+│ → Ship       │ → Consensus  │ → Reply      │ → Fixer           │
+└──────────────┴──────────────┴──────────────┴───────────────────┘
+```
+
+---
 
 #### `dlc-build` — Full Development Loop
 
-Use when implementing a feature, bugfix, or Jira ticket. Runs Research → Plan → Implement → Review → Ship.
+The primary workflow for any coding task. Runs Research → Plan → Implement → Review → Ship with an iterative fix-review loop.
+
+**When to use:** New features, bug fixes, refactors, Jira tickets, CI failures, production hotfixes.
 
 ```bash
 /claude-code-skills:dlc-build "add rate limiting to the API"
-/claude-code-skills:dlc-build BEP-1234          # auto-fetches Jira AC
-/claude-code-skills:dlc-build BEP-1234 --quick  # skip research for small fixes
-/claude-code-skills:dlc-build BEP-1234 --hotfix # urgent production incident
+/claude-code-skills:dlc-build PROJ-1234           # auto-fetches Jira AC
+/claude-code-skills:dlc-build PROJ-1234 --quick   # skip research for small fixes
+/claude-code-skills:dlc-build PROJ-1234 --hotfix  # urgent production incident
 ```
+
+| Mode | When to use |
+| --- | --- |
+| _(default)_ | Full loop — research, plan, implement, review |
+| `--quick` | Small fix with clear scope — skip research phase |
+| `--hotfix` | Branches from `main`, creates backport PR to `develop` |
+
+---
 
 #### `dlc-review` — Adversarial PR Review
 
-Use when reviewing a pull request. Three agents independently review then debate findings to reduce false positives.
+Three agents independently review a PR, then debate their findings in rounds to eliminate false positives. Final output is a single ranked table with evidence-backed findings.
+
+**When to use:** Reviewing any pull request — quick standards check, architecture review, or thorough multi-perspective analysis.
 
 ```bash
-/claude-code-skills:dlc-review 42               # PR number
-/claude-code-skills:dlc-review 42 BEP-1234      # with Jira AC verification
-/claude-code-skills:dlc-review 42 Author        # apply fixes directly
-/claude-code-skills:dlc-review 42 Reviewer      # post GitHub comments
+/claude-code-skills:dlc-review 42                  # PR number
+/claude-code-skills:dlc-review 42 PROJ-1234        # with Jira AC verification
+/claude-code-skills:dlc-review 42 Author           # apply fixes directly to the branch
+/claude-code-skills:dlc-review 42 Reviewer         # post findings as GitHub review comments
 ```
+
+| Mode | When to use |
+| --- | --- |
+| `Author` | You own the PR and want fixes applied automatically |
+| `Reviewer` | You are reviewing someone else's PR and want GitHub comments posted |
+
+---
 
 #### `dlc-respond` — Address PR Review Comments
 
-Use after receiving PR review feedback. Fetches open threads, fixes each issue, commits, and replies to reviewers.
+Fetches all open GitHub review threads on a PR, groups them by file, fixes each issue in parallel, commits changes, and posts replies to close each thread.
+
+**When to use:** After receiving PR review feedback and needing to address all comments systematically.
 
 ```bash
 /claude-code-skills:dlc-respond 42
-/claude-code-skills:dlc-respond 42 BEP-1234     # with Jira context
+/claude-code-skills:dlc-respond 42 PROJ-1234   # with Jira AC context for prioritization
 ```
+
+---
 
 #### `dlc-debug` — Parallel Root Cause Analysis
 
-Use when debugging a complex bug. Investigator traces root cause while DX Analyst audits observability and error handling in parallel.
+Two agents run in parallel: an Investigator traces the root cause through logs, stack traces, and code, while a DX Analyst audits observability, error handling, and test coverage in the affected area. A Fixer agent then applies the fix.
+
+**When to use:** Complex bugs, production incidents, or when you want to harden the affected area alongside the fix.
 
 ```bash
 /claude-code-skills:dlc-debug "NullPointerException in UserService"
-/claude-code-skills:dlc-debug BEP-5678          # from Jira bug ticket
-/claude-code-skills:dlc-debug BEP-5678 --quick  # skip DX analysis
+/claude-code-skills:dlc-debug PROJ-5678          # from a Jira bug ticket
+/claude-code-skills:dlc-debug PROJ-5678 --quick  # fix only, skip DX analysis
 ```
 
 ---
@@ -120,97 +163,120 @@ Use when debugging a complex bug. Investigator traces root cause while DX Analys
 
 #### `merge-pr` — Git-flow Merge & Deploy
 
-Use to merge a PR, deploy a hotfix, or cut a release following git-flow conventions.
+Automates the full merge and release process following git-flow conventions: version bumps, CHANGELOG updates, tags, backport PRs, and post-merge verification.
 
 ```bash
-/claude-code-skills:merge-pr 42          # feature/bugfix → develop
-/claude-code-skills:merge-pr --hotfix    # hotfix → main + backport
-/claude-code-skills:merge-pr --release   # release → main + tag
+/claude-code-skills:merge-pr 42           # feature/bugfix → develop
+/claude-code-skills:merge-pr --hotfix     # hotfix → main + backport to develop
+/claude-code-skills:merge-pr --release    # release → main + tag + backport
 ```
+
+**Requires:** `gh` CLI (authenticated), clean working tree, GitHub remote.
+
+---
 
 #### `optimize-context` — Audit CLAUDE.md
 
-Use to audit and improve a CLAUDE.md file — scores quality, removes bloat, and adds missing context.
+Scores a CLAUDE.md file across quality dimensions, identifies bloat and gaps, and rewrites sections to be more useful for Claude. Safe to run — use `--dry-run` to preview changes.
 
 ```bash
 /claude-code-skills:optimize-context
+/claude-code-skills:optimize-context --dry-run    # preview without editing
+/claude-code-skills:optimize-context --coverage   # include coverage analysis
 ```
+
+---
 
 #### `env-heal` — Fix Environment Variables
 
-Use when env vars are missing from schema or `.env.example`, or when the app crashes at startup due to missing config.
+Scans the codebase for all env var references, cross-references against the validation schema and `.env.example`, classifies gaps, auto-fixes discrepancies, and runs tests to verify.
 
 ```bash
-/claude-code-skills:env-heal             # full scan and fix
-/claude-code-skills:env-heal --quick     # schema vs .env.example only
+/claude-code-skills:env-heal              # full scan and fix
+/claude-code-skills:env-heal --quick      # schema vs .env.example only
+/claude-code-skills:env-heal --dry-run    # preview changes without applying
 ```
+
+**Supports:** AdonisJS (`Env.schema`), dotenv (`.env.example`), and any Node.js project.
+
+---
 
 #### `systems-thinking` — Causal Loop Analysis
 
-Use before major architecture decisions to map feedback loops and second-order effects.
+Helps think through complex architecture decisions by mapping causal loops, identifying feedback cycles, and surfacing second-order effects before committing to a direction.
 
 ```bash
 /claude-code-skills:systems-thinking "should we move to microservices?"
+/claude-code-skills:systems-thinking "what happens if we remove the cache layer?"
 ```
 
 ---
 
-## What's Included
+## Agents
 
-### Agents (7)
+Specialized subagents that the DLC skills and other workflows spawn automatically. You can also invoke them directly.
 
-| Agent | Model | Purpose |
-| --- | --- | --- |
-| `commit-finalizer` | haiku | Fast git commit with conventional commits format |
-| `dev-loop-bootstrap` | haiku | Pre-gather context before dlc-build explorer spawns |
-| `dlc-debug-bootstrap` | haiku | Pre-gather debug context before dlc-debug Investigator spawns |
-| `pr-review-bootstrap` | sonnet | Fetch PR diff + Jira AC in one pass before review |
-| `review-consolidator` | haiku | Dedup/sort multi-reviewer findings into single ranked table |
-| `skill-validator` | sonnet | Validates SKILL.md against best practices |
-| `tathep-reviewer` | sonnet | Code reviewer with persistent memory (tathep projects) |
-
-### Hooks — Distributed via Plugin
-
-These hooks are active automatically after plugin install:
-
-| Hook | Event | Purpose |
-| --- | --- | --- |
-| `check-deps.sh` | SessionStart | Warn if required tools are missing |
-| `session-start-context.sh` | SessionStart | Inject git branch + uncommitted changes into context |
-| `skill-routing.sh` | UserPromptSubmit | Auto-suggest relevant skills based on prompt keywords |
-| `protect-files.sh` | PreToolUse[Edit\|Write] | Block Claude from editing `.claude/settings.json` directly |
-| _(inline)_ | PostToolUse[Edit\|Write] | Auto-lint `.md` files with `markdownlint-cli2 --fix` |
-| `shellcheck-written-scripts.sh` | PostToolUse[Write] | Auto-validate shell scripts Claude writes |
-| `task-gate.sh` | TaskCompleted | Require file:line evidence before agent tasks complete |
-| `idle-nudge.sh` | TeammateIdle | Nudge idle teammates during Agent Teams workflows |
-
-### Output Styles (2)
-
-| Style | Description |
-| --- | --- |
-| `thai-tech-lead` | Thai language, concise, architecture-focused |
-| `coding-mentor` | Explains decisions inline while coding |
-
-### Commands (1)
-
-| Command | Description |
-| --- | --- |
-| `analyze-claude-features` | Analyze Claude Code features and capabilities |
+| Agent | Model | Invoked by | Purpose |
+| --- | --- | --- | --- |
+| `commit-finalizer` | Haiku | Manually | Fast git commit — formats conventional commit messages |
+| `dev-loop-bootstrap` | Haiku | `dlc-build` Phase 1 | Pre-gathers project structure and type definitions |
+| `dlc-debug-bootstrap` | Haiku | `dlc-debug` Phase 0 | Pre-gathers stack trace context and affected files |
+| `pr-review-bootstrap` | Sonnet | `dlc-review` Phase 0 | Fetches PR diff, Jira AC, and groups changed files |
+| `review-consolidator` | Haiku | `dlc-review` Phase 4 | Deduplicates and ranks findings from multiple reviewers |
+| `skill-validator` | Sonnet | Manually | Validates SKILL.md frontmatter and description quality |
+| `tathep-reviewer` | Sonnet | Manually | Code reviewer with persistent memory (tathep projects) |
 
 ---
 
-## Optional: Jira Integration
+## Hooks
 
-DLC skills (`dlc-build`, `dlc-review`, `dlc-respond`, `dlc-debug`) can auto-fetch Jira ticket context when you pass a ticket key as argument (e.g. `/claude-code-skills:dlc-build PROJ-123`).
+These hooks are distributed automatically with the plugin and activate on install. No manual configuration required.
 
-Configure one of these MCP servers:
-
-| MCP Server | How to install | Notes |
+| Hook | Event | What it does |
 | --- | --- | --- |
-| `mcp-atlassian` | See [mcp-atlassian docs](https://github.com/sooperset/mcp-atlassian) | Direct Jira API |
-| `jira-cache-server` | See [jira-cache-server docs](https://github.com/wasikarn/jira-cache-server) | Cached, faster |
+| `check-deps.sh` | `SessionStart` | Warns in context if `jq`, `gh`, or `rtk` are missing |
+| `session-start-context.sh` | `SessionStart` | Injects current git branch and uncommitted file count |
+| `skill-routing.sh` | `UserPromptSubmit` | Detects workflow keywords and suggests the right skill before responding |
+| `protect-files.sh` | `PreToolUse[Edit\|Write]` | Blocks Claude from editing `.claude/settings.json` directly |
+| _(inline)_ | `PostToolUse[Edit\|Write]` | Auto-lints `.md` files with `markdownlint-cli2 --fix` |
+| `shellcheck-written-scripts.sh` | `PostToolUse[Write]` | Auto-validates `.sh` files Claude writes |
+| `task-gate.sh` | `TaskCompleted` | Requires `file:line` evidence before agent tasks are marked complete |
+| `idle-nudge.sh` | `TeammateIdle` | Nudges idle Agent Teams teammates back on task |
 
-If neither is configured, skills skip Jira context silently and work normally.
+### Skill Routing Keywords
+
+`skill-routing.sh` detects these patterns and injects a skill hint before Claude responds:
+
+| Pattern | Suggested skill |
+| --- | --- |
+| `bug`, `broken`, `failing`, `crash`, `test fail` | `dlc-debug` |
+| `ready to merge`, `feature complete`, `ready for PR` | `dlc-review` → ship workflow |
+| `review PR`, `review pull request`, `review code` | `dlc-review` |
+| `implement`, `add feature`, `build component`, `create page` | `dlc-build` |
+
+---
+
+## Output Styles
+
+Activate an output style to change how Claude communicates throughout a session.
+
+| Style | How to activate | Description |
+| --- | --- | --- |
+| `thai-tech-lead` | `/output-style thai-tech-lead` | Thai language responses, English for code and technical terms. Concise, architecture-focused. |
+| `coding-mentor` | `/output-style coding-mentor` | Explains architectural decisions and trade-offs inline while writing code. Good for onboarding. |
+
+---
+
+## Jira Integration
+
+DLC skills auto-fetch Jira context when you pass a ticket key (e.g. `PROJ-123`). Configure one MCP server to enable:
+
+| MCP Server | Notes | Install |
+| --- | --- | --- |
+| `mcp-atlassian` | Direct Jira API | [sooperset/mcp-atlassian](https://github.com/sooperset/mcp-atlassian) |
+| `jira-cache-server` | Cached, faster | [wasikarn/jira-cache-server](https://github.com/wasikarn/jira-cache-server) |
+
+> If neither is configured, skills skip Jira context silently and continue normally. Jira is never a blocker.
 
 ---
 
@@ -218,40 +284,52 @@ If neither is configured, skills skip Jira context silently and work normally.
 
 ### DLC skills do nothing / no agents spawn
 
-Enable Agent Teams:
+Agent Teams must be enabled:
 
 ```bash
 claude config set env.CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS 1
 ```
 
-Then restart Claude Code.
+Restart Claude Code after setting.
 
 ### Skills not triggering automatically
 
-The `skill-routing.sh` hook detects keywords in your prompt and suggests relevant skills. Verify it's active:
+`skill-routing.sh` detects keywords and suggests skills. If it's not triggering, verify the plugin is installed:
 
 ```bash
 claude plugin list
-# claude-code-skills should appear
+# Expected: claude-code-skills appears
 ```
 
-If the plugin is installed but skills still don't trigger, try invoking manually with the `/claude-code-skills:` prefix.
+If missing, reinstall: `claude plugin install wasikarn/claude-code-skills`
+
+### Warning about missing tools at session start
+
+Install the flagged tools:
+
+```bash
+brew install jq gh rtk
+gh auth login
+```
+
+Then restart Claude Code to dismiss the warning.
 
 ### Jira context not loading
 
-Jira integration is optional. DLC skills work without it. If you want Jira context, configure one of:
-
-- `mcp-atlassian` MCP server (direct Jira API)
-- `jira-cache-server` MCP server (cached, faster)
-
-If neither is configured, skills skip Jira context silently and continue normally.
+Jira is optional. If you want it, configure `mcp-atlassian` or `jira-cache-server`. See [Jira Integration](#jira-integration).
 
 ### Plugin skills show as `claude-code-skills:skill-name`
 
-This is correct — skills installed via plugin are namespaced automatically.
+This is correct. Skills installed via plugin are namespaced automatically to avoid conflicts.
 
 ---
 
 ## Contributing
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for how to set up a local development environment, add new skills, and run the linter.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for local development setup, how to add new skills, and linting instructions.
+
+---
+
+## License
+
+[MIT](LICENSE) — © [kobig](https://github.com/wasikarn)
