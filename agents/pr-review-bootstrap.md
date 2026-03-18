@@ -1,7 +1,7 @@
 ---
 name: pr-review-bootstrap
 description: "Bootstraps PR review context by fetching PR diff, Jira issue, and AC in one fast pass. Use at the START of any PR review session before dispatching review agents. Accepts PR number or branch name as input. Returns structured review context: changed files, Jira AC, PR description, and file groups for parallel agent dispatch."
-tools: Bash, Read, mcp__mcp-atlassian__jira_get_issue, mcp__mcp-atlassian__jira_search
+tools: Bash, Read
 model: haiku
 ---
 
@@ -27,7 +27,12 @@ Look for ticket ID in:
 - PR title (e.g. `[PROJ-123]` or `PROJ-123:`)
 - PR body
 
-If found, fetch via MCP: `jira_get_issue` with the ticket ID.
+If found, fetch ticket using fallback order:
+
+1. `jira-cache-server` → `cache_get_issue` (preferred)
+2. `mcp-atlassian` → `jira_get_issue` (fallback)
+3. Neither available → skip Jira section, continue without AC
+
 Extract acceptance criteria from the issue description or custom fields.
 
 ### 3. Group Changed Files
