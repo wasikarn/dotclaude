@@ -16,7 +16,7 @@ Invoke as `/dlc-respond [pr-number] [jira-key?]`
 **PR:** #$0 | **Today:** !`date +%Y-%m-%d`
 **Git branch:** !`git branch --show-current`
 **Project:** !`bash "${CLAUDE_SKILL_DIR}/../../scripts/detect-project.sh" 2>/dev/null`
-**Open threads:** !`gh pr view $0 --json reviews,comments --jq '[.reviews[] | select(.state == "CHANGES_REQUESTED")] | length' 2>/dev/null`
+**Open threads:** !`gh pr view $0 --json reviewThreads --jq '[.reviewThreads[] | select(.isResolved == false)] | length' 2>/dev/null`
 **PR diff stat:** !`rtk gh pr diff $0 --stat 2>/dev/null`
 
 **Args:** `$0`=PR# (required) · `$1`=Jira key (optional, for AC context)
