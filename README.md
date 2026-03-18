@@ -36,24 +36,27 @@ bash scripts/link-skill.sh --list
 
 ## Contents
 
-### Skills (7)
+### Skills (8)
 
 | Category | Skills | Description |
 | --- | --- | --- |
 | **DLC Workflows** | `dlc-build`, `dlc-review`, `dlc-respond`, `dlc-debug` | Full DLC — feature dev (`--quick`/`--hotfix`), adversarial PR review, respond to review comments, debug |
 | **Thinking** | `systems-thinking` | Causal Loop Diagram analysis for architecture decisions and bottleneck diagnosis |
-| **Utilities** | `optimize-context`, `env-heal` | CLAUDE.md optimizer, env var healing |
+| **Utilities** | `optimize-context`, `env-heal`, `merge-pr` | CLAUDE.md optimizer, env var healing, git-flow merge and deploy (feature/hotfix/release) |
 
-### Agents (4)
+### Agents (7)
 
 | Agent | Model | Purpose |
 | --- | --- | --- |
 | `commit-finalizer` | haiku | Fast git commit with conventional commits format |
+| `dev-loop-bootstrap` | haiku | Pre-gather Phase 1 context before dlc-build explorer spawns |
+| `dlc-debug-bootstrap` | haiku | Pre-gather debug context before dlc-debug Investigator spawns |
 | `pr-review-bootstrap` | sonnet | Fetch PR diff + Jira AC in one pass before review |
-| `tathep-reviewer` | sonnet | Code reviewer with persistent memory + preloaded skills |
+| `review-consolidator` | haiku | Dedup/sort multi-reviewer findings into single ranked table |
 | `skill-validator` | sonnet | Validates SKILL.md against best practices |
+| `tathep-reviewer` | sonnet | Code reviewer with persistent memory + preloaded skills |
 
-### Hooks (15)
+### Hooks (13)
 
 > **Critical:** `skill-routing.sh` is required for reliable skill auto-triggering. Without it, skills activate only ~20% of the time. `install.sh` sets this up automatically via `settings.json`.
 
@@ -61,19 +64,18 @@ bash scripts/link-skill.sh --list
 | --- | --- | --- |
 | `skill-routing.sh` | UserPromptSubmit | **Critical** — Forces Claude to evaluate all skills before responding (~84% trigger rate) |
 | `session-start-context.sh` | SessionStart | Inject git state + project detection |
+| `session-start-mcp-cleanup.sh` | SessionStart | Kill orphaned MCP processes from force-closed sessions |
 | `post-compact-context.sh` | SessionStart[compact] | Re-inject context after compaction |
-| `auto-test-env.sh` | PostToolUse[Edit\|Write] | Auto-detect test framework after file edits |
+| `bash-blockers.sh` | PreToolUse[Bash] | Block bash commands that have dedicated Claude tools (cat, head, grep, etc.) |
 | `protect-files.sh` | PreToolUse[Edit\|Write] | Block edits to protected config files |
-| `session-summary-hook.sh` | PostToolUse[Bash] | Track session activity |
-| `rtk-rewrite.sh` | PreToolUse[Bash] | Rewrite bash commands through RTK for token savings |
 | `qmd-pre-search.sh` | PreToolUse[Grep] | Inject QMD semantic search results before grep |
+| `auto-test-env.sh` | PostToolUse[Edit\|Write] | Auto-detect test framework after file edits |
 | `shellcheck-written-scripts.sh` | PostToolUse[Write] | Auto-validate shell scripts after writing |
-| `patch-plugin-skills.sh` | — | Patch plugin skill files after updates |
+| `session-summary-hook.sh` | PostToolUse[Bash] | Track session activity |
+| `idle-nudge.sh` | TeammateIdle | Nudge idle teammates (dev-loop, review-debate, respond, debug) |
+| `task-gate.sh` | TaskCompleted | Gate task completions — verify file:line evidence |
 | `play-sound.sh` | Notification/Stop | macOS sound feedback (CS:S sounds) |
-| `dev-loop-idle-nudge.sh` | Stop | Nudge dev-loop team to continue |
-| `dev-loop-task-gate.sh` | Stop | Gate dev-loop completion |
-| `review-debate-idle-nudge.sh` | Stop | Nudge review-debate to continue |
-| `review-debate-task-gate.sh` | Stop | Gate review-debate completion |
+| `patch-plugin-skills.sh` | — | Patch plugin skill files after updates |
 
 ### Output Styles (2)
 

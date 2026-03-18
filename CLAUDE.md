@@ -42,10 +42,12 @@ Full spec + examples: [references/skills-best-practices.md](references/skills-be
 | --- | --- |
 | `optimize-context` | Audit and optimize CLAUDE.md files |
 | `env-heal` | Scan and fix environment variable mismatches |
+| `merge-pr` | Git-flow merge and deploy (feature/hotfix/release modes) |
 | `dlc-build` | Full development loop (Research → Plan → Implement → Review → Ship) |
 | `dlc-review` | Adversarial PR review with 3-reviewer debate |
 | `dlc-respond` | Address PR review comments as author |
 | `dlc-debug` | Parallel root cause analysis + DX hardening |
+| `systems-thinking` | Causal Loop Diagram analysis for architecture decisions |
 
 Commands live at `commands/<name>.md` (symlinked to `~/.claude/commands/`). Current: `analyze-claude-features`.
 
@@ -55,7 +57,17 @@ Custom subagents live at `agents/<name>.md` with YAML frontmatter. Symlinked to 
 
 Key fields: `description` (include "proactively" to auto-trigger), `memory` (`user`/`project`/`local` for cross-session persistence), `skills` (preload into agent context). All fields: `name`, `tools`/`disallowedTools`, `model`, `hooks`, `permissionMode`, `maxTurns`, `background`, `isolation`.
 
-Current agents: `tathep-reviewer` (code reviewer with persistent memory), `skill-validator` (checks SKILL.md against best practices)
+Current agents (7):
+
+| Agent | Model | Purpose |
+| --- | --- | --- |
+| `commit-finalizer` | haiku | Fast git commit with conventional commits format |
+| `dev-loop-bootstrap` | haiku | Pre-gather Phase 1 context before dlc-build explorer spawns |
+| `dlc-debug-bootstrap` | haiku | Pre-gather debug context before dlc-debug Investigator spawns |
+| `pr-review-bootstrap` | sonnet | Fetch PR diff + Jira AC in one pass before review |
+| `review-consolidator` | haiku | Dedup/sort multi-reviewer findings into single ranked table |
+| `skill-validator` | sonnet | Validates SKILL.md against best practices |
+| `tathep-reviewer` | sonnet | Code reviewer with persistent memory + preloaded skills |
 
 ## Hooks
 
