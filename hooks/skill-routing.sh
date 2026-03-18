@@ -38,7 +38,7 @@ Skip verification: tests already passing / already verified"
 fi
 
 # --- review-pr (priority 3) ---
-if [[ $PROMPT_LOWER =~ review\ pr|review\ pull\ request|review\ code|tathep- ]] \
+if [[ $PROMPT_LOWER =~ review\ pr|review\ pull\ request|review\ code ]] \
    || [[ $PROMPT =~ ดู\ PR ]]; then
   emit_hint "[skill-hint:review-pr]
 Run IN PARALLEL (all independent):
