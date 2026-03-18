@@ -1,9 +1,17 @@
 {
   "name": "claude-code-skills",
-  "description": "A collection of Claude Code skills for PR review, context optimization, spec-driven development, and deep research workflows.",
+  "description": "A collection of Claude Code skills for PR review, context optimization, spec-driven development, and deep research workflows. Includes DLC workflow skills (dlc-build, dlc-review, dlc-respond, dlc-debug), utility skills, custom agents, workflow automation hooks, and output styles.",
   "version": "1.0.0",
+  "license": "MIT",
+  "keywords": ["skills", "dlc", "pr-review", "dev-loop", "debug", "productivity", "workflow"],
   "author": {
-    "name": "kobig"
+    "name": "kobig",
+    "url": "https://github.com/wasikarn"
   },
-  "repository": "https://github.com/wasikarn/claude-code-skills"
+  "repository": "https://github.com/wasikarn/dotclaude",
+  "skills": "./skills/",
+  "agents": "./agents/",
+  "commands": "./commands/",
+  "outputStyles": "./output-styles/",
+  "hooks": "./hooks/hooks.json"
 }

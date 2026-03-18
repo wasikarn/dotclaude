@@ -2,7 +2,23 @@
 
 Personal Claude Code configuration — skills, agents, hooks, output styles, and scripts. Symlinked to `~/.claude/` for immediate effect across all sessions.
 
-## Quick Start
+## Install as Plugin (recommended for teams)
+
+```bash
+# Install via GitHub
+claude plugin install wasikarn/dotclaude
+
+# Or in dev mode (local path)
+claude --plugin-dir /path/to/dotclaude
+```
+
+Skills are namespaced after install: `/claude-code-skills:dlc-build`, `/claude-code-skills:dlc-review`, etc.
+
+> **What's included automatically:** skills, agents, commands, output styles, and workflow hooks (skill routing, task gates, idle nudges, session context, file protection, shellcheck).
+>
+> **What requires manual setup:** `post-compact-context` hook (global `~/.claude/settings.json`), sound notifications, QMD semantic search (`qmd-pre-search`), and personal dotfiles (`zshrc`, `global-CLAUDE.md`). See [Global Hooks](#global-hooks) below.
+
+## Personal Setup (symlink method)
 
 ```bash
 # New machine setup
@@ -108,6 +124,19 @@ dotclaude/
 ├── zshrc             → ~/.zshrc
 └── global-settings.template.json  # Template for settings.json
 ```
+
+## Global Hooks
+
+Hooks that require manual setup in `~/.claude/settings.json` (not bundled in the plugin because they are personal or have external dependencies):
+
+| Hook | Event | Why manual |
+| --- | --- | --- |
+| `post-compact-context.sh` | SessionStart[compact] | Global scope only — must be in `~/.claude/settings.json` |
+| `play-sound.sh` | Notification/Stop | Personal preference (macOS + CS:S sounds) |
+| `qmd-pre-search.sh` | PreToolUse[Grep] | Requires [QMD](https://github.com/kobig/qmd) installed and indexed |
+| `session-summary-hook.sh` | PostToolUse[Bash] | Requires claude-mem |
+
+Use `global-settings.template.json` as a reference for configuring these.
 
 ## New Machine Setup
 

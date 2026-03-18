@@ -1,0 +1,124 @@
+{
+  "description": "Workflow automation hooks for dotclaude — skill routing, quality gates, context injection, and file protection",
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/skill-routing.sh"
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "matcher": "startup",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/session-start-context.sh"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/protect-files.sh"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "FILE=$(jq -r '.tool_input.file_path // empty'); if [ -n \"$FILE\" ] && echo \"$FILE\" | grep -qE '\\.md$'; then npx markdownlint-cli2 --fix \"$FILE\" 2>/dev/null; fi"
+          }
+        ]
+      },
+      {
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/shellcheck-written-scripts.sh"
+          }
+        ]
+      }
+    ],
+    "TaskCompleted": [
+      {
+        "matcher": "review-debate",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "GATE_PATTERN='review|debate|finding' GATE_MSG='Your findings must include file:line evidence for every issue. Please re-review and cite specific code locations.' ${CLAUDE_PLUGIN_ROOT}/hooks/task-gate.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "dev-loop",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "GATE_PATTERN='dev-loop|explore|implement|review|fix|finding' GATE_MSG='Your output must include file:line evidence. Re-examine the code and cite specific locations.' ${CLAUDE_PLUGIN_ROOT}/hooks/task-gate.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "respond",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "GATE_PATTERN='respond|fix-thread|reply-thread' GATE_MSG='Your output must include file:line evidence. Cite the specific file and line number you fixed.' ${CLAUDE_PLUGIN_ROOT}/hooks/task-gate.sh"
+          }
+        ]
+      }
+    ],
+    "TeammateIdle": [
+      {
+        "matcher": "review-pr",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "NUDGE_PATTERN='review-pr' NUDGE_CHECK_TASKS=1 NUDGE_MSG='You still have pending debate tasks. Please review your assigned teammate\\'s findings and respond with Agree, Challenge, or Escalate per the debate protocol.' ${CLAUDE_PLUGIN_ROOT}/hooks/idle-nudge.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "dev-loop",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "NUDGE_PATTERN='dev-loop' NUDGE_CHECK_TASKS=1 NUDGE_MSG='You have pending tasks. Please continue working on your assigned phase tasks and message the team lead when done.' ${CLAUDE_PLUGIN_ROOT}/hooks/idle-nudge.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "respond",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "NUDGE_PATTERN='respond' NUDGE_MSG='You are idle. Continue fixing your assigned threads and message the team lead when done. If blocked, message lead with: thread number, what you tried, and where you are stuck.' ${CLAUDE_PLUGIN_ROOT}/hooks/idle-nudge.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "debug-",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "NUDGE_PATTERN='^debug-' NUDGE_MSG='You are idle. Continue your investigation and send findings to the team lead when done. If blocked, message the lead with: what you tried, what you found, and where you are stuck.' ${CLAUDE_PLUGIN_ROOT}/hooks/idle-nudge.sh"
+          }
+        ]
+      }
+    ]
+  }
+}
