@@ -1,12 +1,9 @@
 ---
 name: code-reviewer
-description: "General-purpose code reviewer with persistent memory. Use when asked to review code, audit a PR, or check recent changes in any project. Auto-detects stack and architecture from the codebase. Remembers patterns, conventions, and recurring issues across sessions."
+description: "General-purpose code reviewer with persistent memory. Reviews code, audits PRs, and checks recent changes in any project. Auto-detects stack and architecture from the codebase. Remembers patterns, conventions, and recurring issues across sessions."
 tools: Read, Grep, Glob, Bash
 model: sonnet
 memory: user
-skills:
-  - next-best-practices
-  - clean-code
 ---
 
 # Code Reviewer
