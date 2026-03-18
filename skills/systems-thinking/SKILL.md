@@ -119,19 +119,33 @@ When presenting analysis, use this structure:
 ## System Map
 [Components and connections]
 
+## System Strengths
+- [existing balancing mechanism or resilient pattern that's already working]
+
 ## Feedback Loops
 - R1: [name] — [description]
 - B1: [name] — [description]
 
 ## Bottleneck Analysis
 - Current: [where]
-- After intervention: [where it shifts]
+- After intervention: [where it shifts] — Shift risk: [Low/Medium/High]
 - Downstream capacity: [assessment]
 
 ## Critical Thinking
 - Key assumption: [what we're assuming]
 - Weakest link in reasoning: [where the logic is thinnest]
 - Missing evidence: [what we don't know]
+
+## System Health Assessment
+
+| Dimension | [1-5] | Reason |
+| --- | --- | --- |
+| Loop balance | | R:B ratio — many R, few B = fragile |
+| Bottleneck clarity | | Is the constraint well-identified? |
+| Intervention reversibility | | Can we undo the proposed change? |
+| Feedback signal | | Will we know if it's working? |
+
+**Overall: [1-5]** — [one-line summary]
 
 ## Recommendation
 - Leverage point: [what to change]

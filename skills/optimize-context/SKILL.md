@@ -135,6 +135,8 @@ Load [audit-antipatterns.md](references/audit-antipatterns.md) to systematically
 
 Categorize as `Stale (must fix)`, `Gaps (must add)`, `Redundant (can reduce)`, `Noise (should remove)`, `OK`.
 
+**Strengths (1-3):** Cite highest-scoring criteria with evidence. E.g., "Commands: 15/15 — all 8 scripts documented with context."
+
 > **If `--dry-run`:** output report above and STOP — do not proceed to Phase 4.
 
 Proceed directly to phase 4 after outputting the report.

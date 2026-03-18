@@ -5,7 +5,15 @@ Output this report in Phase 7. Replace placeholders with actual data. Omit any s
 ```markdown
 ## Env Healing Report
 
-**Mode:** Full / Quick | **Scanned vars:** N | **Gaps found:** N | **Fixed:** N
+**Mode:** Full / Quick | **Health: N%** | **Scanned vars:** N | **Gaps found:** N | **Fixed:** N
+
+Health = (vars with both schema + example) / total vars × 100
+
+### Baseline
+
+- Schema coverage: N/M vars validated (X%)
+- Example completeness: N/M vars documented (X%)
+- Stale vars: N
 
 ### Added to env.ts
 

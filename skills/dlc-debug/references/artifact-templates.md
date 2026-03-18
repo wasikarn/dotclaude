@@ -40,11 +40,15 @@ Branch: {branch_name}
 
 ## Root Cause
 {Investigator findings — hypothesis, evidence, file:line}
+**Recurrence Risk:** [Low/Medium/High] — [reason]
 
 ## DX Findings
 | # | Sev | Category | File | Line | Issue | Recommendation |
 | --- | --- | --- | --- | --- | --- | --- |
 | 1 | Critical | Silent failure | ... | ... | ... | ... |
+
+## Existing Resilience (0-2 items)
+- [mechanism that already worked, e.g., "Error boundary in `ErrorHandler.ts:15` prevented cascade"]
 
 ## Fix Plan
 1. [Bug] Fix root cause: {description}
@@ -61,6 +65,7 @@ Branch: {branch_name}
 **Root Cause:** {one-line}
 **Fix:** {commit refs}
 **DX Improvements:** {count} items (Critical: X, Warning: Y)
+**Resolution Confidence:** [High/Medium/Low] — [reason]
 
 ### Commits
 | # | Type | Description |

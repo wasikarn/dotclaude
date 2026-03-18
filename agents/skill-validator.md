@@ -46,12 +46,32 @@ Read the target SKILL.md and check every criterion below.
 - [ ] Would trigger on expected user phrases
 - [ ] Would NOT trigger on similar but unrelated phrases (near-miss negatives)
 
+## Scoring
+
+| Category | Weight | Criteria |
+| --- | --- | --- |
+| Required fields | 40 | name, description, description tone (third person), description triggers (keywords) |
+| Safety | 25 | disable-model-invocation for side-effect skills, compatibility for external tools, allowed-tools if needed |
+| Structure | 20 | SKILL.md exists, body under 500 lines, refs loaded on-demand, ${CLAUDE_SKILL_DIR} used, consistent terminology |
+| Polish | 15 | argument-hint present, tables over prose, rules include "why", trigger near-miss tested |
+
 ## Output Format
 
-Report findings organized as:
+### Score Table
 
-- **Pass**: criteria met
-- **Fail**: criteria violated — include what's wrong and how to fix
-- **Warning**: not violated but could be improved
+| Category | Pass/Total | Score |
+| --- | --- | --- |
+| Required fields | ?/4 | ?/40 |
+| Safety | ?/3 | ?/25 |
+| Structure | ?/5 | ?/20 |
+| Polish | ?/4 | ?/15 |
+| **Total** | **?/16** | **?/100** |
 
-End with a score: `X/Y criteria passed` and top 3 recommended fixes.
+Grade: A (90+), B (70-89), C (50-69), F (<50)
+
+### Findings
+
+- **Fail**: [criterion] — [what's wrong] → [how to fix]
+- **Warning**: [criterion] — [could be improved]
+
+Top 3 recommended fixes (by weight impact).
