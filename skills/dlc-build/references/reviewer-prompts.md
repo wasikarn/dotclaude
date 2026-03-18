@@ -21,14 +21,7 @@ YOUR FOCUS: Rules #1 (correctness), #2 (app helpers & util), #10 (type safety), 
 - Type safety: `as any`, unsafe casts, missing null checks
 - Error handling: empty catch, swallowed errors, silent failures
 
-RULES: Apply all rules from reviewer-shared-rules.md. Your domain confidence threshold: Security: 70, Correctness: 75.
-6. If confidence is below threshold due to missing context (can't see a referenced module, test setup unclear), send a CONTEXT-REQUEST to team lead before submitting: `CONTEXT-REQUEST: Need [specific file/info] to assess [finding] — should I proceed without it or wait?`
-
-OUTPUT FORMAT:
-| # | Sev | File | Line | Confidence | Issue | Fix |
-| --- | --- | --- | --- | --- | --- | --- |
-
-Sev values: 🔴 Critical | 🟡 Warning | 🔵 Info
+RULES: Apply all rules from reviewer-shared-rules.md. Thresholds and CONTEXT-REQUEST pattern: per reviewer-shared-rules.md.
 
 Send findings to team lead when done.
 ```
@@ -53,14 +46,7 @@ YOUR FOCUS: Rules #3 (N+1), #4 (DRY), #5 (flatten/guard clauses), #6 (SOLID), #7
 - SOLID: single responsibility, interface segregation
 - Performance: hot paths, memory leaks, missing indexes
 
-RULES: Apply all rules from reviewer-shared-rules.md. Your domain confidence threshold: Architecture: 80.
-6. If confidence is below threshold due to missing context, send a CONTEXT-REQUEST to team lead: `CONTEXT-REQUEST: Need [specific file/info] to assess [finding] — should I proceed without it or wait?`
-
-OUTPUT FORMAT:
-| # | Sev | File | Line | Confidence | Issue | Fix |
-| --- | --- | --- | --- | --- | --- | --- |
-
-Sev values: 🔴 Critical | 🟡 Warning | 🔵 Info
+RULES: Apply all rules from reviewer-shared-rules.md. Thresholds and CONTEXT-REQUEST pattern: per reviewer-shared-rules.md.
 
 Send findings to team lead when done.
 ```
@@ -85,14 +71,7 @@ YOUR FOCUS: Rules #8 (naming), #9 (docs), #11 (testability), #12 (debugging).
 - Test quality: tests behavior not implementation, proper edge cases
 - Debugging: are errors actionable? `console.log` in production code?
 
-RULES: Apply all rules from reviewer-shared-rules.md. Your domain confidence threshold: DX: 85.
-6. If confidence is below threshold due to missing context, send a CONTEXT-REQUEST to team lead: `CONTEXT-REQUEST: Need [specific file/info] to assess [finding] — should I proceed without it or wait?`
-
-OUTPUT FORMAT:
-| # | Sev | File | Line | Confidence | Issue | Fix |
-| --- | --- | --- | --- | --- | --- | --- |
-
-Sev values: 🔴 Critical | 🟡 Warning | 🔵 Info
+RULES: Apply all rules from reviewer-shared-rules.md. Thresholds and CONTEXT-REQUEST pattern: per reviewer-shared-rules.md.
 
 Send findings to team lead when done.
 ```
@@ -125,7 +104,7 @@ When constructing reviewer prompts:
 3. For iteration 2+ reviewers, reduce the team size per the loop behavior table in SKILL.md
 4. **Iteration 2+:** Set `{dismissed_findings_path}` to `.claude/dlc-build/review-findings-{N-1}.md` so reviewers check the `## Dismissed` section before submitting. For iteration 1, set to `(none — first iteration)` to disable the dismissed check.
 5. **Domain lenses:** Set `{domain_lenses}` to the relevant lens content from `references/review-lenses/` based on file extensions and Jira labels detected in Phase 0. Leave empty if no domain lens applies.
-6. **Confidence thresholds by role:** Security/Correctness = 70/75, Architecture = 80, DX = 85. Hard Rules bypass all thresholds.
+6. **Confidence thresholds by role:** per `reviewer-shared-rules.md` — Security/Correctness: 70/75, Architecture: 80, DX: 85. Hard Rules bypass all thresholds.
 
 ### Lens Selection
 

@@ -2,11 +2,23 @@
 
 Common rules and output format shared across all reviewer roles. Referenced from each reviewer template to avoid duplication.
 
+## Confidence Thresholds (by role)
+
+| Reviewer role | Threshold | Notes |
+| --- | --- | --- |
+| Correctness & Security | 75 | Security findings: 70 (false positives acceptable) |
+| Architecture & Performance | 80 | |
+| DX & Testing | 85 | |
+
+Hard Rule violations bypass all thresholds — always report regardless of confidence.
+
+> **dlc-review divergence:** `dlc-review/references/teammate-prompts.md` uses a flat threshold of 80 for all teammates (not per-role). This is intentional — dlc-review runs adversarial debate to filter noise post-review, so a uniform threshold is sufficient. dlc-build has no debate phase, so per-role calibration matters more.
+
 ## Rules (all reviewers)
 
 1. Read actual code before flagging — no speculation without file:line evidence
 2. Score confidence 0-100 for each finding
-3. Only report findings above your role's domain threshold (see reviewer-prompts.md for thresholds)
+3. Only report findings above your role's domain threshold (see table above)
 4. Hard Rule violations bypass confidence filter — always report
 5. Review ONLY changed files — not pre-existing issues
 6. If confidence is below threshold due to missing context, send a CONTEXT-REQUEST to team lead before submitting: `CONTEXT-REQUEST: Need [specific file/info] to assess [finding] — should I proceed without it or wait?`

@@ -33,13 +33,7 @@ Load debate protocol for 2-round debate cases: check `../dlc-review/references/d
 
 ## Confidence Filter (all iterations)
 
-Drop findings below the role threshold before consolidation. Hard Rule violations bypass this filter — always report.
-
-| Reviewer role | Confidence threshold |
-| --- | --- |
-| Correctness & Security | 75 |
-| Architecture & Performance | 80 |
-| DX & Testing | 85 |
+Drop findings below the role threshold before consolidation. Hard Rule violations bypass this filter — always report. Thresholds: per [reviewer-shared-rules.md](reviewer-shared-rules.md).
 
 **Debate early-exit:** After debate round 1, if ≥90% of findings have consensus (all reviewers agree) → skip round 2. Only run round 2 when genuine disagreement remains.
 

@@ -16,7 +16,7 @@ RULES:
 - READ-ONLY — do not modify any files
 - Every finding MUST cite file:line with actual code evidence
 - Hard Rules: [insert project Hard Rules here]
-- Non-Hard-Rule findings require confidence >= 80 (scale 0-100)
+- Non-Hard-Rule findings require confidence >= 80 (scale 0-100) — flat threshold for all roles; dlc-build uses per-role thresholds (75/80/85) but dlc-review relies on adversarial debate to filter noise post-review
 
 CRITICAL MINDSET: Existing tests passing does NOT mean the implementation is correct.
 Tests only cover what was written. Reason independently from the code itself.
