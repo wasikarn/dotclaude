@@ -112,6 +112,18 @@ If no review-rules found, use generic rules:
 
 ## Phase 2: Create Team and Independent Review
 
+### Pre-spawn: Diff Scope Check
+
+Before spawning reviewers, count changed files from the already-loaded PR diff stat header:
+
+| Diff files (from header) | Lens injection |
+| --- | --- |
+| <30 | Standard — inject all relevant lenses per existing Lens Selection table |
+| 30–50 | Reduced — inject only the 1 highest-risk lens: security > database > performance > frontend > typescript |
+| >50 | Skip all lenses — Hard Rules only; notify user: "Large diff (N files) — lenses skipped, Hard Rules only" |
+
+Use the file count from `PR diff stat` in the skill header (`!gh pr diff $0 --stat`). Parse the summary line (e.g., "12 files changed") — do not run a new git command.
+
 ### Step 1: Create the team
 
 Create an agent team named `review-pr-$0` with 3 reviewer teammates using prompts from [teammate-prompts.md](references/teammate-prompts.md):
