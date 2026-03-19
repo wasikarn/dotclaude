@@ -108,6 +108,18 @@
         ]
       }
     ],
+    "SubagentStop": [
+      {
+        "matcher": "code-reviewer|silent-failure-hunter|type-design-analyzer|pr-test-analyzer|comment-analyzer|code-simplifier",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "GATE_PATTERN='code-reviewer|silent-failure-hunter|type-design-analyzer|pr-test-analyzer|comment-analyzer|code-simplifier' GATE_MSG='Your review output must include file:line evidence for every issue. Re-examine the code and cite specific code locations before finishing.' ${CLAUDE_PLUGIN_ROOT}/hooks/subagent-stop-gate.sh",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
     "TeammateIdle": [
       {
         "matcher": "review-pr",
