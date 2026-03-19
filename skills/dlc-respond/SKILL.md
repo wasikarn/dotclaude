@@ -97,11 +97,11 @@ Before routing threads to Fixers, group threads that share the same file:
 
 **Updated triage table format:**
 
-| # | File | GROUP | Reviewer | Severity | Issue Summary | Status | AC |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| 1 | auth.service.ts | GROUP-1 | reviewer | 🔴 | Missing null check | Open | — |
-| 3 | auth.service.ts | GROUP-1 | reviewer | 🟡 | Inconsistent error msg | Open | — |
-| 2 | user.mapper.ts | — | reviewer | 🟡 | Wrong date format | Open | — |
+| # | File | Line | GROUP | Reviewer | Severity | Issue Summary | Status | AC |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 1 | auth.service.ts | 42 | GROUP-1 | reviewer | 🔴 | Missing null check | Open | — |
+| 3 | auth.service.ts | 91 | GROUP-1 | reviewer | 🟡 | Inconsistent error msg | Open | — |
+| 2 | user.mapper.ts | 15 | — | reviewer | 🟡 | Wrong date format | Open | — |
 
 **Routing rule (used in Phase 1):**
 
