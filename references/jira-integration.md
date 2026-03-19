@@ -9,7 +9,7 @@ All Jira phases are optional — if no Jira key detected, skip entirely.
 
 ### Detect Jira Key
 
-Scan all `$ARGUMENTS` for pattern `BEP-\d+` (case-insensitive). Position-agnostic — the key can appear anywhere in the arguments.
+Scan all `$ARGUMENTS` for standard Jira key pattern `[A-Z]+-\d+` (e.g. `PROJ-123`). Position-agnostic — the key can appear anywhere in the arguments.
 
 - Match found → extract key, proceed with fetch
 - No match → skip all Jira sections, proceed as if no ticket
@@ -72,7 +72,7 @@ From the issue response, extract and summarize:
 
    ```markdown
    ## Jira Ticket
-   Key: BEP-XXXX
+   Key: PROJ-123
    Summary: {summary}
    Priority: {priority}
    Status: {status}
@@ -106,7 +106,7 @@ From the issue response, extract and summarize:
 
    ```markdown
    ## Jira Ticket
-   Key: BEP-XXXX
+   Key: PROJ-123
    Summary: {summary}
    Priority: {priority}
 
@@ -131,7 +131,7 @@ From the issue response, extract and summarize:
 
    ```markdown
    ## Jira Ticket
-   Key: BEP-XXXX
+   Key: PROJ-123
    Summary: {summary}
    Priority: {priority}
 

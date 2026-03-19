@@ -1,9 +1,21 @@
+# macOS
+**/.DS_Store
+
+# Node
+node_modules/
+*.log
+
+# Environment
+.env*
+
+# Worktrees & workspaces
 .worktrees/
-skills/.DS_Store
+*-workspace/
+
+# Personal / non-distributed
+prompts/
+
+# Docs (internal)
 docs/superpowers
 docs/specs
 docs/eval/*.local.md
-skill-creator-workspace/
-prompts/
-eval-workspace/
-*-workspace/
