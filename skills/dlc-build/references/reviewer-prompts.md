@@ -21,7 +21,7 @@ HARD RULES: {hard_rules}
 {domain_lenses}
 
 DISMISSED FINDINGS: {dismissed_findings_path}
-— Read the `## Dismissed` section. Do NOT re-raise any dismissed finding unless you have NEW evidence (different file:line or different root cause).
+— If file has a `## Dismissed` section, read it; otherwise treat all rows as dismissed entries. Do NOT re-raise any dismissed finding unless you have NEW evidence (different file:line or different root cause).
 
 YOUR FOCUS: Rules #1 (correctness), #2 (app helpers & util), #10 (type safety), #12 (error handling).
 - Functional correctness: does the code do what the plan says? Include security checks (injection, auth bypass, data exposure, OWASP Top 10) as Rule #1 correctness failures
@@ -53,7 +53,7 @@ HARD RULES: {hard_rules}
 {domain_lenses}
 
 DISMISSED FINDINGS: {dismissed_findings_path}
-— Read the `## Dismissed` section. Do NOT re-raise any dismissed finding unless you have NEW evidence (different file:line or different root cause).
+— If file has a `## Dismissed` section, read it; otherwise treat all rows as dismissed entries. Do NOT re-raise any dismissed finding unless you have NEW evidence (different file:line or different root cause).
 
 YOUR FOCUS: Rules #3 (N+1), #4 (DRY), #5 (flatten/guard clauses), #6 (SOLID), #7 (elegance).
 - N+1 queries: query inside loop, unbounded data fetch
@@ -86,7 +86,7 @@ HARD RULES: {hard_rules}
 {domain_lenses}
 
 DISMISSED FINDINGS: {dismissed_findings_path}
-— Read the `## Dismissed` section. Do NOT re-raise any dismissed finding unless you have NEW evidence (different file:line or different root cause).
+— If file has a `## Dismissed` section, read it; otherwise treat all rows as dismissed entries. Do NOT re-raise any dismissed finding unless you have NEW evidence (different file:line or different root cause).
 
 YOUR FOCUS: Rules #8 (naming), #9 (docs), #11 (testability), #12 (debugging).
 - Naming: variables, functions, files — do they communicate intent?
