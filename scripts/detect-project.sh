@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# detect-project.sh — Detect tathep project from git remote and output config JSON.
+# detect-project.sh — Detect project from git remote and output config JSON.
 # Usage: bash detect-project.sh [project-root]
 # Output: {"project":"...","repo":"...","validate":"...","base_branch":"...","branch":"...","hints":"..."}
 # If validate is empty for unknown projects, the caller should ask the user for a validate command.
@@ -18,53 +18,14 @@ BRANCH=$(git branch --show-current 2>/dev/null || echo "unknown")
 REMOTE_URL=$(git remote get-url origin 2>/dev/null || echo "")
 REPO_SLUG=$(echo "$REMOTE_URL" | sed 's/.*[:/]\([^/]*\/[^.]*\).*/\1/' 2>/dev/null || echo "")
 
-# Match against known projects
 PROJECT="unknown"
 REPO=""
 VALIDATE=""
 BASE_BRANCH="main"
 HINTS=""
 
-case "$REMOTE_URL" in
-  *bd-eye-platform-api*)
-    PROJECT="tathep-platform-api"
-    REPO="100-Stars-Co/bd-eye-platform-api"
-    VALIDATE="npm run validate:all"
-    BASE_BRANCH="develop"
-    HINTS="Clean Architecture (Domain/Application/Infrastructure), Effect-TS pipes, Japa tests, AdonisJS 5.9, Lucid ORM, check for N+1 queries and missing indexes"
-    ;;
-  *bluedragon-eye-website*)
-    PROJECT="tathep-website"
-    REPO="100-Stars-Co/bluedragon-eye-website"
-    VALIDATE="npm run ts-check && npm run lint:fix && npm test"
-    BASE_BRANCH="develop"
-    HINTS="Next.js 14 Pages Router, Chakra UI, React Query v3, Firebase Auth, SSR patterns, getServerSideProps/getStaticProps"
-    ;;
-  *bluedragon-eye-admin*)
-    PROJECT="tathep-admin"
-    REPO="100-Stars-Co/bluedragon-eye-admin"
-    VALIDATE="npm run ts-check && npm run lint:fix && npm run test"
-    BASE_BRANCH="develop"
-    HINTS="Next.js 14 Pages Router, Tailwind, Headless UI, Vitest, admin dashboard patterns, role-based access"
-    ;;
-  *tathep-ai-agent-python*)
-    PROJECT="tathep-ai-agent"
-    REPO="100-Stars-Co/tathep-ai-agent-python"
-    VALIDATE="uv run black --check . && uv run mypy ."
-    BASE_BRANCH="develop"
-    HINTS="Python, uv package manager, mypy strict typing, async patterns"
-    ;;
-  *tathep-video-processing*)
-    PROJECT="tathep-video"
-    REPO="100-Stars-Co/tathep-video-processing"
-    VALIDATE="bun run check && bun run test"
-    BASE_BRANCH="develop"
-    HINTS="Bun runtime, video processing pipelines, worker patterns"
-    ;;
-esac
-
-# Auto-detection fallback for unknown projects
-if [ "$PROJECT" = "unknown" ] && [ -z "$VALIDATE" ]; then
+# Auto-detection for all projects
+if [ -z "$VALIDATE" ]; then
   # Try package.json scripts
   if [ -f "package.json" ]; then
     # Scan package.json once, check extracted names in-memory (avoids 5 separate forks)
