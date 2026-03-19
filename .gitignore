@@ -2,6 +2,7 @@
 skills/.DS_Store
 docs/superpowers
 docs/specs
+docs/eval/*.local.md
 skill-creator-workspace/
 prompts/
 eval-workspace/

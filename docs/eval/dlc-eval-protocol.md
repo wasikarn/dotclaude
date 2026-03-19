@@ -94,3 +94,4 @@ Without a pre-implementation baseline, before/after comparisons are invalid.
 Add your project's PR entries below using the Ground Truth Format above.
 
 <!-- Add PR entries here — minimum 5 (3 bug-fix + 2 feature) -->
+<!-- Keep this file LOCAL — do not commit project-specific PR data to the plugin repo -->
