@@ -640,7 +640,7 @@ claude-code-skills/
 │   └── hooks.json            # Plugin hook registry (auto-loaded on install)
 ├── output-styles/            # Custom output styles
 ├── commands/                 # Slash commands
-├── scripts/                  # Dev tooling (link-skill.sh, fix-tables.sh, sync-docs.sh, detect-project.sh)
+├── scripts/                  # Dev tooling (link-skill.sh, fix-tables.sh, detect-project.sh, patch-plugin-skills.sh)
 └── references/               # Shared reference docs
 ```
 

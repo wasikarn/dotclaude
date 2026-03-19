@@ -87,7 +87,7 @@ Notes:
 
 - `task-gate.sh` and `idle-nudge.sh` use `GATE_PATTERN`/`NUDGE_PATTERN` env vars for filtering. `TaskCompleted`/`TeammateIdle` matchers may be unsupported — scripts self-filter as fallback.
 - `stop-failure-log.sh` — file logging is opt-in via `LOG=1` env var; macOS notification via `NOTIFY=1`
-- `patch-plugin-skills.sh` — personal utility script, not registered in `hooks.json`, not distributed
+- `patch-plugin-skills.sh` — personal utility script at `scripts/patch-plugin-skills.sh`, not a hook, not registered in `hooks.json`
 
 ## Output Styles
 
@@ -122,7 +122,6 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for the full step-by-step guide. Key rule
 | Task | Command |
 | --- | --- |
 | Lint all markdown | `npx markdownlint-cli2 "**/*.md"` |
-| Sync docs cache | `bash scripts/sync-docs.sh` (fetches Claude Code official docs to `~/.claude/docs/`) |
 
 **Contributor dev mode only** (do not use if plugin is installed — will conflict):
 

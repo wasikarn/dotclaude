@@ -13,5 +13,6 @@
   "skills": "./skills/",
   "agents": "./agents/",
   "commands": "./commands/",
-  "outputStyles": "./output-styles/"
+  "outputStyles": "./output-styles/",
+  "hooks": "./hooks/hooks.json"
 }
