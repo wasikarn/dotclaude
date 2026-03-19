@@ -86,6 +86,30 @@ Build triage table:
 - `(blocking)` in thread body → override to 🔴 Critical regardless of content
 - No decoration → use severity inference above
 
+### Step 3.5: Cluster Analysis
+
+Before routing threads to Fixers, group threads that share the same file:
+
+- Add a `GROUP` column to the triage table (from Step 3)
+- Assign `[GROUP-N]` to all threads touching the same file (N = sequential number per file)
+- Threads touching unique files → leave `GROUP` as `—`
+- Max 5 threads per group: if a file has >5 threads, split into `GROUP-Xa` (Critical/Important) and `GROUP-Xb` (Suggestion)
+
+**Updated triage table format:**
+
+| # | File | GROUP | Reviewer | Severity | Issue Summary | Status | AC |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| 1 | auth.service.ts | GROUP-1 | reviewer | 🔴 | Missing null check | Open | — |
+| 3 | auth.service.ts | GROUP-1 | reviewer | 🟡 | Inconsistent error msg | Open | — |
+| 2 | user.mapper.ts | — | reviewer | 🟡 | Wrong date format | Open | — |
+
+**Routing rule (used in Phase 1):**
+
+- Threads sharing a GROUP → assign to a single Fixer (sequential, not parallel) so it reads the file once and fixes all related threads
+- Independent threads (GROUP = —) → parallel Fixers as before
+
+Why file-based only: semantic grouping requires extra reasoning and adds complexity without proportional benefit. File-based grouping is deterministic and sufficient.
+
 ### Step 4: Write `respond-context.md`
 
 Write to `{project_root}/respond-context.md` — thread triage table, project info, validate command, Jira context if fetched. Required for context compression recovery.
