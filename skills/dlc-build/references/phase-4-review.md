@@ -2,6 +2,20 @@
 
 Load [reviewer-prompts.md](reviewer-prompts.md), [../../references/review-conventions.md](../../references/review-conventions.md), [../../references/review-output-format.md](../../references/review-output-format.md) before starting.
 
+## Pre-spawn Diff Check
+
+Before spawning reviewers, check diff size to determine lens injection level:
+
+```bash
+git diff {base_branch}...HEAD --name-only | wc -l
+```
+
+| Diff files | Lens injection |
+| --- | --- |
+| <30 | Standard — inject all relevant lenses per Lens Selection table |
+| 30–50 | Reduced — inject only lenses matching the top 3 file extensions by change volume |
+| >50 | Skip all lenses — use Hard Rules only; notify user: "Large diff (N files) — lenses skipped" |
+
 ## Review Scale (Iteration 1)
 
 Determine diff size first: `git diff {base_branch}...HEAD --stat | tail -1`

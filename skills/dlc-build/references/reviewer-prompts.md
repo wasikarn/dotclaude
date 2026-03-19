@@ -30,6 +30,7 @@ YOUR FOCUS: Rules #1 (correctness), #2 (app helpers & util), #10 (type safety), 
 - Error handling: empty catch, swallowed errors, silent failures
 
 RULES: Apply all rules from reviewer-shared-rules.md. Thresholds and CONTEXT-REQUEST pattern: per reviewer-shared-rules.md.
+TOKEN BUDGET: After reading 8+ files directly (excluding Lead-provided shared context): switch to header + structure overview for files >300 lines.
 
 Send findings to team lead when done.
 ```
@@ -63,6 +64,7 @@ YOUR FOCUS: Rules #3 (N+1), #4 (DRY), #5 (flatten/guard clauses), #6 (SOLID), #7
 - Performance: hot paths, memory leaks, missing indexes
 
 RULES: Apply all rules from reviewer-shared-rules.md. Thresholds and CONTEXT-REQUEST pattern: per reviewer-shared-rules.md.
+TOKEN BUDGET: After reading 8+ files directly (excluding Lead-provided shared context): switch to header + structure overview for files >300 lines.
 
 Send findings to team lead when done.
 ```
@@ -96,6 +98,7 @@ YOUR FOCUS: Rules #8 (naming), #9 (docs), #11 (testability), #12 (debugging).
 - Debugging: are errors actionable? `console.log` in production code?
 
 RULES: Apply all rules from reviewer-shared-rules.md. Thresholds and CONTEXT-REQUEST pattern: per reviewer-shared-rules.md.
+TOKEN BUDGET: After reading 8+ files directly (excluding Lead-provided shared context): switch to header + structure overview for files >300 lines.
 
 Send findings to team lead when done.
 ```
