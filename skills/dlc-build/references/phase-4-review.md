@@ -60,6 +60,29 @@ Write findings to `.claude/dlc-build/review-findings-{iteration}.md` per [../../
 
 **GATE:** Findings consolidated → update `Phase: review` in dev-loop-context.md → proceed to Assess.
 
+## Phase 4.5: Falsification Pass (Full mode iter 1 only)
+
+After debate completes but **before** dispatching `review-consolidator`, spawn the `falsification-agent` (defined in `agents/falsification-agent.md`) with the raw pre-consolidation findings table inline.
+
+**Spawn condition:** Full mode iter 1 only (3 reviewers). Skip for: Quick/Hotfix mode, iter 2+ reviews.
+
+Pass to the agent:
+
+- Raw findings table from all reviewers (inline in the prompt)
+- Diff access via the agent's Read/Grep/Glob tools
+
+**Apply verdicts before dispatching `review-consolidator`:**
+
+| Verdict | Action |
+| --- | --- |
+| SUSTAINED | Pass through unchanged |
+| DOWNGRADED {new severity} | Update severity in findings table |
+| REJECTED | Remove from findings table |
+
+Note rejected count in the Phase 4 status line: `(N findings rejected by Falsification Pass)`.
+
+Then proceed to dispatch `review-consolidator` with the post-verdict findings table.
+
 ## Lead Notes
 
 **Task context injection (B1):** When constructing reviewer prompts, populate `TASK_CONTEXT` from:
@@ -67,3 +90,22 @@ Write findings to `.claude/dlc-build/review-findings-{iteration}.md` per [../../
 - `Description`: task description from `dev-loop-context.md` → `task:` field
 - `AC items`: Jira AC list from `dev-loop-context.md` → Jira context section, or "none"
 - `Plan summary`: read plan file path from `dev-loop-context.md` → `plan_file:` field; read that file and extract top 5 task titles (one line, max 10 words each). If `plan_file` is empty, set Plan summary to "plan file path not in context."
+
+**Severity calibration injection (SA):** Before spawning reviewers, construct a `SEVERITY CALIBRATION` block and inject it into each reviewer prompt:
+
+```text
+SEVERITY CALIBRATION — examples from this project:
+Critical: {most recent Critical example from .claude/review-dismissed.md}
+Warning: {most recent Warning example}
+Suggestion: {most recent Suggestion example}
+
+Anchor to these before assigning any severity. When in doubt, use Warning over Critical.
+```
+
+**Example source priority:**
+
+1. Read `.claude/review-dismissed.md` if it exists — find the most recent entry per severity level (Critical, Warning, Suggestion) and use the `Finding` column text as the example.
+2. If the file does not exist or has no entry for a severity level, use hardcoded fallback:
+   - Critical: "SQL injection via unsanitized user input in query builder"
+   - Warning: "Missing null check on optional field that is null in 10% of production calls"
+   - Suggestion: `Variable name 'data' is ambiguous — rename to reflect content type`
