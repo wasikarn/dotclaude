@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.6.11] — 2026-03-20
+
+### Add QA check script and integrate with bump-version
+
+- feat(scripts): add qa-check.sh and integrate into bump-version pre-release gate
+
 ## [0.6.10] — 2026-03-20
 
 ### Shellcheck Hook Fixes
