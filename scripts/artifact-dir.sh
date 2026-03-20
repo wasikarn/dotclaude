@@ -32,6 +32,10 @@ if [ -n "$CONTEXT_SUFFIX" ]; then
       exit 1
       ;;
   esac
+  # Treat suffixes ending with "-" as empty (e.g., "pr-" when PR number argument is empty)
+  case "$CONTEXT_SUFFIX" in
+    *-) CONTEXT_SUFFIX="" ;;
+  esac
 fi
 
 # Derive project root
