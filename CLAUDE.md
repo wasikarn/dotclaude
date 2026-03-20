@@ -41,8 +41,10 @@ skills/<name>/
 | `merge-pr` | Git-flow merge and deploy (feature/hotfix/release modes) |
 | `dlc-build` | Full development loop (Research → Plan → Implement → Review → Ship) |
 | `dlc-review` | Adversarial PR review with 3-reviewer debate |
-| `dlc-respond` | Address PR review comments as author |
 | `dlc-debug` | Parallel root cause analysis + DX hardening |
+| `dlc-metrics` | Run retrospective report from dlc-metrics.jsonl — iteration counts, finding categories, recurrent issues |
+| `dlc-onboard` | Bootstrap a new project into the dev-loop ecosystem — scaffold hard-rules.md and dlc-build directories |
+| `dlc-respond` | Address PR review comments as author |
 | `systems-thinking` | Causal Loop Diagram analysis for architecture decisions |
 
 Commands live at `commands/<name>.md`. Current: `analyze-claude-features`.
