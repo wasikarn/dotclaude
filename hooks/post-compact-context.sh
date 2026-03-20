@@ -26,6 +26,6 @@ if [ -n "$BRANCH" ]; then
   DIRTY=$(git status --porcelain 2>/dev/null | head -5)
   if [ -n "$DIRTY" ]; then
     echo "- Uncommitted changes:"
-    echo "$DIRTY" | sed 's/^/  - /'
+    while IFS= read -r line; do echo "  - $line"; done <<< "$DIRTY"
   fi
 fi
