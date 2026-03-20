@@ -10,11 +10,29 @@
 # The leading - in the encoded path (e.g., -Users-kobig-...) is intentional — not a bug.
 #
 # Compatible with bash 3.x (macOS default).
+# Note: must be invoked from within the target project directory (or any subdirectory)
+#       so that git rev-parse --show-toplevel resolves the correct project root.
 
 set -euo pipefail
 
 SKILL_NAME="${1:?artifact-dir.sh: skill name required}"
 CONTEXT_SUFFIX="${2:-}"
+
+# Guard against path traversal in inputs
+case "$SKILL_NAME" in
+  */*|*..*)
+    echo "artifact-dir.sh: invalid skill name: $SKILL_NAME" >&2
+    exit 1
+    ;;
+esac
+if [ -n "$CONTEXT_SUFFIX" ]; then
+  case "$CONTEXT_SUFFIX" in
+    */*|*..*)
+      echo "artifact-dir.sh: invalid context suffix: $CONTEXT_SUFFIX" >&2
+      exit 1
+      ;;
+  esac
+fi
 
 # Derive project root
 PROJECT_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || pwd)
