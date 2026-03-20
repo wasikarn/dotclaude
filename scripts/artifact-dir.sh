@@ -4,9 +4,10 @@
 # Output: absolute path (stdout)
 # Side effect: mkdir -p on the output path
 #
-# Path convention: $HOME/.claude/projects/<encoded-path>/dev-loop/<skill>[/<suffix>]
+# Path convention: $HOME/.claude/plugins/data/dev-loop-dev-loop/<encoded-path>/<skill>[/<suffix>]
 # Encoding: absolute project root path with / replaced by -
-# This matches Claude Code's own ~/.claude/projects/ naming convention.
+# Stored under ~/.claude/plugins/data/dev-loop-dev-loop/ (NOT ~/.claude/projects/) to avoid colliding with
+# Claude Code's session JSONL storage which owns ~/.claude/projects/ exclusively.
 # The leading - in the encoded path (e.g., -Users-kobig-...) is intentional — not a bug.
 #
 # Compatible with bash 3.x (macOS default).
@@ -47,9 +48,9 @@ ENCODED=$(echo "$PROJECT_ROOT" | tr '/' '-')
 
 # Compose path
 if [ -n "$CONTEXT_SUFFIX" ]; then
-  ARTIFACT_DIR="$HOME/.claude/projects/${ENCODED}/dev-loop/${SKILL_NAME}/${CONTEXT_SUFFIX}"
+  ARTIFACT_DIR="$HOME/.claude/plugins/data/dev-loop-dev-loop/${ENCODED}/${SKILL_NAME}/${CONTEXT_SUFFIX}"
 else
-  ARTIFACT_DIR="$HOME/.claude/projects/${ENCODED}/dev-loop/${SKILL_NAME}"
+  ARTIFACT_DIR="$HOME/.claude/plugins/data/dev-loop-dev-loop/${ENCODED}/${SKILL_NAME}"
 fi
 
 mkdir -p "$ARTIFACT_DIR"
