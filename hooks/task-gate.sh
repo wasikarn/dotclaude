@@ -14,8 +14,11 @@ INPUT=$(cat)
 TASK_NAME=$(echo "$INPUT" | jq -r '.task_name // empty')
 TOOL_OUTPUT=$(echo "$INPUT" | jq -r '.tool_output // empty')
 
+# Require GATE_PATTERN — without it, this hook has no target and should be a no-op
+[ -z "${GATE_PATTERN:-}" ] && exit 0
+
 # Skip tasks that don't match this gate's pattern
-if ! echo "$TASK_NAME" | grep -qiE "${GATE_PATTERN:-}"; then
+if ! echo "$TASK_NAME" | grep -qiE "$GATE_PATTERN"; then
   exit 0
 fi
 

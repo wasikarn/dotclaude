@@ -15,8 +15,11 @@ INPUT=$(cat)
 
 TEAM_NAME=$(echo "$INPUT" | jq -r '.team_name // empty')
 
+# Require NUDGE_PATTERN — without it, this hook has no target and should be a no-op
+[ -z "${NUDGE_PATTERN:-}" ] && exit 0
+
 # Skip teams that don't match this nudge's pattern
-if ! echo "$TEAM_NAME" | grep -qiE "${NUDGE_PATTERN:-}"; then
+if ! echo "$TEAM_NAME" | grep -qiE "$NUDGE_PATTERN"; then
   exit 0
 fi
 
