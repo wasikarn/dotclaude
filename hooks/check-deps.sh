@@ -23,15 +23,20 @@ if [ -n "$MISSING" ]; then
 fi
 
 # Optional: atlassian-pm plugin
-# Detection: check enabledPlugins in settings files for atlassian-pm@atlassian-pm.
+# Detection: check settings files for "atlassian-pm" key (stored without @scope suffix)
+# or fall back to plugin cache directory presence.
 SETTINGS_FILES="$HOME/.claude/settings.json $HOME/.claude/settings.local.json"
 ATLASSIAN_PM_FOUND=0
 for f in $SETTINGS_FILES; do
-  if [ -f "$f" ] && grep -q "atlassian-pm@atlassian-pm" "$f" 2>/dev/null; then
+  if [ -f "$f" ] && grep -q '"atlassian-pm"' "$f" 2>/dev/null; then
     ATLASSIAN_PM_FOUND=1
     break
   fi
 done
+# Fallback: plugin cache directory (created on install regardless of settings format)
+if [ "$ATLASSIAN_PM_FOUND" -eq 0 ] && [ -d "$HOME/.claude/plugins/cache/atlassian-pm" ]; then
+  ATLASSIAN_PM_FOUND=1
+fi
 
 if [ "$ATLASSIAN_PM_FOUND" -eq 0 ]; then
   printf "\n## 💡 dev-loop: Optional Enhancement\n\n- \`atlassian-pm\` (not installed)\n  Install: \`claude plugin marketplace add wasikarn/atlassian-pm && claude plugin install atlassian-pm\`\n  Unlocks: Jira context in all DLC skills, ADF comment formatting, sprint digest in work-context.\n"
