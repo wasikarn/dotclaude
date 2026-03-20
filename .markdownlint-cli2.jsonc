@@ -1,0 +1,10 @@
+{
+  // markdownlint-cli2 options (separate from rule config in .markdownlint.json)
+  "ignores": [
+    "prompts/**/*.md",
+    "*-workspace/**/*.md",
+    "docs/superpowers/**/*.md",
+    "docs/specs/**/*.md",
+    "docs/eval/*.local.md"
+  ]
+}

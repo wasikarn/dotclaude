@@ -1,3 +1,6 @@
 # Generated eval outputs — not skill source files
 dlc-build-workspace/
 skill-creator-workspace/
+
+# Local-only prompts (gitignored)
+prompts/

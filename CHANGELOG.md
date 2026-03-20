@@ -2,6 +2,102 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.6.6] — 2026-03-20
+
+### Fixed
+
+- Broken relative links in `dlc-build/references/phase-0-triage.md` and `phase-4-review.md` (2-level `../../references/` → 3-level `../../../references/` from within `references/` subdir)
+- Broken `debate-protocol.md` link in `dlc-review/SKILL.md` and `dlc-build/SKILL.md` (was pointing to non-existent `dlc-review/references/debate-protocol.md`)
+
+### Added
+
+- MIT `LICENSE` file (referenced by README badge)
+
+## [0.6.5] — 2026-03-20
+
+### Fixed
+
+- `artifact-dir.sh`: suffix ending with `-` (e.g. `pr-` when PR number is empty) now falls back to base dir instead of creating a malformed directory name
+
+## [0.6.4] — 2026-03-20
+
+### Fixed
+
+- `check-deps.sh`: false positive atlassian-pm "not installed" warning — settings.json stores the key as `"atlassian-pm"` (without `@scope` suffix); added plugin cache directory fallback
+
+## [0.6.3] — 2026-03-20
+
+### Fixed
+
+- `check-deps.sh`: corrected atlassian-pm install command and detection logic
+
+## [0.6.2] — 2026-03-20
+
+### Fixed
+
+- Bootstrap and onboarder agents: stale `.claude/` artifact paths updated to centralized `~/.claude/projects/` convention
+
+## [0.6.1] — 2026-03-20
+
+### Fixed
+
+- `marketplace.json`: added `metadata.description` to fix plugin validator warning
+
+## [0.6.0] — 2026-03-20
+
+### Added
+
+- `scripts/bump-version.sh`: automated version bumping with semver validation, color output, git tag, push, and GitHub release creation; shows Fresh install vs Update paths in next-steps
+
+## [0.5.0] — 2026-03-20
+
+### Added
+
+- Centralized artifact paths: all skill-generated files now stored at `~/.claude/projects/<encoded-project>/dev-loop/<skill>/` instead of polluting the target project directory
+- `scripts/artifact-dir.sh`: single source of truth for artifact path computation; called via `!` shell substitution in SKILL.md headers
+
+### Changed
+
+- `dlc-build`, `dlc-review`, `dlc-debug`, `dlc-respond` SKILL.md files updated to use `{artifacts_dir}` header variable
+- All phase reference files updated to use `{artifacts_dir}` instead of hardcoded `.claude/dlc-build/` paths
+
+## [0.4.0] — 2026-03-19
+
+### Added
+
+- `/dlc-metrics` skill: surfaces `metrics-analyst` agent for retrospective reports from `dlc-metrics.jsonl`
+- `/dlc-onboard` skill: surfaces `project-onboarder` agent for bootstrapping new projects
+
+### Changed
+
+- Skills table in CLAUDE.md updated to include new skills
+
+## [0.3.1] — 2026-03-19
+
+### Fixed
+
+- `commit-finalizer` agent: documented pre-conditions and Agent tool access for workers
+- `pr-review-bootstrap`: removed dead cross-plugin agent references from output
+
+## [0.3.0] — 2026-03-19
+
+### Added
+
+- `dlc-debug`: Jira sync call and metrics logging in Phase 3
+- `jira-sync` agent: posts structured implementation summary to Jira after dlc-build/dlc-debug
+
+## [0.2.0] — 2026-03-19
+
+### Added
+
+- `dlc-metrics` agent (`metrics-analyst`): retrospective report from `~/.claude/dlc-metrics.jsonl`
+- `dlc-onboard` agent (`project-onboarder`): bootstrap new project into dev-loop ecosystem
+- `work-context` agent: session start digest (active sprint tickets, open PRs, unmerged branches)
+- `jira-sync` agent, `merge-preflight` agent, `metrics-analyst` agent, `plan-challenger` agent
+- `test-quality-reviewer`, `migration-reviewer`, `api-contract-auditor` agents
+- `fix-intent-verifier`, `falsification-agent`, `research-validator`, `review-consolidator` agents
+- `dlc-respond-bootstrap`, `dlc-debug-bootstrap` agents
+
 ## [0.1.0] — 2026-03-19
 
 ### Added
