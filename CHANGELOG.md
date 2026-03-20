@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.6.9] — 2026-03-20
+
+### Fix task-gate and idle-nudge false-positive block when env vars unset
+
+- fix(hooks): guard against empty GATE_PATTERN/NUDGE_PATTERN causing false-positive block
+
 ## [0.6.8] — 2026-03-20
 
 ### Auto-generate CHANGELOG entry in bump-version
