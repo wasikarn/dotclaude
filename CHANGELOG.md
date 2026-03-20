@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.6.8] — 2026-03-20
+
+### Auto-generate CHANGELOG entry in bump-version
+
+- feat(scripts): auto-generate CHANGELOG entry on bump-version
+
 ## [0.6.6] — 2026-03-20
 
 ### Fixed
