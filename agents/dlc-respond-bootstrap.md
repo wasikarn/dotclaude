@@ -16,8 +16,10 @@ can inject directly into Fixer prompts — no redundant file reads per Fixer.
 
 ### 1. Fetch Open Review Threads
 
+> **Note:** `<PR_NUMBER>` is injected by the calling lead when constructing this agent's prompt — it is not a runtime shell variable or skill substitution.
+
 ```bash
-gh pr view $0 --json reviewThreads \
+gh pr view <PR_NUMBER> --json reviewThreads \
   --jq '[.reviewThreads[] | select(.isResolved == false)] |
     map({id: .id, path: .path, line: .line, body: (.comments[0].body // ""), reviewer: (.comments[0].author.login // "")})' \
   2>/dev/null
@@ -26,7 +28,7 @@ gh pr view $0 --json reviewThreads \
 Also fetch review-level comments (CHANGES_REQUESTED / COMMENTED):
 
 ```bash
-gh pr view $0 --json reviews \
+gh pr view <PR_NUMBER> --json reviews \
   --jq '[.reviews[] | select(.state == "CHANGES_REQUESTED" or .state == "COMMENTED") |
     {reviewer: .author.login, body: .body, state: .state}]' \
   2>/dev/null
