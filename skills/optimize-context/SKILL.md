@@ -178,7 +178,17 @@ Proceed directly to phase 5 after outputting the proposed changes table.
 
 **If verification fails:** revert (`git checkout`), return to Phase 4, re-apply cleanly.
 
-Report: `CLAUDE.md Quality: XX → XX | Fixed N stale | Added N gaps | Removed N redundant | Size: XX KB → XX KB`
+✅ **Good** — concrete before/after scores, counts all change types, size delta:
+
+```text
+CLAUDE.md Quality: 58 → 82 | Fixed 3 stale | Added 2 gaps | Removed 4 redundant | Size: 18.2 KB → 7.4 KB
+```
+
+❌ **Bad** — no before score, no change breakdown, no size:
+
+```text
+Done. CLAUDE.md updated.
+```
 
 ## Key Rules
 

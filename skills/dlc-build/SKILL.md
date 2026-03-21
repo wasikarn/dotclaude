@@ -64,6 +64,33 @@ Phase 0→1→2→ [3: Implement ↔ 4: Review ↔ 5: Assess loop (max 3)] →6:
 | [../../references/jira-integration.md](../../references/jira-integration.md) | Jira key in `$ARGUMENTS` |
 | [references/pr-template.md](references/pr-template.md) | Entering Phase 6 |
 
+## Invocation Examples
+
+✅ **Good** — task description + explicit mode flag:
+
+```text
+/dlc-build "Add health check endpoint GET /api/health → returns {status: ok, uptime}" --full
+/dlc-build "Fix null crash in UserService.findById when profile is missing" --quick
+/dlc-build BEP-1234 --hotfix
+```
+
+❌ **Bad** — no task description (skill cannot determine scope):
+
+```text
+/dlc-build
+/dlc-build --full
+```
+
+❌ **Bad** — Jira key without `--hotfix`/`--quick` when mode is ambiguous (forces unnecessary mode-confirmation round trip):
+
+```text
+/dlc-build BEP-1234
+```
+
+> **Tip:** Include a Jira key when the ticket has AC — the skill auto-extracts acceptance criteria into plan tasks. Combine with `--quick` for small tasks or `--hotfix` for production incidents.
+
+---
+
 ## Fallback Behavior
 
 **Jira unreachable:** If Jira fetch fails — proceed with task description as acceptance criteria. Note `[Jira: UNAVAILABLE]` in dev-loop-context.md.

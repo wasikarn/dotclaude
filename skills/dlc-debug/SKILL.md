@@ -59,6 +59,34 @@ If TeamCreate tool is not available → check graceful degradation:
 
 ---
 
+## Invocation Examples
+
+✅ **Good** — specific bug description with error type and location:
+
+```text
+/dlc-debug "NullPointerException in UserService.findById — user.profile is null for users registered before 2024"
+/dlc-debug "API POST /payments returns 500 when amount is 0.00" --quick
+/dlc-debug BEP-5678
+```
+
+❌ **Bad** — no bug description (Investigator cannot start without a hypothesis):
+
+```text
+/dlc-debug
+/dlc-debug --quick
+```
+
+❌ **Bad** — too vague (forces extra round-trip to clarify):
+
+```text
+/dlc-debug "something is broken"
+/dlc-debug "fix the bug"
+```
+
+> **Tip:** Include stack trace or error message in the description when available — paste the key lines directly into the argument. The Investigator uses this to locate the affected files immediately.
+
+---
+
 ## Phase 0: Triage (Lead Only)
 
 ### Step 1: Detect Project

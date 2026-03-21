@@ -102,12 +102,24 @@ Abort cleanly if user selects "No, abort".
 
 ## Progress Format
 
-Report at every step:
+Report at every step.
+
+✅ **Good** — step count shown, clear status per step, recovery instructions on failure:
 
 ```text
-[1/N] ✓ Step description
-[2/N] ⟳ Running step...
-[3/N] ✗ Error message — {recovery instructions}
+[1/6] ✓ Fetched origin — branch up to date
+[2/6] ✓ PR #42 is ready: not draft, CI passing, no conflicts
+[3/6] ⟳ Rebasing feature/add-health-check onto develop...
+[4/6] ✗ Rebase conflict in src/routes.ts — Resolve conflict manually then re-run /merge-pr
+```
+
+❌ **Bad** — no step count, no status symbol, silent on failure:
+
+```text
+Fetching origin
+Checking PR
+Rebasing
+Done
 ```
 
 ---

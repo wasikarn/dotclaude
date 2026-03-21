@@ -63,15 +63,29 @@ Load `{review_memory_dir}/review-dismissed.md` if present. Threads matching dism
 
 ### Step 3: Classify Threads
 
-Build triage table:
+Build triage table.
+
+✅ **Good** — specific file+line, clear issue summary, correct severity:
 
 ```markdown
 ## Thread Triage
 
 | # | File | Line | Reviewer | Severity | Issue Summary | Status | AC |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| 1 | src/foo.ts | 42 | reviewer | 🔴 Critical | ... | Open | AC1 |
-| 2 | src/bar.ts | 15 | reviewer | 🟡 Important | ... | Open | — |
+| 1 | src/auth/user.service.ts | 42 | reviewer-a | 🔴 Critical | Missing null check on `user.profile` — causes crash for pre-2024 users | Open | AC2 |
+| 2 | src/utils/format.ts | 15 | reviewer-b | 🟡 Important | Date format uses `MM/DD/YYYY` — project standard is `YYYY-MM-DD` | Open | — |
+| 3 | src/auth/user.service.ts | 91 | reviewer-a | 🔵 Suggestion | Variable name `d` unclear — consider `daysUntilExpiry` | Open | — |
+```
+
+❌ **Bad** — no line number, vague summary, severity not assigned:
+
+```markdown
+## Threads
+
+| # | File | Issue | Status |
+| --- | --- | --- | --- |
+| 1 | user.service.ts | reviewer wants changes | Open |
+| 2 | format.ts | fix this | Open |
 ```
 
 `AC` column: populated only when `$1` Jira key provided — `AC1`, `AC2`, etc. for threads relating to an AC item; `—` for unrelated threads.
@@ -188,13 +202,26 @@ rm -f {artifacts_dir}/respond-context.md
 
 ### Final Summary
 
+✅ **Good** — all fields populated, commit count matches threads:
+
+```markdown
+## Respond Review Complete
+
+**PR:** #42
+**Threads addressed:** 3
+**Commits made:** 2
+**Validate:** ✅ passes
+**Re-review requested:** reviewer-a
+```
+
+❌ **Bad** — placeholders not filled in, validate status missing:
+
 ```markdown
 ## Respond Review Complete
 
 **PR:** #{pr}
 **Threads addressed:** {total}
 **Commits made:** {count}
-**Validate:** ✅ passes
 **Re-review requested:** {reviewer_login}
 ```
 

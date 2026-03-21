@@ -69,6 +69,29 @@ For each var missing from schema, add the appropriate validation rule:
 
 If Phase 4 determined the var is **required**, use `.required()` instead of `.optional()`.
 
+✅ **Good** — correct type inference, preserves file structure, groups near related vars:
+
+```typescript
+// Before (existing):
+REDIS_HOST: Env.schema.string(),
+REDIS_PORT: Env.schema.number(),
+
+// After (added):
+REDIS_HOST: Env.schema.string(),
+REDIS_PORT: Env.schema.number(),
+REDIS_TIMEOUT: Env.schema.number.optional(),  // ← correct: number for TIMEOUT
+REDIS_URL: Env.schema.string.optional(),      // ← correct: string for URL
+```
+
+❌ **Bad** — wrong type (all `string`), wrong placement, real secret value:
+
+```typescript
+// Added at end of file, wrong types, secret exposed:
+REDIS_URL: Env.schema.string.optional(),
+REDIS_TIMEOUT: Env.schema.string.optional(), // ← wrong: TIMEOUT should be number
+REDIS_PASSWORD: Env.schema.string.optional(), // value: "MyRealPassword123"
+```
+
 Preserve existing file ordering and section groupings.
 
 ### Add to .env.example

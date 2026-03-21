@@ -235,14 +235,29 @@ These become positive severity anchors in future reviews (Step 0.9).
 
 Replace the "Agents" column with "Consensus":
 
+✅ **Good** — specific file+line, actionable issue, consensus recorded:
+
 ```markdown
-**Summary: Critical X / Warning Y / Info Z** (after debate)
+**Summary: Critical 1 / Warning 2 / Info 0** (after debate)
 
 #### Findings
 
 | # | Sev | Rule | File | Line | Consensus | Issue |
 | --- | --- | --- | --- | --- | --- | --- |
-| 1 | Critical | #2 | `src/foo.tsx` | 42 | 3/3 | Uses `as any` — should use type guard |
+| 1 | Critical | #2 | `src/auth/user.service.ts` | 42 | 3/3 | Uses `as any` to bypass user type — add `isUser()` type guard |
+| 2 | Warning | #5 | `src/auth/user.service.ts` | 78 | 2/3 | Nested ternary (depth 3) — extract to `resolveUserStatus()` |
+| 3 | Warning | #8 | `src/utils/format.ts` | 12 | 3/3 | `data` is ambiguous — rename to `userPayload` |
+```
+
+❌ **Bad** — no file path, no line number, vague issue, no consensus:
+
+```markdown
+#### Findings
+
+| # | Sev | Issue |
+| --- | --- | --- |
+| 1 | Critical | Bad typing |
+| 2 | Warning | Nested code |
 ```
 
 ## Phase 5: Action

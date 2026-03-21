@@ -116,7 +116,59 @@ Not all interventions are equal. Prioritize by impact:
 
 ## Output Template
 
-When presenting analysis, use this structure:
+When presenting analysis, use this structure. The template below shows a filled-in example.
+
+✅ **Good** — all sections populated, specific evidence, quantified where possible:
+
+```markdown
+## System Map
+[AI Coding Speed ↑] → feeds → [Code Output Volume ↑] → triggers → [Review Queue ↑]
+                                                        → also affects → [PR Merge Rate ↑]
+
+## System Strengths
+- CI/CD pipeline acts as balancing loop — catches regressions before they compound
+
+## Feedback Loops
+- R1: Speed Spiral — AI speed ↑ → output ↑ → team expects more → AI used more → speed ↑
+- B1: Review Brake — output ↑ → review queue ↑ → PR wait time ↑ → output ↓
+
+## Bottleneck Analysis
+- Current: code review (2 reviewers, 15 PRs/week backlog)
+- After intervention: merge conflicts (more parallel branches → more conflicts)
+- Shift risk: Medium — 2 reviewers can absorb ~20 PRs/week, but conflicts scale non-linearly
+
+## Critical Thinking
+- Key assumption: review quality stays constant as volume grows
+- Weakest link: we assumed reviewers won't fatigue — 50+ PRs/week will degrade quality
+- Missing evidence: actual reviewer capacity data
+
+## System Health Assessment
+
+| Dimension | Score | Reason |
+| --- | --- | --- |
+| Loop balance | 2/5 | R1 (speed spiral) dominates; B1 weak |
+| Bottleneck clarity | 4/5 | Review queue is clearly measurable |
+| Intervention reversibility | 5/5 | Adding review automation is fully reversible |
+| Feedback signal | 3/5 | PR wait time visible; reviewer fatigue is not |
+
+**Overall: 3/5** — system optimized for output speed, not output quality. Fragile under volume.
+
+## Recommendation
+- Leverage point: strengthen B1 (Review Brake) via automated review tooling
+- Why this point: reduces cognitive load on reviewers → quality holds as volume grows
+- Risk if wrong: automation misses context-sensitive bugs → false confidence
+- How to verify: track Critical findings per PR before/after — should stay ≥ 1 per 10 PRs
+```
+
+❌ **Bad** — only symptoms, no feedback loops, no bottleneck shift, no evidence:
+
+```markdown
+## Analysis
+The team is generating too much code too fast. Reviewers are overwhelmed.
+We should slow down AI usage or hire more reviewers.
+```
+
+When presenting analysis, structure your output as:
 
 ```markdown
 ## System Map

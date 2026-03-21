@@ -122,6 +122,24 @@ The description is the **primary trigger mechanism**. See `skills-best-practices
 
 Key: lean slightly **pushy** — Claude has a natural undertrigger bias (Anthropic observation).
 
+✅ **Good** — third-person, specific what + when + trigger keywords, within budget:
+
+```yaml
+description: "Create long-form Facebook posts for Brand Innovation Vantage. Use when writing content, creating a caption, or posting about a topic. Output: 800–2000 word post with emoji, hashtags, and CTA. Triggers: write content, create a post, write a caption, Facebook post, FB post."
+```
+
+❌ **Bad** — first-person, vague, no triggers, no when-to-use:
+
+```yaml
+description: "I help you write Facebook posts."
+```
+
+❌ **Bad** — trigger keywords too broad (fires on unrelated requests):
+
+```yaml
+description: "Write content. Use when user wants to write anything."
+```
+
 #### Degrees of Freedom
 
 Match constraint level to task risk:
@@ -148,11 +166,25 @@ Define exact structure when consistency matters:
 
 #### Examples
 
-2–3 concrete input/output pairs outperform lengthy prose descriptions:
+2–3 concrete input/output pairs outperform lengthy prose descriptions.
+
+✅ **Good** — concrete input/output pair, shows format:
 
 ```text
-Input: Write a caption about AI for business
-Output: "AI isn't here to replace you..." [emoji, hashtags, CTA]
+Input: Write a post about AI helping SME businesses
+Output:
+Hook: "AI isn't here to replace you — it's here to give you superpowers. 🚀"
+[Body 800-2000 words, casual voice, real SME examples]
+CTA: "DM us to see how AI can work for YOUR business today"
+#AIforBusiness #SMEThailand #DigitalTransformation
+```
+
+❌ **Bad** — prose description instead of input/output pair (harder for Claude to pattern-match):
+
+```text
+The skill should produce a long-form Facebook post that starts with a hook,
+has a body section, and ends with a call to action and relevant hashtags.
+The tone should be casual but professional.
 ```
 
 #### Workflow Checklist
@@ -203,6 +235,54 @@ Near-miss negatives (same keywords, different intent) are the most valuable test
 | Time-bound conditions | "Before August 2025, use old method" — breaks as time passes | Remove; update the Skill instead |
 | Inconsistent terminology | Switching between "output" / "result" / "response" → confusion | Pick one term per concept, use it throughout |
 | ALWAYS/NEVER commands | Brittle; ignores context; Claude follows mechanically | Replace with reasoning — explain *why* the rule exists |
+
+### Anti-Pattern Examples
+
+**Too many options:**
+
+❌ **Bad** — Claude picks randomly between A/B/C/D/E:
+
+```markdown
+Parse the PDF using one of: pdfplumber, PyMuPDF, pypdf, pdfminer, or camelot.
+Choose based on the document type.
+```
+
+✅ **Good** — one default, one escape hatch:
+
+```markdown
+Parse the PDF using pdfplumber.
+If the PDF is scanned (no text layer), use pdf2image + pytesseract instead.
+```
+
+**ALWAYS/NEVER commands vs reasoning:**
+
+❌ **Bad** — mechanical rule with no reasoning:
+
+```markdown
+ALWAYS use async/await. NEVER use callbacks.
+```
+
+✅ **Good** — explains why the rule exists, Claude can apply judgment in edge cases:
+
+```markdown
+Prefer async/await over callbacks — callbacks nest deeply, making error propagation and
+stack traces unreliable. Use callbacks only when interfacing with legacy APIs that don't
+support Promises.
+```
+
+**Time-bound conditions:**
+
+❌ **Bad** — breaks silently after the date passes:
+
+```markdown
+Before August 2025, use the v1 API endpoint. After August 2025, use v2.
+```
+
+✅ **Good** — no date dependency, update the skill instead:
+
+```markdown
+Use the v2 API endpoint: POST /api/v2/resource
+```
 
 ## 5 Golden Rules
 
