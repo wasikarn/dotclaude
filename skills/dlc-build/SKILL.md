@@ -77,6 +77,7 @@ Phase 0→1→2→ [3: Implement ↔ 4: Review ↔ 5: Assess loop (max 3)] →6:
 | [../../references/debate-protocol.md](../../references/debate-protocol.md) | Phase 4 iter 1 debate only (fallback in phase-4-review.md) |
 | [../../references/jira-integration.md](../../references/jira-integration.md) | Jira key in `$ARGUMENTS` |
 | [references/pr-template.md](references/pr-template.md) | Entering Phase 6 |
+| [references/examples.md](references/examples.md) | When assessing research/plan/implementation quality or checking for YAGNI violations |
 
 ## Invocation Examples
 

@@ -43,6 +43,8 @@ Invoke as `/dlc-review [pr-number] [jira-key?] [Author|Reviewer]`
 | --- | --- |
 | [jira-integration.md](../../references/jira-integration.md) | When Jira key detected in arguments |
 | [references/operational.md](references/operational.md) | On graceful degradation or context compression recovery |
+| [references/examples.md](references/examples.md) | When calibrating finding quality, debate depth, or output format |
+| [../../references/review-examples.md](../../references/review-examples.md) | Code pattern examples for all 12 rules — inject into teammate prompts |
 
 **PR:** #$0 | **Mode:** $2 (default: Author)
 **Today:** !`date +%Y-%m-%d`

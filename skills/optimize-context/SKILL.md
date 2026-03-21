@@ -33,6 +33,7 @@ Audit, score, and optimize CLAUDE.md files for maximum agent effectiveness. Invo
 | [templates.md](references/templates.md) | CLAUDE.md templates by project type (horizontal/vertical/hybrid) — load in Phase 4 when creating from scratch |
 | `scripts/pre-scan.sh` | Detects framework, npm scripts, dir structure in ~30ms — run first in Phase 1 |
 | [key-rules.md](references/key-rules.md) | 12 operational rules — read before making changes in Phase 4 |
+| [examples.md](references/examples.md) | Before/after CLAUDE.md examples for noise, stale, compression, and directive anti-patterns |
 
 **Why passive context wins:** Compressed 8KB context = 100% task success vs 53% baseline. AGENTS.md outperforms skills by 2×. Full data and grade thresholds: [references/quality-criteria.md](references/quality-criteria.md#vercel-research).
 

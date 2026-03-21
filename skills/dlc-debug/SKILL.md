@@ -44,6 +44,7 @@ Invoke as `/dlc-debug [bug-description-or-jira-key] [--quick?]`
 | [jira-integration.md](../../references/jira-integration.md) | When Jira key detected in arguments |
 | [references/operational.md](references/operational.md) | On graceful degradation or context compression recovery |
 | [artifact-templates.md](references/artifact-templates.md) | Phase 0 Step 4, Phase 1 Step 3, Phase 3 — artifact format reference |
+| [references/examples.md](references/examples.md) | When assessing investigation quality, root cause vs symptom, or DX finding depth |
 
 ---
 

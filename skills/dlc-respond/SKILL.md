@@ -48,6 +48,7 @@ Read CLAUDE.md first — auto-loaded, contains project patterns and conventions.
 | [references/operational.md](references/operational.md) | Mode detection, compression recovery, success criteria |
 | [../../references/review-conventions.md](../../references/review-conventions.md) | Phase 2: reply format and comment labels |
 | [../../references/jira-integration.md](../../references/jira-integration.md) | Phase 0 Step 0.5: when Jira key detected in `$1` |
+| [references/examples.md](references/examples.md) | When calibrating reply quality, fix scope, or triage table format |
 
 ---
 
