@@ -4,6 +4,7 @@ description: "Agent Teams debugging with parallel DX analysis — Investigator t
 argument-hint: "[bug-description-or-jira-key] [--quick?] [--review?]"
 compatibility: "Requires gh CLI, git, and CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1 (degrades gracefully without)"
 disable-model-invocation: true
+effort: high
 allowed-tools: Read, Grep, Glob, Bash(git *), Bash(gh *)
 ---
 

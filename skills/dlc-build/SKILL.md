@@ -4,6 +4,7 @@ description: "Primary development workflow — use /dlc-build for any coding tas
 argument-hint: "[task-description-or-jira-key] [--quick?] [--full?] [--hotfix?]"
 compatibility: "Requires gh CLI, git, CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1 (degrades gracefully without)"
 disable-model-invocation: true
+effort: high
 allowed-tools: Read, Grep, Glob, Bash(git *), Bash(gh *)
 ---
 

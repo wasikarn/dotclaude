@@ -4,6 +4,7 @@ description: "Use this skill whenever someone wants a pull request reviewed — 
 argument-hint: "[pr-number] [jira-key?] [Author|Reviewer?]"
 compatibility: "Requires gh CLI, git, and CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1 enabled in settings"
 disable-model-invocation: true
+effort: high
 allowed-tools: Read, Grep, Glob, Bash(gh *), Bash(git *)
 ---
 

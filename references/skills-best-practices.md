@@ -15,6 +15,7 @@ All fields are optional. Only `description` is recommended.
 | `user-invocable` | `false` = hides from `/` menu. Claude can still auto-invoke. | — |
 | `allowed-tools` | Tools auto-approved when skill is active (e.g. `Read, Grep, Bash(gh *)`). | — |
 | `model` | Model override when skill is active (e.g. `sonnet`, `opus`, `haiku`). | — |
+| `effort` | Override effort level for this skill: `low`, `medium`, `high`, `max`. `max` is Opus 4.6 only. | — |
 | `context` | `fork` = run in isolated subagent context. | — |
 | `agent` | Subagent type when `context: fork` (e.g. `Explore`, `Plan`, custom agent). | — |
 | `hooks` | Lifecycle hooks scoped to this skill. See hooks docs for format. | — |
