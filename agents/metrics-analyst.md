@@ -32,6 +32,9 @@ Each line is a JSON object. Common fields:
 - `final_critical` — critical findings in final review
 - `final_warning` — warning findings in final review
 - `timestamp` — ISO date string
+- `findings_reversed` — count of findings rejected by falsification-agent (0 if absent in older entries)
+- `ac_coverage` — string fraction e.g. "3/4" (empty string or absent if no Jira)
+- `human_confirmed` — boolean; true if user engaged Comprehension Gate (absent in older entries — treat as unknown)
 
 ### 3. Aggregate Metrics
 
@@ -42,6 +45,9 @@ Compute:
 - **High-iteration tasks** (iterations >= 3 — suggest architectural complexity)
 - **Tasks with final_critical > 0** — review loop didn't catch critical issues before ship
 - **Finding trends** — if finding categories are recorded, count top recurring categories
+- **Findings reversed rate** — avg `findings_reversed` per run; values >2 suggest agent overconfidence
+- **Human confirmed rate** — percentage of runs where `human_confirmed = true`; <50% suggests rubber-stamp pattern
+- **AC coverage** — parse fraction strings, compute average; <75% avg suggests spec quality issues
 
 ### 4. Output Retrospective Report
 
@@ -66,10 +72,21 @@ Compute:
 {list — these bypassed review or review loop was insufficient}
 
 ### Recurring Finding Categories
+
 | Category | Count | Recommendation |
 | --- | --- | --- |
 | Type safety | 12 | Add Hard Rule: no `as any` without justification comment |
 | Missing null check | 8 | Add Hard Rule: validate external data at system boundaries |
+
+### Engineering Quality Signals
+
+| Signal | Value | Threshold | Status |
+| --- | --- | --- | --- |
+| Avg findings reversed/run | {avg} | >2 = agent overconfidence | 🟢/🟡/🔴 |
+| Human confirmed rate | {pct}% | <50% = rubber-stamp risk | 🟢/🟡/🔴 |
+| Avg AC coverage | {pct}% | <75% = spec quality issues | 🟢/🟡/🔴 |
+
+Omit this table if fewer than 3 data points have the relevant fields (older entries won't have them).
 
 ### Recommendations
 1. {specific improvement based on data — e.g., "5 tasks required 3 iterations — consider adding
