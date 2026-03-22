@@ -1,0 +1,8 @@
+# shellcheck configuration for dev-loop hooks
+# https://www.shellcheck.net/wiki/Optional
+
+# Follow sourced files (resolves SC1091 for hooks/lib/common.sh)
+external-sources=true
+
+# Source path for resolving relative paths in # shellcheck source= directives
+source-path=hooks
