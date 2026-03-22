@@ -316,3 +316,11 @@ Append one JSON line to `~/.claude/dlc-metrics.jsonl`:
 ## Operational Reference
 
 See [references/operational.md](references/operational.md) for Graceful Degradation levels, Context Compression Recovery steps, and Success Criteria checklist.
+
+## Gotchas
+
+- **Minified or bundled stack traces reduce Investigator accuracy** — if the error originates in a compiled/bundled file, the Investigator maps to the wrong source location. Provide source-mapped stack traces or point to the source file explicitly in the bug description.
+- **Multiple investigators can produce conflicting root causes** — in Full mode, the Investigator and DX Analyst may identify different root causes. The convergence step (Phase 1 Step 3) is required to reconcile; do not skip it or proceed with only one finding.
+- **P0 severity skips mode confirmation but not fix approval** — the gate clarification in Phase 0 Step 2 is explicit: only the mode selection gate is skipped for P0. Fix plan approval still requires user confirmation. Don't assume P0 = fully automated.
+- **DX scope is the affected area only** — the DX Analyst is constrained to files touched by the bug fix. If broader DX improvements are needed, run `/dlc-build` after the fix is merged, not within this session.
+- **`--review` flag adds a Fix Reviewer** — this spawns an additional teammate after the Fixer and reviews only the fix commits. Without `--review` (and for non-P0 severity), fix review is skipped. For production fixes, always pass `--review` or set severity to P0.

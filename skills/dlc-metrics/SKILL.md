@@ -5,3 +5,10 @@ disable-model-invocation: true
 context: fork
 agent: metrics-analyst
 ---
+
+## Gotchas
+
+- **Requires `~/.claude/dlc-metrics.jsonl` to exist** — the file is created automatically by dlc-build and dlc-debug at Phase end. If no dlc-build or dlc-debug runs have completed, the file won't exist and the report will be empty (not an error). Run at least one full dlc-build session first.
+- **Only covers dlc-build and dlc-debug runs** — ad-hoc coding sessions, manual fixes, and dlc-review-only workflows do not append to the metrics file. The report reflects structured dev-loop usage, not total Claude Code activity.
+- **Runs as an isolated subagent (`context: fork`)** — delegated entirely to the `metrics-analyst` agent (Haiku). No lead context is available. The agent reads `~/.claude/dlc-metrics.jsonl` directly; ensure the path is accessible from the subagent's environment.
+- **JSONL entries are append-only** — there is no deduplication. If a session crashes and is re-run, the same task may appear twice. Treat iteration counts as approximate, especially for sessions that were restarted.

@@ -208,3 +208,11 @@ Done. CLAUDE.md updated.
 ## Key Rules
 
 See [references/key-rules.md](references/key-rules.md) for 12 operational rules (evidence-based, preserve intent, compress not delete, idempotent, passive over active, and more).
+
+## Gotchas
+
+- **Use `--dry-run` before editing critical files** — Phase 4-5 writes to CLAUDE.md directly. For global `~/.claude/CLAUDE.md` or shared project files, always preview the proposed changes table from `--dry-run` first; a bad edit affects every future session.
+- **Score improvement does not guarantee better Claude behavior** — the rubric measures structure and completeness, not semantic effectiveness. Test before/after by running real tasks; a compressed CLAUDE.md can score higher but still miss a critical non-obvious pattern.
+- **`pre-scan.sh` uses BSD `stat` syntax** — `stat -f%z` works on macOS but fails on Linux (GNU `stat` needs `-c%s`). If running on Linux, file size measurement in Phase 3 will error. The script degrades gracefully but the size check in the report will be empty.
+- **Auto-generated sections are excluded from size scoring** — `<claude-mem-context>` blocks and plugin-injected content don't count toward the 15KB threshold. Size is measured on human-authored content only. A 20KB file may still score well if 10KB is auto-generated.
+- **Project Coverage score (--coverage) only counts applicable categories** — not all 12 categories apply to every project. The score is normalized to applicable categories, so 100/100 is achievable even if some categories don't apply. Don't interpret a missing category as a gap.

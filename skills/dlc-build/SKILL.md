@@ -154,3 +154,11 @@ See [references/operational.md](references/operational.md) for degradation behav
 | Ship → Done | User selects completion option |
 
 Full gate details: [references/phase-gates.md](references/phase-gates.md)
+
+## Gotchas
+
+- **Agent Teams required for parallel phases** — without `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`, the skill degrades to subagent or solo mode; phases that rely on parallel workers run sequentially, increasing token cost and time.
+- **Phase 0 AC validation skips silently if Jira key is invalid** — if the key doesn't exist or Jira is unreachable, the skill proceeds using the raw task description as AC. Verify the Jira key resolves before invoking to avoid a silent no-op on acceptance criteria.
+- **Research phase can exceed context budget on large repos** — the Explorer spawns multiple subagents to read files; on repos with hundreds of relevant files this burns context fast. Use `--quick` for small tasks; save `--full` for cross-cutting changes.
+- **Artifacts live outside the project repo** — `dev-loop-context.md`, `research.md`, and `review-findings-*.md` are written to `{artifacts_dir}` (from `scripts/artifact-dir.sh`), not the working directory. Plan file goes to `~/.claude/plans/`. Don't look for them in the project root.
+- **Max 3 review iterations is enforced** — if Critical findings remain after iteration 3, the skill escalates with 4 options rather than looping further. This is intentional: 3+ iterations signals a design problem, not a fix problem.

@@ -165,3 +165,11 @@ Done
 | Backport cherry-pick conflict | Create PR but don't auto-merge: "Backport has conflicts — manual resolution needed." |
 | No GitHub remote | Abort: "No GitHub remote found. Cannot use gh CLI." |
 | Not on expected branch type | Show detected mode, confirm with user before proceeding |
+
+## Gotchas
+
+- **Feature branch must be pushed to origin before Mode 1** — the skill rebases onto `develop` and merges via `gh pr merge`. If the branch hasn't been pushed, `gh pr view` finds no PR and the auto-detect fails. Run `git push -u origin HEAD` first.
+- **Hotfix mode creates a version tag** — in Mode 2, the skill tags the release after merging to `main`. Confirm the version bump in CHANGELOG.md is correct before approving the Confirmation Gate; the tag cannot be easily undone after `git push --tags`.
+- **Requires a clean working tree** — Check 1 in Pre-execution Safety Checks aborts on any uncommitted changes. Stash or commit everything before invoking; `git stash` is the fastest recovery if you forgot.
+- **Backport cherry-pick uses unquoted `$fix_shas`** — shell word-splitting is required to enumerate multiple SHAs. If `fix_shas` is empty (e.g., version-bump commit captured accidentally), the cherry-pick is a no-op and the backport PR will be empty.
+- **`gh pr merge --delete-branch` only deletes the remote branch** — the local branch still exists after the merge. The workflow explicitly deletes it in a follow-up step; if the session aborts between steps, run `git branch -d {branch}` manually.

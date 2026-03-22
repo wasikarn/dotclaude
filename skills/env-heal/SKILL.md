@@ -146,3 +146,11 @@ Output the report using the template in [references/report-template.md](referenc
 - Preserve existing file structure, ordering, and comments.
 - If unsure whether a var is required or optional, default to optional.
 - Skip `node_modules/`, `dist/`, `build/`, `.next/` directories.
+
+## Gotchas
+
+- **Runs as an isolated subagent (`context: fork`)** — has no access to the lead conversation context or previously loaded files. All file paths must be resolved relative to the project root passed at invocation. Don't assume inherited context from the calling session.
+- **Only scans files matched by the script's patterns** — custom config locations (e.g., `infra/secrets.ts`, non-standard schema files) are not picked up automatically. Pass explicit `schema-file` and `example-file` arguments to `classify-env-gaps.sh` if the project uses non-default paths.
+- **Haiku model trades depth for speed** — complex multi-file env patterns (e.g., dynamic key construction, env vars built at runtime) may be missed. Review the gap report before merging fixes, especially for `in_schema_not_code` (potentially stale) entries.
+- **Type inference uses name heuristics only** — `PORT` → number, `ENABLE_*` → boolean, everything else → string. If the actual type doesn't match the name convention, the inferred schema rule will be wrong. Check added rules manually for non-standard naming.
+- **Auto-fix reverts after 3 test failures** — if tests fail for reasons unrelated to env changes (e.g., a pre-existing broken test), the skill will still revert its changes. Check test output carefully before assuming the revert was caused by the env fix itself.

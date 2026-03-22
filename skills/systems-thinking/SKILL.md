@@ -229,3 +229,11 @@ When presenting analysis, structure your output as:
 - **Respect feedback loops** — they're more powerful than any single intervention
 - **Today's solution is tomorrow's problem** — always ask "then what?"
 - **The system is not broken, it's perfectly designed for the results it gets** — change the design, not the symptoms
+
+## Gotchas
+
+- **CLD quality depends entirely on variable selection** — missing a key variable (e.g., "reviewer fatigue" in a code-velocity analysis) invalidates the loops built on it. Spend more time on Step 1 (variable identification) than on drawing the diagram.
+- **Reinforcing loops look like solutions but create oscillation** — R loops amplify in both directions. An intervention that accelerates a reinforcing loop may produce a short-term win followed by a larger collapse. Always pair R loop interventions with a corresponding B loop strengthener.
+- **Explicitly label arc polarity (+/−) for every connection** — unlabeled arcs make loops ambiguous. A connection that "seems positive" may reverse under different conditions (e.g., more reviews can improve quality up to a point, then degrade it through fatigue). Polarity labels make this visible.
+- **Bottleneck shift analysis requires downstream capacity data** — predicting where stress moves after an intervention is only valid if you know the capacity of downstream components. Without data, the bottleneck shift assessment is a hypothesis, not a prediction. Label it accordingly.
+- **The output template is illustrative, not prescriptive** — the filled-in AI coding speed example is a reference. Real analyses will have different loop counts, different leverage points, and different health scores. Adapt the structure; don't copy-fill.

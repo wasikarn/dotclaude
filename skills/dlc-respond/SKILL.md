@@ -242,6 +242,14 @@ rm -f {artifacts_dir}/respond-context.md
 
 See [references/operational.md](references/operational.md) for Success Criteria checklist and team cleanup steps.
 
+## Gotchas
+
+- **Run after review comments are posted, not before** — the skill fetches open threads from GitHub; if no review has been submitted yet, the thread list is empty and nothing gets fixed. Confirm reviewer comments are posted before invoking.
+- **fix-intent-verifier requires GitHub App permissions** — the verifier reads thread text via `gh api`. If the token lacks `pull_requests: read` scope, the intent verification step fails silently and Fixers proceed without the check.
+- **Parallel Fixers must not share files** — the file-group clustering (Step 3.5) prevents this, but if two threads touch the same file through different group assignments, write conflicts occur. Review the triage table's GROUP column before approving the fix phase.
+- **respond-context.md is ephemeral** — it is written to `{artifacts_dir}` (centralized, not the project repo) and deleted after Phase 3. If the session crashes mid-run, the file remains and must be cleaned up manually before re-running.
+- **Re-request review targets the original reviewer login** — the skill uses `gh pr edit --add-reviewer {original_reviewer_login}`. If the reviewer has left the org or changed their login, this step fails. Verify the login before Phase 3.
+
 ---
 
 ## Constraints
@@ -252,4 +260,3 @@ See [references/operational.md](references/operational.md) for Success Criteria 
 - **Never silently skip a Critical thread** — why: skipped Criticals become production incidents; if unfixable, the decision must be explicit and documented
 - **Max 3 fix attempts per thread** — why: beyond 3 attempts = architectural mismatch, not a surface fix; further attempts waste tokens without progress
 - **One commit per thread group** — why: enables clean revert of one fix without affecting others
-- **READ the code before fixing** — do not guess at the reviewer's intent
