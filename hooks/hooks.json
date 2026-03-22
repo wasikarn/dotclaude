@@ -67,6 +67,15 @@
             "command": "bash ${CLAUDE_PLUGIN_ROOT}/hooks/skill-usage-tracker.sh"
           }
         ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ${CLAUDE_PLUGIN_ROOT}/hooks/permission-router.sh"
+          }
+        ]
       }
     ],
     "PostToolUse": [
