@@ -19,9 +19,12 @@ IFS=$'\t' read -r AGENT_TYPE LAST_MSG < <(jq_fields '.agent_type // ""' '.last_a
 [ -z "${GATE_PATTERN:-}" ] && exit 0
 
 # Skip agents that don't match this gate's pattern
-if ! echo "$AGENT_TYPE" | grep -qiE "${GATE_PATTERN:-}"; then
+shopt -s nocasematch
+if [[ ! "$AGENT_TYPE" =~ ${GATE_PATTERN:-} ]]; then
+  shopt -u nocasematch
   exit 0
 fi
+shopt -u nocasematch
 
 # Require at least one file:line reference
 if ! has_evidence "$LAST_MSG"; then

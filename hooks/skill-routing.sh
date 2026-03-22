@@ -17,7 +17,12 @@ PROMPT=$(echo "$INPUT" | jq -r '.user_prompt // empty' 2>/dev/null) || exit 0
 [ -z "$PROMPT" ] && exit 0
 
 # Lowercase once for case-insensitive matching (Thai chars unaffected)
-PROMPT_LOWER=$(echo "$PROMPT" | tr '[:upper:]' '[:lower:]')
+# bash 4+ builtin (macOS ships bash 3.2; homebrew bash is 5+)
+if (( BASH_VERSINFO[0] >= 4 )); then
+  PROMPT_LOWER="${PROMPT,,}"
+else
+  PROMPT_LOWER=$(echo "$PROMPT" | tr '[:upper:]' '[:lower:]')
+fi
 
 # Ranked-hint accumulator — collects all matching hints, emits once at end
 # Supports multi-intent prompts ("I finished this feature and there's a weird bug")

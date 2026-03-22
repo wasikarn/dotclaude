@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### perf(hooks): replace echo|grep subprocesses with bash builtins
+
+- perf(hooks): replace `echo "$VAR" | grep -qiE` with `shopt -s nocasematch; [[ =~ ]]` in `task-gate.sh`, `subagent-stop-gate.sh`, `idle-nudge.sh`
+- perf(hooks): replace 6× `echo "$ERROR" | grep -qi` chains with single `shopt nocasematch` block + `[[ == *glob* ]]` in `bash-failure-hint.sh` (hottest PostToolUseFailure path)
+- perf(hooks): replace `echo "$PROMPT" | tr '[:upper:]' '[:lower:]'` with `${PROMPT,,}` bash 4+ builtin (falls back to `tr` on bash 3.2) in `skill-routing.sh` (hottest UserPromptSubmit path)
+
 ### refactor(hooks): extract shared lib and apply consistency rules
 
 - refactor(hooks): extract shared lib (`hooks/lib/common.sh`) with `require_jq`, `has_evidence`, `jq_fields`; apply consistency rules across 9 hook scripts

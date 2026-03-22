@@ -19,9 +19,12 @@ IFS=$'\t' read -r TASK_NAME TOOL_OUTPUT < <(jq_fields '.task_name // ""' '.tool_
 [ -z "${GATE_PATTERN:-}" ] && exit 0
 
 # Skip tasks that don't match this gate's pattern
-if ! echo "$TASK_NAME" | grep -qiE "$GATE_PATTERN"; then
+shopt -s nocasematch
+if [[ ! "$TASK_NAME" =~ $GATE_PATTERN ]]; then
+  shopt -u nocasematch
   exit 0
 fi
+shopt -u nocasematch
 
 # Require at least one file:line reference in the output
 if ! has_evidence "$TOOL_OUTPUT"; then

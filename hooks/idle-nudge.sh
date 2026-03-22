@@ -21,9 +21,12 @@ read -r TEAM_NAME < <(jq_fields '.team_name // ""')
 [ -z "${NUDGE_PATTERN:-}" ] && exit 0
 
 # Skip teams that don't match this nudge's pattern
-if ! echo "$TEAM_NAME" | grep -qiE "$NUDGE_PATTERN"; then
+shopt -s nocasematch
+if [[ ! "$TEAM_NAME" =~ $NUDGE_PATTERN ]]; then
+  shopt -u nocasematch
   exit 0
 fi
+shopt -u nocasematch
 
 # Optionally check for pending tasks before nudging
 if [ "${NUDGE_CHECK_TASKS:-0}" = "1" ]; then
