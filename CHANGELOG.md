@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.6.14] — 2026-03-22
+
+### feat(agents): extend metrics-analyst to parse and report new quality signal fields
+
+- feat(agents): extend metrics-analyst to parse and report new quality signal fields
+- feat(dlc-review): add Comprehension Gate (Phase 5.5) for Author mode
+- feat(dlc-build): add Comprehension Gate (Step 1.5) and extend metrics schema in Phase 6
+- feat(dlc-build): add AC quality check in Phase 0 triage (Step 1e)
+- fix(hooks): re-inject hard-rules.md after context compaction
+- docs: update README and CHANGELOG to reflect current state
+- chore: replace hardcoded BEP prefix and personal username with generic examples
+
 ## [Unreleased]
 
 ### Chore
