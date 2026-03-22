@@ -336,6 +336,28 @@ else
   printf "%b" "$SIZE_ISSUES"
 fi
 
+# ── 12. bats hook tests ───────────────────────────────────────────────────────
+
+section "12. bats hook tests"
+
+TESTS_DIR="$REPO_ROOT/tests/hooks"
+if ! command -v bats > /dev/null 2>&1; then
+  skip "bats not installed — skipping (brew install bats-core)"
+elif [ ! -d "$TESTS_DIR" ]; then
+  skip "tests/hooks/ not found — skipping"
+else
+  # Capture output once to avoid double-execution on flaky tests
+  BATS_OUT=$(bats --tap "$TESTS_DIR" 2>&1)
+  BATS_STATUS=$?
+  if [ "$BATS_STATUS" -eq 0 ]; then
+    TEST_COUNT=$(echo "$BATS_OUT" | grep -c "^ok " || true)
+    pass "bats — $TEST_COUNT tests passed"
+  else
+    fail "bats — one or more tests failed:"
+    echo "$BATS_OUT" | tail -20
+  fi
+fi
+
 # ── summary ───────────────────────────────────────────────────────────────────
 
 TOTAL=$((PASS + FAIL + SKIP))
