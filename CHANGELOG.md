@@ -14,14 +14,6 @@ All notable changes to this project will be documented in this file.
 - docs: update README and CHANGELOG to reflect current state
 - chore: replace hardcoded BEP prefix and personal username with generic examples
 
-## [Unreleased]
-
-### Chore
-
-- chore: replace hardcoded BEP Jira prefix with generic ABC across all skills, agents, hooks, and references
-- chore: replace personal username in artifact-dir.sh comment with generic example
-- docs: update README.md — version badge, skills/agents counts, add dlc-metrics and dlc-onboard sections, expand agents table to 20
-
 ## [0.6.13] — 2026-03-22
 
 ### Add good/bad examples to 5 skills
