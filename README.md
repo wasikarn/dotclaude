@@ -351,6 +351,21 @@ Scaffolds the dev-loop ecosystem into a new project: generates `hard-rules.md` w
 
 ---
 
+### Skill Guides
+
+Detailed usage guides for each skill: [docs/skills/](docs/skills/)
+
+| Guide | Skill |
+| --- | --- |
+| [dlc-build](docs/skills/dlc-build.md) | Full development loop |
+| [dlc-review](docs/skills/dlc-review.md) | Adversarial PR review |
+| [dlc-respond](docs/skills/dlc-respond.md) | Address PR comments |
+| [dlc-debug](docs/skills/dlc-debug.md) | Root cause analysis |
+| [merge-pr](docs/skills/merge-pr.md) | Safe PR merge |
+| [utilities](docs/skills/utilities.md) | optimize-context, env-heal, systems-thinking, dlc-metrics |
+
+---
+
 ## Full Workflow Example — Jira Ticket to Merged PR
 
 > **PROJ-1234** — "Add rate limiting to auth endpoints"
