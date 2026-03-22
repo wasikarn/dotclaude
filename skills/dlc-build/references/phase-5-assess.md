@@ -36,9 +36,9 @@ Call AskUserQuestion:
 **If "Run simplification":**
 
 1. Note changed file list: `git diff {base_branch}...HEAD --name-only` (read `base_branch` from `dev-loop-context.md`)
-2. Spawn `code-simplifier` agent — pass the file list as `$ARGUMENTS` (agent uses these instead of its fallback `git diff HEAD`)
+2. Spawn `code-simplifier` agent with task text: `"Simplify changed files: <space-separated file list>"` — the agent treats the task text as its `$ARGUMENTS` and uses it instead of its fallback git diff scope
 3. Wait for agent completion
-4. Run validate command from `dev-loop-context.md` → `validate_command:` field — confirm no regressions introduced
+4. Run validate command from `dev-loop-context.md` → `validate:` field — confirm no regressions introduced. If `validate:` is empty, use fallback: `npx tsc --noEmit && npx eslint . --ext .ts,.tsx`
 5. If validate passes → proceed to Phase 6
 6. If validate fails → revert simplifier changes (`git checkout HEAD -- <changed-files>`), note in context, proceed to Phase 6 with original code
 
