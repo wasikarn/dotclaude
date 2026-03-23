@@ -13,50 +13,57 @@ Quickly reconstruct your work state at session start. One agent call replaces 4-
 
 ## Steps
 
-### 1. Git State
+Issue Steps 1 and 2 as a single Bash call (using background processes), and Step 3 as a Jira MCP call — **all in the same parallel tool call round**. Collect results and format the digest.
+
+### 1 + 2. Git State + Open PRs (single Bash call)
 
 ```bash
-git branch --show-current
-git log --oneline -5
-git stash list
-git status --short
+TMPDIR=$(mktemp -d)
+trap 'rm -rf "$TMPDIR"' EXIT
+
+# Step 1: git state (local — fast)
+{
+  git branch --show-current
+  git log --oneline -5
+  git stash list
+  git status --short
+  echo "---BRANCHES---"
+  git branch -v | grep -v "^*" | awk '{print $1, $3}' | grep -v "\[gone\]" | head -10
+} > "$TMPDIR/git.txt" 2>&1 &
+
+# Step 2: open PRs (network — run concurrently with git)
+{
+  gh pr list --author "@me" --state open \
+    --json number,title,reviewDecision,statusCheckRollup,updatedAt \
+    --jq '.[] | {number, title, decision: .reviewDecision, ci: (.statusCheckRollup[0].state // "unknown"), updated: .updatedAt}' \
+    2>/dev/null | head -10
+  echo "---REVIEW-REQUESTS---"
+  gh pr list --search "review-requested:@me" --state open \
+    --json number,title,author,updatedAt \
+    --jq '.[] | {number, title, author: .author.login, updated: .updatedAt}' \
+    2>/dev/null | head -10
+} > "$TMPDIR/prs.txt" 2>&1 &
+
+wait
+cat "$TMPDIR/git.txt"
+echo "=== PRs ==="
+cat "$TMPDIR/prs.txt"
 ```
 
-List all local branches with unpushed commits:
-
-```bash
-git branch -v | grep -v "^*" | awk '{print $1, $3}' | grep -v "\[gone\]" | head -10
-```
-
-### 2. Open PRs Awaiting Action
-
-```bash
-# PRs where you are the author and review was requested / changes requested
-gh pr list --author "@me" --state open \
-  --json number,title,reviewDecision,statusCheckRollup,updatedAt \
-  --jq '.[] | {number, title, decision: .reviewDecision, ci: (.statusCheckRollup[0].state // "unknown"), updated: .updatedAt}' \
-  2>/dev/null | head -10
-
-# PRs where you are the requested reviewer
-gh pr list --search "review-requested:@me" --state open \
-  --json number,title,author,updatedAt \
-  --jq '.[] | {number, title, author: .author.login, updated: .updatedAt}' \
-  2>/dev/null | head -10
-```
-
-### 3. Active Jira Tickets (In Progress)
-
-Fetch tickets assigned to the current user with status "In Progress":
+### 3. Active Jira Tickets (MCP, same round as Steps 1 + 2)
 
 ```text
-mcp__mcp-atlassian__jira_search(jql="assignee = currentUser() AND status = 'In Progress' ORDER BY updated DESC", fields=["summary","status","priority"], limit=5)
+mcp__mcp-atlassian__jira_search(
+  jql="assignee = currentUser() AND status = 'In Progress' ORDER BY updated DESC",
+  fields=["summary","status","priority"],
+  limit=5
+)
 ```
 
 If `sprint-planner` agent (atlassian-pm plugin) is available, also fetch sprint context:
 sprint name, days remaining, and total story points — append as a one-line header above the ticket table.
 
-If MCP not available, skip this section — output:
-`[Jira: skipped — install atlassian-pm plugin for Jira integration]`
+If MCP not available, skip — output: `[Jira: skipped — install atlassian-pm plugin for Jira integration]`
 
 ### 4. Output Daily Digest
 
