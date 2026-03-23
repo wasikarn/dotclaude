@@ -77,9 +77,26 @@ If TeamCreate tool is not available → check graceful degradation:
 
 In **Reviewer mode**: `gh pr checkout $0 --worktree /tmp/review-pr-$0`. Skip if already on PR branch or if worktree exists. Skip entirely in Author mode. Clean up after Phase 6: `git worktree remove /tmp/review-pr-$0`.
 
-## Phase 0.05: Context Bootstrap
+## Phase 0.05: Parallel Context Bootstrap
 
-Run `pr-review-bootstrap` agent (Haiku) with PR #$0 and Jira key if present. Capture `{bootstrap_context}` (diff summary, file groupings, AC checklist) — inject into all 3 Phase 2 teammate prompts. If bootstrap fails: Teammate 1 fetches full diff and posts lightweight summary; teammates 2+3 use that instead.
+Start both simultaneously — do not wait between them:
+
+**A) `pr-review-bootstrap` agent (Haiku):** Spawn with PR #$0 and Jira key if present. Output: `{bootstrap_context}` (diff summary, file groupings, AC checklist).
+
+**B) Jira fetch** (only if Jira key found in `$ARGUMENTS`): Follow [jira-integration.md](../../references/jira-integration.md) §dlc-review while bootstrap agent runs:
+
+1. Fetch ticket → summarize Problem / Value / Scope
+2. Parse AC → numbered checklist
+3. Map each AC to PR diff files — flag missing implementation or tests as Critical
+
+Run Phase 0.1 (scope assessment) while A and B are in flight — it reads only the diff stat from the header.
+
+**Merge before Phase 2:** Collect both outputs once available, then inject into all Phase 2 teammate prompts:
+
+- `{bootstrap_context}` → all 3 teammate prompts
+- AC summary → all 3 teammate prompts + Phase 4 output
+
+**Fallbacks:** If bootstrap fails → Teammate 1 fetches full diff; teammates 2+3 use that instead. If no Jira key → skip B entirely.
 
 ## Phase 0.1: PR Scope Assessment
 
@@ -90,18 +107,6 @@ Parse `Diff stat` from header. Classify per [review-conventions.md](../../refere
 | Normal | <=400 | Full review with debate |
 | Large | 401-1000 | Full review + suggest split |
 | Massive | >1000 | Spawn Correctness reviewer (Hard Rules + confidence ≥85 only) · skip debate · lightweight falsification on Hard Rule findings · warn prominently |
-
-## Phase 0.6: Ticket Understanding (skip if no Jira)
-
-Scan `$ARGUMENTS` for Jira key (`ABC-\d+`). If found, follow [jira-integration.md](../../references/jira-integration.md) §dlc-review:
-
-1. Fetch ticket → summarize Problem / Value / Scope
-2. Parse AC → numbered checklist
-3. Map each AC to PR diff files — flag missing implementation or tests as Critical
-4. Pass AC summary to Phase 2 teammate prompts
-5. Include AC verification table in Phase 4 output
-
-If no Jira key → skip to Phase 1.
 
 ## Phase 1: Project Detection
 
@@ -189,7 +194,7 @@ Insert into each teammate prompt:
 - Project Hard Rules (from Phase 1)
 - PR number
 - `{bootstrap_context}` from Phase 0.05 (if available)
-- AC summary if Jira AC was parsed (Phase 0.6)
+- AC summary if Jira AC was parsed (Phase 0.05)
 - Known dismissed patterns: if `{review_memory_dir}/review-dismissed.md` exists, include last 10 entries as `{dismissed_patterns}` — teammates skip re-raising these patterns without new evidence
 
 All teammates are READ-ONLY.
