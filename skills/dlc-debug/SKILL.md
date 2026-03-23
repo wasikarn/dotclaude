@@ -33,12 +33,12 @@ Invoke as `/dlc-debug [bug-description-or-jira-key] [--quick?]`
 | File |
 | --- |
 | [teammate-prompts.md](references/teammate-prompts.md) |
-| [dx-checklist.md](references/dx-checklist.md) |
 
 **Load on-demand:**
 
 | File | When |
 | --- | --- |
+| [dx-checklist.md](references/dx-checklist.md) | Quick mode confirmed in Phase 0 — inject condensed checklist section into Quick Mode Fixer prompt |
 | [phase-gates.md](references/phase-gates.md) | At gate transitions — if unsure about conditions |
 | [../../references/review-conventions.md](../../references/review-conventions.md) | If adding Fix Review pass |
 | [jira-integration.md](../../references/jira-integration.md) | When Jira key detected in arguments |

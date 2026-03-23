@@ -131,8 +131,7 @@ RULES:
 4. If blocked after 3 attempts on the same item, message the team lead with all attempts — do not guess
 5. Do NOT self-report "tests pass" — the lead verifies independently
 
-CONVENTIONS:
-{project_conventions}
+CONVENTIONS: See CLAUDE.md (auto-loaded) for project patterns, commit format, and coding style.
 
 HARD RULES:
 {hard_rules}
@@ -175,8 +174,7 @@ RULES:
 3. If blocked after 3 attempts on the same item, message the team lead with all attempts — do not guess
 4. Do NOT self-report "tests pass" — the lead verifies independently
 
-CONVENTIONS:
-{project_conventions}
+CONVENTIONS: See CLAUDE.md (auto-loaded) for project patterns, commit format, and coding style.
 
 HARD RULES:
 {hard_rules}
@@ -239,7 +237,7 @@ When constructing prompts:
 1. Replace all `{placeholders}` with actual values from `debug-context.md`
 2. Insert project-specific Hard Rules from `{project_root}/.claude/skills/review-rules/hard-rules.md` if it exists
 3. Insert validate command from phase-gates.md project detection
-4. For Quick mode, use Quick Mode Fixer prompt (includes condensed DX checklist)
+4. For Quick mode, use Quick Mode Fixer prompt — load [dx-checklist.md](dx-checklist.md) and inject the `## Quick Mode Checklist` section as the DX checklist content
 5. For Full mode, use Full Mode Fixer prompt (references investigation.md)
 6. Investigator and DX Analyst receive the same `{bug_description}` and `{project_name}`
 7. Fix Reviewer receives: commit hashes from `git log --oneline -N` + root cause summary from `investigation.md`
