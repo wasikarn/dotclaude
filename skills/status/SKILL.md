@@ -32,4 +32,4 @@ Report:
    - `research.md` + `plan.md` → Phase 2 Plan complete
    - `research.md` + `plan.md` (no `review.md`) → Phase 3 Implementation in progress
    - `research.md` + `plan.md` + `review.md` → Phase 4+ Review/Ship in progress
-4. If no artifacts: "No active Anvil session — start one with /build"
+4. If no artifacts: "No active Anvil session — start one with /anvil:build"
