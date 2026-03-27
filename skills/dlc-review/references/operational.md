@@ -45,3 +45,11 @@ If session compacts mid-workflow, re-read in order:
 - [ ] Critical issues: zero (Author) or documented (Reviewer)
 - [ ] Author: validate passes / Reviewer: review submitted
 - [ ] Team cleaned up
+
+## Gotchas
+
+- **Agent Teams required for adversarial debate** — without `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`, the skill falls back to subagent mode (no debate, parallel subagent review) or solo mode (sequential checklist). Three-reviewer debate only runs in Agent Teams mode.
+- **Input must be a PR number, not a title or URL** — passing PR title text or a GitHub URL instead of a bare number causes `gh pr diff` to fail silently. Extract the numeric ID first: `gh pr list` or the PR URL's trailing number.
+- **Massive PRs (>1000 lines) skip debate** — the skill auto-downgrades to Correctness-only review with Hard Rules + confidence ≥85. Users expecting full debate on large diffs will not get it; split the PR if full coverage is needed.
+- **Reviewer mode creates a git worktree** — `gh pr checkout $0 --worktree /tmp/review-pr-$0` requires a clean repo state. If the worktree already exists from a previous failed run, the checkout fails. Clean up manually: `git worktree remove /tmp/review-pr-$0`.
+- **Dismissed patterns file persists across sessions** — `review-dismissed.md` accumulates up to 50 entries and suppresses re-raising of those patterns. If a pattern was wrongly dismissed, manually remove it from the file before re-running the review.
