@@ -9,6 +9,9 @@ export const VerdictSchema = z.object({
 })
 
 export const VerdictArraySchema = z.array(VerdictSchema)
-export const verdictArrayJsonSchema = z.toJSONSchema(VerdictArraySchema)
+
+// Wrapped schema for SDK outputFormat — Claude API requires top-level type:object (not array)
+export const VerdictResultSchema = z.object({ verdicts: VerdictArraySchema })
+export const verdictResultJsonSchema = z.toJSONSchema(VerdictResultSchema)
 
 export type Verdict = z.infer<typeof VerdictSchema>

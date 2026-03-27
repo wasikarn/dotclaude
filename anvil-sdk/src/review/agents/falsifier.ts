@@ -3,7 +3,7 @@ import { query } from '@anthropic-ai/claude-agent-sdk'
 import type { ResolvedConfig } from '../../config.js'
 import type { Finding, Verdict } from '../../types.js'
 import { FALSIFICATION_PROMPT } from '../prompts/falsifier.js'
-import { VerdictArraySchema, verdictArrayJsonSchema } from '../schemas/verdict.js'
+import { VerdictResultSchema, verdictResultJsonSchema } from '../schemas/verdict.js'
 
 function createFalsifier(model: 'sonnet' | 'opus' | 'haiku'): AgentDefinition {
   return {
@@ -43,16 +43,19 @@ export async function runFalsification(params: {
       maxBudgetUsd: params.config.maxBudgetFalsification,
       outputFormat: {
         type: 'json_schema',
-        schema: verdictArrayJsonSchema as Record<string, unknown>,
+        schema: verdictResultJsonSchema as Record<string, unknown>,
       },
     },
   })) {
     if (msg.type === 'result') {
       if (msg.subtype === 'success') {
         const raw = msg.structured_output
-        const parsed = VerdictArraySchema.safeParse(raw)
+        if (raw === undefined || raw === null) {
+          throw new Error('[sdk-review] falsifier returned no structured_output')
+        }
+        const parsed = VerdictResultSchema.safeParse(raw)
         if (parsed.success) {
-          verdicts.push(...parsed.data)
+          verdicts.push(...parsed.data.verdicts)
         } else {
           throw new Error(`[sdk-review] verdicts failed schema validation: ${JSON.stringify(parsed.error.issues)}`)
         }

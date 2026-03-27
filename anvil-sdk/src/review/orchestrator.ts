@@ -4,8 +4,7 @@ import type { ResolvedConfig } from '../config.js'
 import type { DiffBucket, FileDiff, ReviewerResult } from '../types.js'
 import { createReviewer } from './agents/reviewer.js'
 import { mapToDomains } from './domain-mapper.js'
-import type { Finding } from './schemas/finding.js'
-import { FindingArraySchema, findingArrayJsonSchema } from './schemas/finding.js'
+import { type Finding, FindingResultSchema, findingResultJsonSchema } from './schemas/finding.js'
 
 async function runSingleReviewer(params: {
   bucket: DiffBucket
@@ -39,7 +38,7 @@ async function runSingleReviewer(params: {
       maxBudgetUsd: params.config.maxBudgetPerReviewer,
       outputFormat: {
         type: 'json_schema',
-        schema: findingArrayJsonSchema as Record<string, unknown>,
+        schema: findingResultJsonSchema as Record<string, unknown>,
       },
     },
   })) {
@@ -51,9 +50,9 @@ async function runSingleReviewer(params: {
         if (raw === undefined || raw === null) {
           throw new Error('[sdk-review] reviewer returned no structured_output — budget may have been exceeded or outputFormat was rejected')
         }
-        const parsed = FindingArraySchema.safeParse(raw)
+        const parsed = FindingResultSchema.safeParse(raw)
         if (parsed.success) {
-          findings = parsed.data
+          findings = parsed.data.findings
         } else {
           throw new Error(`[sdk-review] structured_output failed schema validation: ${JSON.stringify(parsed.error.issues)}`)
         }
