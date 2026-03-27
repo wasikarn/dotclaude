@@ -61,6 +61,52 @@ transition that no longer passes through those steps.
 
 ---
 
+## Shared Abstractions
+
+### PhaseVerdict Schema
+
+The three-state verdict (READY / NEEDS WORK / NOT READY) appears in three phases:
+- §2.4 GO/NO-GO (Phase 1 research output)
+- §3.2 Readiness Verdict (Phase 2 plan output)
+- §5.2 Aggregate Verdict (Phase 3.5 verification output)
+
+All three share the same schema and escalation contract. Defined once here:
+
+```
+PhaseVerdict:
+  state: READY | NEEDS WORK | NOT READY
+  evidence: [list of file:line citations, required for NEEDS WORK and NOT READY]
+  escalation:
+    READY: proceed automatically
+    NEEDS WORK: present to user, wait for decision (proceed / address first)
+    NOT READY: present blocking list, require explicit choice (a/b/c)
+```
+
+Implementation: each phase file references this schema by name — do not redefine inline.
+
+### Mode Capability Matrix (single source of truth)
+
+The per-phase behavior for each mode is defined ONCE in `workflow-modes.md`. All phase
+files reference the matrix rather than redefining mode behavior inline. When a mode
+changes, one file changes.
+
+The full matrix is in `workflow-modes.md`. Summary for this spec:
+
+| Phase | Micro | Quick | Full |
+|-------|-------|-------|------|
+| 0: Triage | Score → Micro auto | Score → confirm | Score → confirm |
+| 1: Research | Skip | Lite (WHAT/WHY) | Deep (delta markers + GO/NO-GO) |
+| 2: Plan | 1 truth, no gate | 2–3 truths, no gate | 3–5 truths, user gate |
+| 2: Plan-challenger | Skip | Skip | Run (Full only) |
+| 3: Implement | 1 worker wave | 1–2 waves | Multi-wave continuation |
+| 3.5: Verify | Lightweight (1 truth, no loop) | Full (1 loop) | Full (1 loop) |
+| 4: Review Stage 1 | Run | Run | Run |
+| 4: Review Stage 2 | 1 reviewer | 2 reviewers | 3+ reviewers + debate |
+| 5.5: Simplify | Skip | Optional | Default when Critical=0 |
+| 6: metrics-analyst | Skip | Skip | Run (if ≥5 entries) |
+
+---
+
 ## Non-Goals
 
 - Cross-session Tasks system coordination (separate initiative)
@@ -158,7 +204,7 @@ Lead evaluates 5 factors from task description + live context injection:
 | **Risk** | Task involves auth / payment / DB migration / public API |
 | **Novelty** | Pattern doesn't exist in codebase (new abstraction, new dependency) |
 | **Dependencies** | Code being changed has known downstream consumers |
-| **Ambiguity** | Task description is underspecified or has unclear acceptance criteria |
+| **Ambiguity** | Task description is underspecified or has unclear acceptance criteria. **Tie-break rule: if uncertain whether to score 0 or 1 → score 1.** Uncertainty about scope IS ambiguity. |
 
 **Mode assignment:**
 - Score 1–2 → **Micro** (isolated, zero blast radius)
@@ -166,6 +212,22 @@ Lead evaluates 5 factors from task description + live context injection:
 - Score 4–5 → **Full** (cross-cutting, risky, or unclear)
 
 Lead presents: "Task scored X/5 → suggesting [mode]. Proceed or override?"
+
+### 1.2.5 Hotfix Mode — Unchanged by This Design
+
+`--hotfix` mode bypasses Phase 0 triage entirely and is **not affected by this design**.
+Hotfix has its own gate sequence defined in `references/modes/hotfix.md`:
+- No blast-radius scoring
+- No research phase
+- No plan gate
+- Direct to implementation on `main` branch with immediate review
+
+The new Phase 0 blast-radius scoring, constitution check, and downgrade protection apply
+to Micro/Quick/Full only. Hotfix is identified at Phase 0 entry by the `--hotfix` flag
+and routed directly to the Hotfix mode file — it never enters the scoring path.
+
+`workflow-modes.md` must preserve the Hotfix decision branch exactly as-is while
+adding the new Micro mode and blast-radius auto-score path for the other modes.
 
 ### 1.3.1 Flag vs Score Precedence
 
@@ -220,6 +282,11 @@ Set in **subagent spawn calls** (not SKILL.md frontmatter — which is static):
 | Full | Deep: delta markers + [NEEDS CLARIFICATION] + GO/NO-GO verdict |
 
 ### 2.2 Explorer Pattern (feature-dev agent-returns-references + GSD `<files_to_read>`)
+
+**Explorer count:** spawn **one explorer** per research run unless research-validator flags
+the file list as insufficient (fewer than 3 files for a non-trivial task). In that case,
+spawn a second focused explorer for the gap area only. Never more than 2 explorers — the
+lead reads files directly and does not benefit from parallel explorers flooding it with lists.
 
 Explorer agents return a **structured file list**, not file contents:
 
@@ -279,10 +346,22 @@ Benefit: orchestrator context stays lean; lead controls what enters research
   typically verbose context explanations that repeat what the codebase already shows.
   Do not add new content; trim to reach 900–1600 range.
 
+## Risks Found
+<!-- REQUIRED: list ALL concerns before giving verdict, even minor ones.
+     An empty Risks Found section is a valid output IF you can justify it.
+     Format: - [concern] (file:line evidence)
+     If you have no concerns, write: "None identified — [brief reason why]" -->
+- [concern 1] (evidence)
+- [concern 2] (evidence)
+
 ## GO/NO-GO Verdict
 READY / NEEDS WORK / NOT READY
-Reason: [specific evidence, not opinion]
+Reason: [based on Risks Found above — not independent opinion]
 ```
+
+Rationale: The "Risks Found" block forces adversarial framing BEFORE verdict.
+An LLM that lists 3 risks and then says READY must resolve that self-inconsistency.
+READY requires "None identified" which demands explicit justification — harder to claim.
 
 ### 2.4 GO/NO-GO Behavior (Full mode only — RPI pattern)
 
@@ -328,8 +407,17 @@ Lead derives truths from task description + research.md before writing plan:
 ## must_haves
 
 ### Truths
-- [ ] [observable behavior] (verify: [how to check])
-- [ ] [observable behavior] (verify: [how to check])
+- [ ] [observable behavior]
+      verify: [run test X | call endpoint Y | check output Z]  ← behavioral method only
+      behavioral?: [yes — 1 sentence: what a user/caller observes, not what function runs]
+- [ ] [observable behavior]
+      verify: [run test X | call endpoint Y | check output Z]
+      behavioral?: [yes — 1 sentence]
+
+<!-- verify: must be a behavioral method. Prohibited: "read the code", "check the logic".
+     Permitted: "run test", "call endpoint", "check output", "observe response".
+     behavioral?: must confirm the truth describes external observable behavior, not
+     internal implementation details (function calls, variable values, class structures). -->
 
 ### Key Links ("where is this most likely to break?")
 - [ComponentA] → [ComponentB] via [mechanism]: [why this is critical]
@@ -367,6 +455,14 @@ plan-challenger agent receives the draft plan.md and challenges it from **two le
 > architectural inconsistencies the new code would worsen,
 > targeted pre-work that reduces implementation risk
 
+**Output quota per lens (required):**
+- Minimal-lens: MUST produce ≥2 findings (or explain why plan is already minimal)
+- Clean-lens: MUST produce ≥1 finding (or explain why no pre-work is warranted)
+
+Without quotas, one lens dominates in a single-agent context. The quota forces both lenses
+to do real work. A finding manufactured to meet quota will be weak and the lead will reject
+it — that is acceptable. The cost of a trivially weak finding is lower than zero coverage.
+
 Lead reviews both lenses → decides what to accept/reject → updates plan.md
 Lead does NOT spawn two separate agents — plan-challenger is still a single agent
 with both lenses in its prompt.
@@ -399,15 +495,25 @@ Required order: failing test → verify it fails for right reason → minimal im
 Violation rule: if implementation exists before failing test → DELETE the implementation
                start over from the test. Not refactor — delete.
 
-── TDD COMPLETION REPORT ──
-At the end of your task, include in your completion message:
-  TDD_COMPLIANCE: [FOLLOWED | VIOLATED]
-  If VIOLATED: describe what happened and what you deleted/redid
+── TDD SEQUENCE REPORT ──
+At the end of your task, report the SEQUENCE of your actions as evidence — not a
+self-assessment. Self-assessment is unreliable; sequence evidence is checkable.
+
+Required format in your <worker_completion> message:
+  TDD_SEQUENCE:
+    - first-test-write: [file:line] "[test description]"
+    - first-test-run-FAIL: confirmed failing before impl (yes/no)
+    - first-impl-write: [file:line]
+    - test-run-PASS: [file:line]
+  TDD_COMPLIANCE: FOLLOWED | VIOLATED
+  If VIOLATED: what happened (implementation written before test — state specifically)
 ```
 
-Lead reads `TDD_COMPLIANCE` from each worker's completion message. If VIOLATED:
-- Log the violation in `dev-loop-context.md` under `tdd_violations[]`
-- Surface to user at Phase 6 summary (not as a blocker — for learning/metrics)
+Lead reads `TDD_SEQUENCE` from each worker's completion message.
+Lead infers compliance from the sequence order — not the label alone.
+If VIOLATED or sequence is inconsistent:
+- Log in `dev-loop-context.md` under `tdd_violations[]`
+- Surface to user at Phase 6 summary (informational, not a blocker)
 
 ### 4.2 `<files_to_read>` Pattern (GSD)
 
@@ -426,20 +532,41 @@ Read these files at the start of your task using the Read tool:
 Workers read files fresh with their own clean context.
 Orchestrator never passes file contents directly → keeps lead context lean.
 
-### 4.3 Continuation Agent Pattern (GSD — Full mode multi-wave)
+### 4.3 WorkerContext Schema (GSD continuation agent — Full mode multi-wave)
 
-For Full mode with multiple worker waves:
-- Each wave = fresh agent spawn with explicit state injected
-- State passed: `completed_tasks[]`, `must_haves`, `key_links`, `wave_number`
-- Never resume a prior agent context — always fresh with injected state
+The worker contract is bidirectional. Both directions are defined here.
 
+**Lead → Worker (spawn call):**
 ```
-Wave N spawn includes:
-  completed_tasks: [task 1 ✅, task 2 ✅, ...]
-  pending_tasks: [task 3, task 4]
-  must_haves: [truth 1, truth 2]
+<worker_context>
+  wave_number: N
+  assigned_tasks: [task 3, task 4]    ← tasks for THIS worker only
+  completed_tasks: [task 1 ✅, task 2 ✅]
+  must_haves: [truth 1, truth 2]      ← full list — worker must not regress passing truths
   key_links: [A→B, C→D]
+  files_to_read: [plan.md, research.md, src/...]
+</worker_context>
 ```
+
+**Worker → Lead (completion message, required fields):**
+```
+<worker_completion>
+  assigned_tasks_status:
+    - task 3: DONE / PARTIAL / BLOCKED
+    - task 4: DONE / PARTIAL / BLOCKED
+  files_modified: [src/auth.ts, tests/auth.test.ts]
+  TDD_SEQUENCE: [first-test-write: line X | first-impl-write: line Y | test-run-pass: line Z]
+  TDD_COMPLIANCE: FOLLOWED | VIOLATED
+  blocker: [reason if BLOCKED, else null]
+</worker_completion>
+```
+
+Lead reads `assigned_tasks_status` to update `completed_tasks[]` for Wave N+1.
+PARTIAL or BLOCKED tasks are re-queued as new sequential tasks (no [P] marker).
+A worker that terminates on error without emitting `<worker_completion>` is treated as
+BLOCKED on all assigned tasks — lead does not assume completion.
+
+Never resume a prior agent context — always fresh with injected WorkerContext.
 
 ### 4.4 [P] Marker Wave Assignment (SpecKit)
 
@@ -485,8 +612,17 @@ would be unanchored. Instead, surface the failure immediately.
 ```
 For each truth in must_haves.truths:
   1. State: "Verifying Truth N: [description]"
-  2. Method: run tests / read code / check output / call endpoint
+  2. Method (preference order): run tests → call endpoint → check output → read code
+     Note: "read code" is weakest — only use if no test exists yet. Always prefer
+     executable verification (test run or endpoint call) over static inspection.
   3. Result: ✅ PASS with evidence | ❌ FAIL with specific reason
+
+  4. TEST MEANINGFULNESS CHECK (when truth verified via test run):
+     Read the test file. Does the test contain at least one behavioral assertion?
+     - ✅ MEANINGFUL: has expect/assert on output/response/side-effect
+     - ❌ SHALLOW: only checks mock call counts, or has no assertions at all
+     A SHALLOW test that passes does NOT constitute a truth PASS — log as ❌ FAIL:
+     "Test passes but only asserts mock calls / zero assertions — truth not verified"
 
 For each key_link:
   1. Verify: the connection exists in the actual code (file:line)
@@ -496,7 +632,14 @@ Aggregate verdict:
   ALL PASS → proceed to Phase 4
 
   ANY FAIL (Quick/Full):
-    → return to Phase 3 with specific failure list (max 1 loop)
+    → return to Phase 3 — TARGETED re-implementation only:
+      Lead spawns workers for ONLY the tasks that cover the failed truths.
+      Identify: which plan.md tasks are responsible for Truth N?
+      Spawn one worker per failed truth's task group.
+      Do NOT re-spawn workers for truths that already PASS — risk of regression.
+      This targeted re-entry counts as 1 loop (max 1 Phase 3.5 loop allowed).
+      The Phase 3.5 loop ALSO increments the global iteration_count (max 3 shared counter).
+      Rationale: a Phase 3.5 failure is a Phase 3 failure — it must count against max-3.
 
   ANY FAIL (Micro):
     → escalate immediately: "Truth N failed: [reason]. Fix now or continue to review?"
@@ -525,11 +668,18 @@ Lead must audit `must_haves.truths` before entering Phase 2:
 - Lead must explicitly confirm: "Is this truth still the right behavioral requirement?"
 - Truths may be revised — but only with explicit reasoning, not to make them easier to pass
 
+**Redesign cycle global cap: max 1 redesign cycle.**
+If STILL FAILING after the second full redesign cycle, present only options (a) and (c)
+— (b) is no longer available. Unlimited redesign cycles are not permitted.
+
 **Phase gates note:**
 Implementation must add a `Phase 3.5 → Phase 2` entry to `phase-gates.md` with:
-- Trigger: STILL FAILING after loop AND user picks option (b)
+- Trigger: STILL FAILING after loop AND user picks option (b) AND redesign_count < 1
 - Artifacts: verify-results.md preserved; research.md and plan.md marked for regeneration
-- Iteration: loop counter reset for new planning cycle; prior attempt archived with date suffix
+- Iteration: shared iteration_count reset for new planning cycle; prior attempt archived
+  with date suffix (e.g., `plan-attempt-1.md`, `research-attempt-1.md`)
+- redesign_count: new field in `dev-loop-context.md`, incremented at each redesign entry
+- If redesign_count ≥ 1 when user picks (b): offer (a) or (c) only — no second redesign
 
 ### 5.4 Behavioral Framing (pr-review-toolkit)
 
@@ -568,7 +718,10 @@ Before any code quality review, spec compliance reviewer checks:
 
 1. **must_haves coverage**: all truths from Phase 3.5 confirmed in diff?
 2. **hard-rules.md compliance**: every rule respected? (cite violations with file:line)
-3. **Scope fidelity**: mode-dependent check:
+3. **Test file presence (TDD enforcement)**: for every new behavior in the diff, is there
+   a corresponding test file change? A diff with only production code changes (no test file)
+   fails Stage 1 immediately. Exception: Micro mode with no test framework in the project.
+4. **Scope fidelity**: mode-dependent check:
    - Full: does diff match ADDED/MODIFIED/REMOVED from research.md? Any out-of-scope changes?
    - Quick: does diff stay within the files identified in research.md's Context section?
      (Quick has no ADDED/MODIFIED/REMOVED — use file-level scope instead)
@@ -577,16 +730,29 @@ Before any code quality review, spec compliance reviewer checks:
 **Gate:** Stage 1 FAIL → return to Phase 3 immediately
 Do NOT proceed to Stage 2 — avoids wasting review capacity on non-compliant code.
 
+**Mandatory path after Stage 1 FAIL:**
+Phase 3 (fix) → **Phase 3.5 (verify again)** → Phase 4 Stage 1 (check again)
+Phase 3.5 MUST run again before Phase 4 re-entry. Skipping Phase 3.5 after a
+Stage 1 loop is not permitted — spec compliance cannot be assumed without re-verification.
+
 **Iteration counter interaction:**
-Stage 1 FAIL counts as a full iteration in `dev-loop-context.md`'s iteration counter —
-the same counter used for the Phase 3→4 implement-review loop (max 3 total).
+There is ONE shared `iteration_count` in `dev-loop-context.md` (max 3). Every time a
+Phase 3 → Phase 3.5 cycle completes and something fails, that counts as 1 iteration:
 
-Rationale: Stage 1 failure is a Phase 3 failure surfaced at Phase 4. Counting it prevents
-the following bypass: loop Phase 3→3.5→3→3.5 twice (2 loops) then hit Stage 1 failure
-(uncounted) — which would allow 5+ total fix attempts behind the max-3 protection.
+| Event | Increments iteration_count? |
+|-------|-----------------------------|
+| Phase 3.5 ANY FAIL → loop back to Phase 3 | Yes — targeted re-entry |
+| Phase 4 Stage 1 FAIL → loop back to Phase 3 | Yes |
+| Phase 4 Critical finding → loop back to Phase 3 | Yes |
 
-Lead increments `iteration_count` in `dev-loop-context.md` before returning to Phase 3.
-If `iteration_count` reaches 3 at Stage 1 failure: present options to user instead of looping.
+The Phase 3.5 max-1-loop is a *type-specific* cap: you may only do 1 Phase 3.5-triggered
+re-entry. But it still counts against the shared max-3. Example worst case:
+- Iteration 1: Phase 3.5 FAIL → targeted re-entry → Phase 3.5 PASS → Phase 4 Stage 1 FAIL
+- Iteration 2: Stage 1 FAIL loop → Phase 3 → Phase 3.5 PASS → Phase 4 PASS
+- Iteration 3: any remaining review loop
+
+Lead increments `iteration_count` before returning to Phase 3.
+If `iteration_count` reaches 3: present options to user instead of looping.
 
 ### 6.2 Stage 2 — Code Quality (Conditional Dispatch — pr-review-toolkit)
 
@@ -606,22 +772,32 @@ regardless of commit state. Deduplicate the combined list before checking condit
 | `**/routes/**` or `**/controllers/**` present | api-contract-auditor |
 | `try\|catch\|async` present in diff | error-handling reviewer |
 | `.ts` type definitions (`interface\|type\|enum`) | typescript reviewer |
+| `*.test.*` or `*.spec.*` present in diff | **test-quality-reviewer** (T1–T9 checks) |
 | Always | general code-reviewer |
 
 Skip inapplicable reviewers — reduce wasted tokens for PRs that don't touch those domains.
 
 ### 6.3 Confidence Floor ≥80 (feature-dev + pr-review-toolkit)
 
-Before emitting any finding, every reviewer must reason through 3 questions:
-1. Can I cite a specific `file:line` where this is a problem?
-2. Is this a pre-existing issue unrelated to this diff?
-3. Could I be wrong about the context (missing information, wrong assumption)?
+Before emitting any finding, every reviewer must complete a **structured evidence block**.
+The block is the gate — invisible reasoning is insufficient because it cannot be checked.
 
-If any answer is uncertain → do not emit. If all three answered confidently → emit with
-confidence score label: `[C:92]`, `[C:81]`, etc.
+Required format before each emitted finding:
+```
+Citation: [file:line — specific location of the problem]
+Pre-existing: [yes — existed before this diff at commit HASH | no — introduced in this diff]
+Assumption: [one sentence: what I am assuming about context that could be wrong]
+Confidence: [C:NN]
+```
 
-The numeric label is for reader triage, not as a gate that can be gamed by asserting
-a high number. The gate is the reasoning process above.
+Emit only if:
+- Citation: can be filled with a specific file:line (not "somewhere in the file")
+- Pre-existing: is "no" (pre-existing issues belong in a separate tech-debt report)
+- Assumption: is low-risk or verifiable
+
+The `[C:NN]` label is for reader triage. The structured block is the actual gate.
+Filling in "pre-existing: no" when unsure is a violation — if commit history is unclear,
+check `git log -p [file]` before claiming the issue is diff-introduced.
 
 ### 6.4 Criticality Scaling 1–10 (pr-review-toolkit)
 
@@ -664,7 +840,7 @@ Overall type health = average of 4 dimensions. Scores below 5 in any dimension =
 | ------ | :---------: | :------: |
 | Micro | 1 (general only) | ❌ |
 | Quick | 2 (general + 1 conditional) | ❌ |
-| Full | 3 (general + all applicable conditional) | ✅ |
+| Full | 3 (general + all applicable conditional) | ✅ (see `../../references/debate-protocol.md`) |
 
 ---
 
@@ -689,22 +865,34 @@ naming, nesting reduction, redundant comment removal, dead code.
 
 ### 8.1 Change Folder Structure (OpenSpec)
 
-All artifacts for a task live together:
+**All artifacts for a task live in a single folder from the start** — not written to
+scattered locations then merged later. This eliminates the dual-path ambiguity where
+`plan.md` lives at `~/.claude/plans/` while other artifacts live at `{artifacts_dir}`.
 
+**New canonical path for ALL artifacts:**
 ```
 {artifacts_dir}/{date}-{task-slug}/
+  dev-loop-context.md   (Phase 0 — session state, iteration_count, redesign_count)
   research.md           (Phase 1 output)
-  plan.md               (Phase 2 output)
+  plan.md               (Phase 2 output — written HERE, not to ~/.claude/plans/)
   verify-results.md     (Phase 3.5 output — NEW)
   review-findings-1.md  (Phase 4 iteration 1)
   review-findings-2.md  (Phase 4 iteration 2, if any)
 ```
 
+**Migration from `~/.claude/plans/`:**
+Implementation must change Phase 2 to write `plan.md` directly to
+`{artifacts_dir}/{date}-{task-slug}/plan.md` instead of `~/.claude/plans/`.
+The `plan_file:` entry in `dev-loop-context.md` must point to the new path.
+`~/.claude/plans/` is no longer used by dlc-build for new runs.
+
+All downstream consumers (Phase 3.5 truth reads, Phase 4 Stage 1 spec compliance reads,
+Phase 6 archive) must reference `plan.md` from `{artifacts_dir}` — one consistent path.
+
 After ship: move entire folder to `archive/{date}-{task-slug}/`
 
-Note: `plan.md` is currently written to `~/.claude/plans/` during Phase 2. For archiving, copy
-it into the change folder at Phase 6. The source at `~/.claude/plans/` is not moved — it stays
-for session reference. Implementation must handle this copy step explicitly.
+Redesign cycle: prior attempt artifacts renamed with suffix before regeneration:
+`plan.md → plan-attempt-1.md`, `research.md → research-attempt-1.md`
 
 ### 8.2 Skill Evolution Protocol (claude-code-best-practice — suggest only)
 
@@ -731,64 +919,86 @@ When triggered:
 
 ### 9.1 Hook Upgrades (claude-code-best-practice)
 
-**`subagent-stop-gate.sh` → `type: "agent"` hook**
+**⚠️ IMPLEMENTATION PREREQUISITE — Verify before building:**
+The following three hook features are drawn from research but have NOT been confirmed
+against actual Claude Code hook documentation. The current `hooks/hooks.json` contains
+only `type: "command"` entries. Before implementing any of the three items below, the
+implementer MUST verify:
+1. Does `type: "agent"` exist as a hook type in Claude Code?
+2. Does `additionalContext` work as a hook stdout output that Claude reads?
+3. Does the `InstructionsLoaded` event exist and expose file-path env vars?
 
-Current: bash exit code check
-New: multi-turn agent that inspects actual files before approving subagent completion
+If unverified: keep the existing bash implementations as primary. The items below are
+**aspirational upgrades** — do not replace working bash gates with unverified mechanisms.
 
-```json
-{
-  "event": "SubagentStop",
-  "type": "agent",
-  "prompt": "Review the subagent's output files in {artifacts_dir}.
-             Check: (1) required files exist, (2) no placeholder content,
-             (3) findings are evidence-based (file:line citations present).
-             Return {ok: true/false, reason: '...'}",
-  "matcher": "review-debate|dev-loop|respond"
-}
-```
+---
 
-**`stop-failure-log.sh` → add `additionalContext`**
+**`subagent-stop-gate.sh` — current bash gate (keep as primary)**
 
-Current: writes to log file, optionally sends macOS notification
-New: also returns `additionalContext` with failure summary injected into Claude's conversation
+Current bash implementation works and must remain functional. If `type: "agent"` is
+confirmed to exist, the gate may be upgraded to a multi-turn agent:
 
 ```json
 {
-  "additionalContext": "Previous attempt failed: [failure type]\nLast error: [message]\nSuggested next step: [action]"
+  "SubagentStop": [{
+    "type": "agent",
+    "prompt": "Review the subagent's output files in {artifacts_dir}.
+               Check: (1) required files exist, (2) no placeholder content,
+               (3) findings are evidence-based (file:line citations present).
+               Return {ok: true/false, reason: '...'}",
+    "matcher": "review-debate|dev-loop|respond"
+  }]
 }
 ```
 
-**New: `InstructionsLoaded` hook for hard-rules.md staleness**
+Note: The hook JSON structure above uses the existing schema (event as top-level key,
+array value) — not an inline `"event"` field. Verify against hooks.json schema before use.
+
+**`stop-failure-log.sh` — `additionalContext` (verify before implementing)**
+
+If `additionalContext` is confirmed as a valid hook output field:
 
 ```bash
-# fires when CLAUDE.md or rules files load
-# IMPLEMENTATION PREREQUISITE: verify the exact env var name before writing this hook.
-# Check Claude Code hook documentation for InstructionsLoaded event variables.
-# If the env var is named differently or the event doesn't expose the file path,
-# the hook must degrade gracefully (exit 0, no output) rather than producing errors.
-# Add a test invocation step in the implementation plan for this hook.
-FILE="${CLAUDE_LOADED_PATH:-}"   # adjust var name after verification
-if [[ -z "$FILE" ]]; then exit 0; fi   # graceful degrade if var not available
-if [[ "$FILE" == *"hard-rules.md"* ]]; then
-  DAYS=$(( ($(date +%s) - $(stat -f%m "$FILE" 2>/dev/null || echo 0)) / 86400 ))
-  if [ "$DAYS" -gt 30 ]; then
-    echo '{"additionalContext": "hard-rules.md last updated '"$DAYS"' days ago. Consider reviewing with /optimize-context."}'
-  fi
-fi
+# Use jq for safe JSON construction (never shell string concat for JSON)
+jq -n \
+  --arg type "$FAILURE_TYPE" \
+  --arg msg "$LAST_ERROR" \
+  '{additionalContext: ("Previous attempt failed: " + $type + "\nLast error: " + $msg)}'
 ```
+
+Until confirmed: keep existing file-logging + macOS notification behavior unchanged.
+
+**`InstructionsLoaded` hook (DEFERRED — event existence unconfirmed)**
+
+The hard-rules.md staleness warning concept is sound but requires:
+1. Confirm `InstructionsLoaded` event fires in Claude Code
+2. Confirm what env vars it exposes (file path)
+3. Fix macOS-only `stat -f%m` → use portable: `python3 -c "import os,sys; print(int(os.path.getmtime(sys.argv[1])))" "$FILE"` or detect OS
+
+Implement only after all three are confirmed. Degrade gracefully to no-op if unconfirmed.
 
 ### 9.2 Skill Usage Tracking → dlc-metrics
 
-PreToolUse hook on Skill tool → append to `dlc-metrics.jsonl`:
+**Mechanism: lead writes directly at Phase 0 completion** — NOT via PreToolUse hook.
+
+The PreToolUse hook fires before the skill executes; `mode` and `score` are not yet
+known at that point (they are computed during Phase 0 blast-radius scoring). The hook
+cannot capture these runtime values.
+
+Instead: dlc-build lead appends to `dlc-metrics.jsonl` after Phase 0 completes and mode
+is confirmed:
 
 ```json
 {"ts": "2026-03-27T10:00:00Z", "skill": "dlc-build", "mode": "quick",
  "project": "tathep-platform-api", "score": 3}
 ```
 
+The existing `skill-usage-tracker.sh` PreToolUse hook continues to log basic invocations
+(`TIMESTAMP\tSKILL_NAME`) — that log is unchanged. The `dlc-metrics.jsonl` is a separate,
+richer log written by the lead agent, not the hook.
+
 Enables metrics-analyst to compute: mode distribution, score accuracy over time,
-which skills are under-triggered.
+blast-radius calibration (predicted mode vs user-confirmed mode).
 
 ### 9.3 Descoped (separate initiatives)
 
@@ -822,10 +1032,11 @@ Changes span:
 | `agents/metrics-analyst.md` | Lens update suggestion logic |
 | `skills/dlc-build/references/review-lenses/error-handling.md` | Hidden error types mandatory field |
 | `skills/dlc-build/references/reviewer-prompts.md` | Confidence floor ≥80, criticality scaling |
-| `hooks/hooks.json` | SubagentStop type:agent, stop-failure-log additionalContext, InstructionsLoaded |
-| `hooks/subagent-stop-gate.sh` | Migrate to type:agent |
-| `hooks/stop-failure-log.sh` | Add additionalContext output |
-| `hooks/instructions-loaded-staleness.sh` | NEW FILE |
+| `skills/dlc-build/references/phase-0-*.md` | Lead writes `dlc-metrics.jsonl` entry after Phase 0 mode confirmation |
+| `hooks/hooks.json` | Aspirational: upgrade SubagentStop + add InstructionsLoaded — **only after event verification** |
+| `hooks/subagent-stop-gate.sh` | Keep bash gate as primary; migrate to type:agent only if confirmed to exist in Claude Code |
+| `hooks/stop-failure-log.sh` | Add additionalContext output only if confirmed; use `jq` not shell string concat |
+| `hooks/instructions-loaded-staleness.sh` | NEW FILE — implement only after InstructionsLoaded event confirmed + portability fix |
 
 ---
 
