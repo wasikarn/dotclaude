@@ -1,7 +1,7 @@
 ---
 name: metrics-analyst
 description: "Reads ~/.claude/dlc-metrics.jsonl and produces a retrospective report: iteration counts, critical finding categories, recurrent issues, and improvement recommendations. Use after multiple dlc-build or dlc-review runs to identify recurring workflow patterns and surface candidates for new Hard Rules."
-tools: Bash, Read
+tools: Bash, Read, Write
 model: haiku
 disallowedTools: Edit
 maxTurns: 5
