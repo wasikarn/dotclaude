@@ -51,7 +51,7 @@ export async function runFalsification(params: {
         if (parsed.success) {
           verdicts.push(...parsed.data)
         } else {
-          console.warn('[sdk-review] verdicts failed validation:', parsed.error.issues)
+          throw new Error(`[sdk-review] verdicts failed schema validation: ${JSON.stringify(parsed.error.issues)}`)
         }
       } else {
         throw new Error(`[sdk-review] falsifier ended with subtype: ${msg.subtype}`)
