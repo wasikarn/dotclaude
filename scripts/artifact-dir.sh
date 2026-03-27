@@ -46,11 +46,15 @@ PROJECT_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || pwd)
 # Result has a leading - because the absolute path starts with /
 ENCODED=$(echo "$PROJECT_ROOT" | tr '/' '-')
 
+# CLAUDE_PLUGIN_DATA: stable per-plugin folder set by Claude Code plugin runtime.
+# Falls back to the conventional path for local dev (symlinked, not installed).
+PLUGIN_DATA_BASE="${CLAUDE_PLUGIN_DATA:-$HOME/.claude/plugins/data/dev-loop-dev-loop}"
+
 # Compose path
 if [ -n "$CONTEXT_SUFFIX" ]; then
-  ARTIFACT_DIR="$HOME/.claude/plugins/data/dev-loop-dev-loop/${ENCODED}/${SKILL_NAME}/${CONTEXT_SUFFIX}"
+  ARTIFACT_DIR="${PLUGIN_DATA_BASE}/${ENCODED}/${SKILL_NAME}/${CONTEXT_SUFFIX}"
 else
-  ARTIFACT_DIR="$HOME/.claude/plugins/data/dev-loop-dev-loop/${ENCODED}/${SKILL_NAME}"
+  ARTIFACT_DIR="${PLUGIN_DATA_BASE}/${ENCODED}/${SKILL_NAME}"
 fi
 
 mkdir -p "$ARTIFACT_DIR"

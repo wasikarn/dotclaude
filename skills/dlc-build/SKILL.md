@@ -71,9 +71,9 @@ See [references/operational.md](references/operational.md) for prerequisites, co
 | [references/reviewer-shared-rules.md](references/reviewer-shared-rules.md) | Phase 6 — shared reviewer rules/output format (referenced by reviewer templates) |
 | [references/review-lenses/frontend.md](references/review-lenses/frontend.md) · [security.md](references/review-lenses/security.md) · [database.md](references/review-lenses/database.md) · [performance.md](references/review-lenses/performance.md) · [typescript.md](references/review-lenses/typescript.md) · [error-handling.md](references/review-lenses/error-handling.md) · [api-design.md](references/review-lenses/api-design.md) · [observability.md](references/review-lenses/observability.md) | Phase 6 — domain lenses injected per diff content (see Lens Selection in reviewer-prompts.md) |
 | `review-consolidator` agent | Phase 6 iter 1 (3 reviewers) and iter 2+ (2 reviewers) — consolidate findings |
-| [../../references/review-conventions.md](../../references/review-conventions.md) | Entering Phase 6 |
-| [../../references/review-output-format.md](../../references/review-output-format.md) | Entering Phase 6 |
-| [../../references/debate-protocol.md](../../references/debate-protocol.md) | Phase 6 iter 1 debate only (fallback in phase-6-review.md) |
-| [../../references/jira-integration.md](../../references/jira-integration.md) | Jira key in `$ARGUMENTS` |
+| [review-conventions](../../review-conventions/SKILL.md) | Entering Phase 6 |
+| [review-output-format](../../review-output-format/SKILL.md) | Entering Phase 6 |
+| [debate-protocol](../../debate-protocol/SKILL.md) | Phase 6 iter 1 debate only (fallback in phase-6-review.md) |
+| [jira-integration](../../jira-integration/SKILL.md) | Jira key in `$ARGUMENTS` |
 | [references/pr-template.md](references/pr-template.md) | Entering Phase 9 |
 | [references/examples.md](references/examples.md) | When assessing research/plan/implementation quality or checking for YAGNI violations |

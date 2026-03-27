@@ -533,16 +533,7 @@ Locks edits to a specific directory for the session. Claude will refuse to edit 
 
 ### Skill Guides
 
-Detailed usage guides for each skill: [docs/skills/](docs/skills/)
-
-| Guide | Skill |
-| --- | --- |
-| [dlc-build](docs/skills/dlc-build.md) | Full development loop |
-| [dlc-review](docs/skills/dlc-review.md) | Adversarial PR review |
-| [dlc-respond](docs/skills/dlc-respond.md) | Address PR comments |
-| [dlc-debug](docs/skills/dlc-debug.md) | Root cause analysis |
-| [merge-pr](docs/skills/merge-pr.md) | Safe PR merge |
-| [utilities](docs/skills/utilities.md) | optimize-context, env-heal, systems-thinking, dlc-metrics |
+Detailed contributor docs for each skill live in `skills/<name>/CLAUDE.md`. For skill creation guidelines and best practices, see [`docs/references/`](docs/references/).
 
 ---
 
@@ -746,9 +737,9 @@ dev-loop/
 ├── hooks/                    # Plugin-distributed lifecycle hook scripts
 │   └── hooks.json            # Plugin hook registry (auto-loaded on install)
 ├── output-styles/            # Custom output styles
-├── commands/                 # Slash commands
 ├── scripts/                  # Dev tooling (link-skill.sh, fix-tables.sh, detect-project.sh)
-└── references/               # Shared reference docs
+└── docs/
+    └── references/           # Contributor reference docs (best practices, creation guides)
 ```
 
 ---

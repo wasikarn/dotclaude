@@ -19,8 +19,8 @@ Address PR review comments: fetch threads → fix code → reply on GitHub → r
 | `references/teammate-prompts.md` | Modifying Fixer prompt or thread grouping strategy |
 | `references/phase-gates.md` | Modifying gate conditions or escalation protocol |
 | `references/operational.md` | Graceful Degradation, Context Compression Recovery, Success Criteria |
-| `../../references/review-conventions.md` | Shared comment labels and reply format conventions |
-| `../../references/jira-integration.md` | Jira detection, AC-based thread prioritization |
+| `../../review-conventions/SKILL.md` | Shared comment labels and reply format conventions |
+| `../../jira-integration/SKILL.md` | Jira detection, AC-based thread prioritization |
 
 ## Skill Architecture
 

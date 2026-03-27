@@ -170,6 +170,41 @@
         ]
       }
     ],
+    "SubagentStart": [
+      {
+        "matcher": "code-reviewer|test-quality-reviewer|migration-reviewer|api-contract-auditor",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/subagent-start-context.sh",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "PreCompact": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/pre-compact-save.sh",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "async": true,
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/session-end-cleanup.sh",
+            "timeout": 15
+          }
+        ]
+      }
+    ],
     "TeammateIdle": [
       {
         "matcher": "review-pr",

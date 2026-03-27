@@ -1,6 +1,13 @@
+---
+name: review-examples
+description: "TypeScript code examples for all 12 review rules — good/bad patterns with do-not-flag guidance for code-reviewer, dlc-build, and dlc-review agents"
+user-invocable: false
+disable-model-invocation: true
+---
+
 # Review Examples — 12-Point Canonical Examples
 
-✅/❌ code examples for each rule in [`review-rules.md`](review-rules.md). TypeScript examples — patterns apply to other stacks.
+✅/❌ code examples for each rule in [`review-rules`](../review-rules/SKILL.md). TypeScript examples — patterns apply to other stacks.
 
 ---
 

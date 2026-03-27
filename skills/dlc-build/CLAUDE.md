@@ -27,10 +27,10 @@ Uses dynamic team roster (explorers, workers, reviewers) with iterative implemen
 | `references/workflow-modes.md` | Modifying Full/Quick/Hotfix classification + mode decision tree |
 | `references/review-lenses/` | Domain-specific review checklists (security/perf/frontend/DB/TypeScript) |
 | `references/review-lenses/error-handling.md` | Error handling lens — silent failure patterns; injected when diff contains try/catch/async |
-| `../../references/review-conventions.md` | Shared review conventions (labels, dedup, strengths) |
+| `../../review-conventions/SKILL.md` | Shared review conventions (labels, dedup, strengths) |
 | `references/operational.md` | Graceful Degradation, Crash Recovery, Regression Gate, Solo findings |
-| `../../references/review-output-format.md` | Review output format template |
-| `../../references/debate-protocol.md` | Adversarial debate rules (fallback in phase-6-review.md) |
+| `../../review-output-format/SKILL.md` | Review output format template |
+| `../../debate-protocol/SKILL.md` | Adversarial debate rules (fallback in phase-6-review.md) |
 | `../../docs/superpowers/specs/2026-03-19-dlc-workflow-quality-improvements-round2-design.md` | Behavioral anchor rubric for scoring dimensions — see Round 2 spec |
 
 ## Skill Architecture

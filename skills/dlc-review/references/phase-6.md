@@ -4,7 +4,7 @@
 
 1. Fix AC-related Critical findings first (if Jira), then other Critical, Warning, Info
 2. Run project validate command (detected in Phase 2)
-3. Output fixes table per [review-output-format.md](../../references/review-output-format.md)
+3. Output fixes table per [review-output-format](../../../review-output-format/SKILL.md)
 4. If Jira: show AC checklist with pass/fail status
 
 ## Reviewer Mode
@@ -16,7 +16,7 @@ As **Tech Lead**: focus on architecture, patterns, team standards, and mentoring
 3. Submit to GitHub in ONE `gh api` call
 4. Comment language: Thai mixed with English technical terms
 
-**Comment labels:** Per [review-conventions.md](../../references/review-conventions.md) — prefix every comment with `issue:`/`suggestion:`/`nitpick:`/`praise:`.
+**Comment labels:** Per [review-conventions](../../../review-conventions/SKILL.md) — prefix every comment with `issue:`/`suggestion:`/`nitpick:`/`praise:`.
 
 ## Comprehension Gate (Author mode only)
 

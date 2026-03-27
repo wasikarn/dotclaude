@@ -4,6 +4,7 @@ description: "General-purpose code reviewer with persistent memory. Reviews code
 tools: Read, Grep, Glob, Bash
 model: sonnet
 memory: user
+skills: [review-conventions, review-rules, review-examples]
 ---
 
 # Code Reviewer
@@ -113,7 +114,7 @@ Flag at conf ≥75:
 
 ## 12-Point Review Checklist
 
-> Canonical definition: [`references/review-rules.md`](../references/review-rules.md)
+> Canonical definition: preloaded via `review-rules` skill
 
 ### Correctness & Safety
 

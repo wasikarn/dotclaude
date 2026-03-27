@@ -4,6 +4,7 @@ description: "Mechanical dedup, pattern-cap, sort, and signal-check for multi-re
 model: haiku
 tools: Read
 maxTurns: 5
+skills: [review-conventions, review-output-format]
 ---
 
 # Review Findings Consolidator

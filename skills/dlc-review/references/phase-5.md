@@ -21,9 +21,9 @@ Dispatch `review-consolidator` agent with the surviving debate findings passed i
 the prompt. Capture the agent's output as the consolidated findings table.
 
 If agent errors → perform dedup, pattern-cap, sort, and signal-check inline per
-[review-conventions.md](../../references/review-conventions.md).
+[review-conventions](../../../review-conventions/SKILL.md).
 
-Output the consolidated findings table per [review-output-format.md](../../references/review-output-format.md).
+Output the consolidated findings table per [review-output-format](../../../review-output-format/SKILL.md).
 
 **Confirmed Findings Log:** After consolidation, append Critical and Warning findings that survived falsification to `{review_memory_dir}/review-confirmed.md` (cap 30 FIFO). Format:
 

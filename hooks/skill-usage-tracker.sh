@@ -18,8 +18,8 @@ IFS=$'\t' read -r TOOL_NAME SKILL_NAME < <(jq_fields '.tool_name' '.tool_input.s
 [ -n "$SKILL_NAME" ] || exit 0
 
 # CLAUDE_PLUGIN_DATA: stable per-plugin folder set by Claude Code plugin runtime.
-# Falls back to ~/.claude/dev-loop for local dev (symlinked, not installed).
-DATA_DIR="${CLAUDE_PLUGIN_DATA:-$HOME/.claude/dev-loop}"
+# Falls back to the conventional path for local dev (symlinked, not installed).
+DATA_DIR="${CLAUDE_PLUGIN_DATA:-$HOME/.claude/plugins/data/dev-loop-dev-loop}"
 mkdir -p "$DATA_DIR"
 LOG="${DEV_LOOP_USAGE_LOG:-$DATA_DIR/skill-usage.tsv}"
 TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")

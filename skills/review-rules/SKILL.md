@@ -1,6 +1,13 @@
+---
+name: review-rules
+description: "Core 12-point review framework used across code-reviewer, dlc-build, and dlc-review agents — rule definitions, security coverage, team vs solo reviewer assignment"
+user-invocable: false
+disable-model-invocation: true
+---
+
 # Review Rules — 12-Point Canonical Definition
 
-Single source of truth for the 12-point review framework used across `code-reviewer`, `dlc-build`, and `dlc-review`. Code examples: [`review-examples.md`](review-examples.md)
+Single source of truth for the 12-point review framework used across `code-reviewer`, `dlc-build`, and `dlc-review`. Code examples: [`review-examples`](../review-examples/SKILL.md)
 
 | # | Rule | Category | Look for |
 | --- | --- | --- | --- |

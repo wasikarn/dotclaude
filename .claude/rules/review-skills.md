@@ -1,7 +1,7 @@
 ---
 paths:
   - "skills/dlc-review/**"
-  - "references/review-*.md"
+  - "skills/review-*/**"
 ---
 
 # DLC Review Skills
@@ -11,4 +11,4 @@ paths:
 - **Args:** `[pr-number] [jira-key?] [Author|Reviewer]`
 - **Phases:** Worktree setup → Jira AC → 3 reviewers → debate → consolidation → action
 - **Reviewer language:** Thai mixed with English technical terms
-- **Shared conventions:** `references/review-conventions.md` — comment labels, dedup, strengths, PR size, reviewer focus areas
+- **Shared conventions:** `skills/review-conventions/SKILL.md` — comment labels, dedup, strengths, PR size, reviewer focus areas

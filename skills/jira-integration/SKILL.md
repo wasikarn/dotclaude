@@ -1,3 +1,10 @@
+---
+name: jira-integration
+description: "Shared Jira context injection for dlc-review, dlc-build, dlc-debug, and dlc-respond — Jira key detection, ticket fetch, AC extraction, and skill-specific integration patterns"
+user-invocable: false
+disable-model-invocation: true
+---
+
 # Jira Integration for dlc-* Skills
 
 Shared Jira context injection for dlc-review, dlc-build, and dlc-debug.

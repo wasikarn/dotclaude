@@ -1,6 +1,6 @@
 # Phase 6: Review
 
-Load [reviewer-prompts.md](reviewer-prompts.md), [../../../references/review-conventions.md](../../../references/review-conventions.md), [../../../references/review-output-format.md](../../../references/review-output-format.md) before starting.
+Load [reviewer-prompts.md](reviewer-prompts.md), [review-conventions](../../../review-conventions/SKILL.md), [review-output-format](../../../review-output-format/SKILL.md) before starting.
 
 ## Stage 1: Spec Compliance (Always First)
 
@@ -93,7 +93,7 @@ Determine diff size first: `git diff {base_branch}...HEAD --stat | tail -1`
 > **Quick mode override:** In Quick mode, use lead self-review (Solo Self-Review Checklist) for diffs ≤100 lines — no teammate spawning. Only spawn reviewers for Quick mode diffs >100 lines.
 > **Micro mode:** Always 1 reviewer (general only) — no debate regardless of diff size.
 
-Load debate protocol for 2-round debate cases: [../../../references/debate-protocol.md](../../../references/debate-protocol.md) (shared with dlc-review — always available).
+Load debate protocol for 2-round debate cases: [debate-protocol](../../../debate-protocol/SKILL.md) (shared with dlc-review — always available).
 
 **CONTEXT-REQUEST handling:** If a reviewer sends a `CONTEXT-REQUEST:` message before submitting findings, lead reads the requested file and sends the relevant section back via SendMessage. Reviewer proceeds after receiving context. If context unavailable, respond: "Proceed without it — note low-confidence in the finding."
 
@@ -117,13 +117,13 @@ Drop findings below the role threshold before consolidation. Hard Rule violation
 
 ## Review Output
 
-Write findings to `{artifacts_dir}/review-findings-{iteration}.md` per [../../../references/review-output-format.md](../../../references/review-output-format.md).
+Write findings to `{artifacts_dir}/review-findings-{iteration}.md` per [review-output-format](../../../review-output-format/SKILL.md).
 
 - **Iter 1 (3 reviewers):** After falsification pass (Phase 7), dispatch `review-consolidator` with the post-verdict findings table.
 - **Iter 2+ (2 reviewers):** Dispatch `review-consolidator` immediately when the second reviewer's findings arrive — lead reads findings while agent runs in parallel. No falsification pass.
 - **1 reviewer:** Lead consolidates inline (no agent).
 
-If agent errors → dedup, pattern-cap, sort, and signal-check inline per [review-conventions.md](../../../references/review-conventions.md).
+If agent errors → dedup, pattern-cap, sort, and signal-check inline per [review-conventions](../../../review-conventions/SKILL.md).
 
 **Phase 6 status line** (output before findings table — no prose paragraph):
 `### Phase 6 Complete — N findings consolidated · Proceeding to Phase 8`

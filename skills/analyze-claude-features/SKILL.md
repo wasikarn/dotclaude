@@ -1,3 +1,10 @@
+---
+name: analyze-claude-features
+description: "Audit this project against all official Claude Code features and score adoption coverage. Fetches docs from code.claude.com, verifies project structure, identifies gaps, and produces Analysis Quality + Project Coverage scores. Use /analyze-claude-features to check how well the project uses Claude Code features."
+user-invocable: true
+disable-model-invocation: false
+---
+
 # Analyze Claude Features
 
 Read and analyze each documentation source below, then assess what can be concretely applied or improved in this project.
@@ -31,6 +38,7 @@ Automation:
 Distribution:
 
 - `plugins.md` — <https://code.claude.com/docs/en/plugins.md>
+
 Coordination:
 
 - `agent-teams.md` — <https://code.claude.com/docs/en/agent-teams.md>

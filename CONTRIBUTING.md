@@ -55,7 +55,6 @@ This symlinks all assets to `~/.claude/`:
 - `agents/` → `~/.claude/agents/`
 - `hooks/` → `~/.claude/hooks/`
 - `output-styles/` → `~/.claude/output-styles/`
-- `commands/` → `~/.claude/commands/`
 
 ### Step 3 — Enable Agent Teams
 
@@ -67,7 +66,7 @@ claude config set env.CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS 1
 
 ```bash
 bash scripts/link-skill.sh --list
-# Expected: all skills, agents, hooks, commands, output-styles show as ✓ linked
+# Expected: all skills, agents, hooks, output-styles show as ✓ linked
 ```
 
 ### Step 5 — Restart Claude Code
@@ -95,7 +94,7 @@ compatibility: "List required tools, e.g. Requires gh CLI and git."  # recommend
 ---
 ```
 
-See [`references/skills-best-practices.md`](references/skills-best-practices.md) for the full spec.
+See [`docs/references/skills-best-practices.md`](docs/references/skills-best-practices.md) for the full spec.
 
 ---
 
@@ -119,7 +118,7 @@ The pre-commit hook runs `fix-tables.sh` + `markdownlint-cli2 --fix` on staged `
 ## Linking Everything
 
 ```bash
-# Link all assets (skills, agents, hooks, output-styles, commands)
+# Link all assets (skills, agents, hooks, output-styles)
 bash scripts/link-skill.sh
 
 # Link one skill only
@@ -142,7 +141,7 @@ dev-loop/
 ├── hooks/                    # Lifecycle hooks
 │   └── hooks.json            # Plugin hook registry
 ├── output-styles/            # Custom output styles
-├── commands/                 # Slash commands
 ├── scripts/                  # Dev tooling (link-skill.sh, fix-tables.sh)
-└── references/               # Shared reference docs (not symlinked)
+└── docs/
+    └── references/           # Contributor reference docs (best practices, guides)
 ```

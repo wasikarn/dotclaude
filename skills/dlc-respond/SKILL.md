@@ -46,8 +46,8 @@ Read CLAUDE.md first — auto-loaded, contains project patterns and conventions.
 | [references/teammate-prompts.md](references/teammate-prompts.md) | Phase 2: creating Fixer teammates |
 | [references/phase-gates.md](references/phase-gates.md) | Any gate transition |
 | [references/operational.md](references/operational.md) | Mode detection, compression recovery, success criteria |
-| [../../references/review-conventions.md](../../references/review-conventions.md) | Phase 3: reply format and comment labels |
-| [../../references/jira-integration.md](../../references/jira-integration.md) | Phase 1 Step 2: when Jira key detected in `$1` |
+| [../../review-conventions/SKILL.md](../../review-conventions/SKILL.md) | Phase 3: reply format and comment labels |
+| [../../jira-integration/SKILL.md](../../jira-integration/SKILL.md) | Phase 1 Step 2: when Jira key detected in `$1` |
 | [references/examples.md](references/examples.md) | When calibrating reply quality, fix scope, or triage table format |
 
 ---
@@ -66,7 +66,7 @@ Use the `Project` JSON from the header. Load project-specific Hard Rules from `{
 
 ### Step 2: Jira Context (if `$1` present)
 
-If `$1` matches `ABC-\d+`, follow `## dlc-respond` section in [../../references/jira-integration.md](../../references/jira-integration.md) to fetch AC and enrich thread prioritization.
+If `$1` matches `ABC-\d+`, follow `## dlc-respond` section in [../../jira-integration/SKILL.md](../../jira-integration/SKILL.md) to fetch AC and enrich thread prioritization.
 
 ### Step 3: Fetch Threads
 
@@ -181,7 +181,7 @@ shared context in each Fixer prompt to eliminate redundant per-Fixer reads.
 
 ## Phase 3: Reply to Threads
 
-Post a reply for each thread. Comment labels per [../../references/review-conventions.md](../../references/review-conventions.md).
+Post a reply for each thread. Comment labels per [../../review-conventions/SKILL.md](../../review-conventions/SKILL.md).
 
 ```bash
 gh api repos/{owner}/{repo}/pulls/comments/{comment_id}/replies \

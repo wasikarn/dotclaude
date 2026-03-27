@@ -17,17 +17,17 @@ Uses 3 reviewer teammates that challenge each other's findings instead of 7 para
 
 | Reference | When to use |
 | --- | --- |
-| `references/debate-protocol.md` | Modifying debate rules, round structure, or consensus criteria |
-| `../../references/review-conventions.md` | Shared review conventions (labels, dedup, strengths) |
-| `../../references/review-output-format.md` | Output format template |
+| `../../debate-protocol/SKILL.md` | Modifying debate rules, round structure, or consensus criteria |
+| `../../review-conventions/SKILL.md` | Shared review conventions (labels, dedup, strengths) |
+| `../../review-output-format/SKILL.md` | Output format template |
 | `references/operational.md` | Graceful Degradation, Context Compression Recovery, Success Criteria |
 | `../../docs/superpowers/specs/2026-03-19-dlc-workflow-quality-improvements-round2-design.md` | Behavioral anchor rubric for scoring dimensions — see Round 2 spec |
 
 ## Skill Architecture
 
 - `SKILL.md` — lead orchestration playbook; phases, team creation, debate flow
-- `references/debate-protocol.md` — debate rules, round-robin assignment, consensus criteria
-- Reuses shared `references/review-conventions.md` and `references/review-output-format.md`
+- `../../debate-protocol/SKILL.md` — debate rules, round-robin assignment, consensus criteria
+- Reuses shared `../../review-conventions/SKILL.md` and `../../review-output-format/SKILL.md`
 - Project-specific Hard Rules loaded from `{project_root}/.claude/skills/review-rules/hard-rules.md` if present
 
 ## Validate After Changes

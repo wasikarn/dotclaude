@@ -14,11 +14,11 @@ Prefer reading source before editing — key references:
 
 | Reference | Contents |
 | --- | --- |
-| [`references/skills-best-practices.md`](references/skills-best-practices.md) | Full frontmatter spec, description rules, substitutions (`$0`/`$1`/`!`), context budget |
-| [`references/skill-creation-guide.md`](references/skill-creation-guide.md) | 5 golden rules, creation workflow, skill brief template, anti-patterns |
+| [`docs/references/skills-best-practices.md`](docs/references/skills-best-practices.md) | Full frontmatter spec, description rules, substitutions (`$0`/`$1`/`!`), context budget |
+| [`docs/references/skill-creation-guide.md`](docs/references/skill-creation-guide.md) | 5 golden rules, creation workflow, skill brief template, anti-patterns |
 | `skills/<name>/references/checklist.md` | Per-skill review criteria with severity markers (review-pr skills) |
 | `skills/<name>/references/examples.md` | Per-skill ✅/❌ code examples for all 12 rules (review-pr skills) |
-| [`references/review-conventions.md`](references/review-conventions.md) | Comment labels, dedup protocol, strengths, PR size thresholds |
+| [`skills/review-conventions/SKILL.md`](skills/review-conventions/SKILL.md) | Comment labels, dedup protocol, strengths, PR size thresholds |
 | [`skills/dlc-build/references/review-lenses/`](skills/dlc-build/references/review-lenses/) | 8 domain lenses injected into reviewers at Phase 6 — `frontend`, `security`, `database`, `performance`, `typescript`, `error-handling`, `api-design`, `observability`. Shared by both `dlc-build` and `dlc-review`. |
 
 <important if="editing or creating skills">
@@ -53,8 +53,15 @@ skills/<name>/
 | `systems-thinking` | Causal Loop Diagram analysis for architecture decisions |
 | `careful` | Enter careful mode — elevated confirmation threshold for destructive operations |
 | `freeze` | Freeze a file or pattern from being edited for the session |
-
-Commands live at `commands/<name>.md`. Current: `analyze-claude-features`, `dlc-status`, `hook-test`.
+| `dlc-status` | Show active DLC session artifacts and current phase |
+| `hook-test` | Run QA check suite to verify all hooks, skills, and plugin structure |
+| `analyze-claude-features` | Audit project against official Claude Code features and score adoption coverage |
+| `review-rules` | _(background)_ 12-point review framework — preloaded into reviewer agents |
+| `review-conventions` | _(background)_ Comment labels, dedup protocol, PR size thresholds — preloaded into reviewer agents |
+| `review-output-format` | _(background)_ PR review output format templates — preloaded into reviewer agents |
+| `review-examples` | _(background)_ Code pattern examples for all 12 rules — preloaded into reviewer agents |
+| `debate-protocol` | _(background)_ Adversarial debate rules and consensus criteria — preloaded into reviewer agents |
+| `jira-integration` | _(background)_ Jira detection, fetch, and skill-specific integration — preloaded into jira-sync agent |
 
 ## Agents
 
@@ -110,9 +117,12 @@ Hooks live at `hooks/`. All hooks are registered in `hooks/hooks.json` and distr
 | `TaskCompleted` | `review-debate\|dev-loop\|respond` | `task-gate.sh` |
 | `TeammateIdle` | `review-pr\|dev-loop\|respond\|debug-` | `idle-nudge.sh` |
 | `PostCompact` | — | `post-compact-context.sh` |
+| `PreCompact` | — | `pre-compact-save.sh` |
 | `PostToolUseFailure` | `Bash` | `bash-failure-hint.sh` |
 | `StopFailure` | `rate_limit\|...` | `stop-failure-log.sh` |
 | `SubagentStop` | reviewer agent names | `subagent-stop-gate.sh` |
+| `SubagentStart` | reviewer agent names | `subagent-start-context.sh` |
+| `SessionEnd` | — | `session-end-cleanup.sh` (async) |
 
 Notes:
 

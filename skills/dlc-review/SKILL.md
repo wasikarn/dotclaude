@@ -26,10 +26,10 @@ Invoke as `/dlc-review [pr-number] [jira-key?] [Author|Reviewer]`
 
 | File |
 | --- |
-| [debate-protocol.md](../../references/debate-protocol.md) |
+| [debate-protocol](../../debate-protocol/SKILL.md) |
 | [teammate-prompts.md](references/teammate-prompts.md) |
-| [review-output-format.md](../../references/review-output-format.md) |
-| [review-conventions.md](../../references/review-conventions.md) |
+| [review-output-format](../../review-output-format/SKILL.md) |
+| [review-conventions](../../review-conventions/SKILL.md) |
 
 **Load on-demand:**
 
@@ -41,10 +41,10 @@ Invoke as `/dlc-review [pr-number] [jira-key?] [Author|Reviewer]`
 | [references/phase-4.md](references/phase-4.md) | Entering Phase 4 (adversarial debate) |
 | [references/phase-5.md](references/phase-5.md) | Entering Phase 5 (convergence, falsification, log schemas) |
 | [references/phase-6.md](references/phase-6.md) | Entering Phase 6 (action, comprehension gate) |
-| [jira-integration.md](../../references/jira-integration.md) | When Jira key detected in arguments |
+| [jira-integration](../../jira-integration/SKILL.md) | When Jira key detected in arguments |
 | [references/operational.md](references/operational.md) | Graceful degradation, compression recovery, gotchas |
 | [references/examples.md](references/examples.md) | When calibrating finding quality, debate depth, or output format |
-| [../../references/review-examples.md](../../references/review-examples.md) | Code pattern examples for all 12 rules — inject into teammate prompts |
+| [review-examples](../../review-examples/SKILL.md) | Code pattern examples for all 12 rules — inject into teammate prompts |
 
 **PR:** #$0 | **Mode:** $2 (default: Author)
 **Today:** !`date +%Y-%m-%d`
@@ -59,7 +59,7 @@ Invoke as `/dlc-review [pr-number] [jira-key?] [Author|Reviewer]`
 **Args:** `$0`=PR# (required) · `$1`=Jira key or Author/Reviewer · `$2`=Author/Reviewer
 **Modes:** Author = fix code · Reviewer = comment only (in Thai)
 **Role:** Tech Lead — improve code health via architecture, mentoring, team standards.
-**Output format:** Follow [review-output-format.md](../../references/review-output-format.md) with debate additions described in phase files.
+**Output format:** Follow [review-output-format](../../review-output-format/SKILL.md) with debate additions described in phase files.
 
 ## Phase 7: Cleanup
 
@@ -68,7 +68,7 @@ After Phase 6 completes:
 1. Shut down all teammates
 2. Clean up the team
 
-Output final verdict per [review-output-format.md](../../references/review-output-format.md).
+Output final verdict per [review-output-format](../../review-output-format/SKILL.md).
 
 In Reviewer mode: `git worktree remove /tmp/review-pr-$0`.
 

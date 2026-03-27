@@ -40,8 +40,8 @@ Invoke as `/dlc-debug [bug-description-or-jira-key] [--quick?]`
 | --- | --- |
 | [dx-checklist.md](references/dx-checklist.md) | Quick mode confirmed in Phase 1 — inject condensed checklist section into Quick Mode Fixer prompt |
 | [phase-gates.md](references/phase-gates.md) | At gate transitions — if unsure about conditions |
-| [../../references/review-conventions.md](../../references/review-conventions.md) | If adding Fix Review pass |
-| [jira-integration.md](../../references/jira-integration.md) | When Jira key detected in arguments |
+| [review-conventions](../../review-conventions/SKILL.md) | If adding Fix Review pass |
+| [jira-integration](../../jira-integration/SKILL.md) | When Jira key detected in arguments |
 | [references/operational.md](references/operational.md) | On graceful degradation or context compression recovery |
 | [artifact-templates.md](references/artifact-templates.md) | Phase 1 Step 5, Phase 2 Step 3, Phase 5 — artifact format reference |
 | [references/examples.md](references/examples.md) | When assessing investigation quality, root cause vs symptom, or DX finding depth |
@@ -112,7 +112,7 @@ Check for project-specific Hard Rules at `{project_root}/.claude/skills/review-r
 
 ### Step 2: Jira Context (skip if no Jira)
 
-Scan `$ARGUMENTS` for Jira key (`ABC-\d+`). If found, follow [jira-integration.md](../../references/jira-integration.md) §dlc-debug:
+Scan `$ARGUMENTS` for Jira key (`ABC-\d+`). If found, follow [jira-integration](../../jira-integration/SKILL.md) §dlc-debug:
 
 1. Fetch ticket — enrich bug description with ticket details
 2. Check linked issues — related bugs may share root cause

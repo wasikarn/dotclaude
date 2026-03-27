@@ -5,6 +5,7 @@ tools: Read, Grep, Glob, Bash
 model: sonnet
 disallowedTools: Edit, Write
 maxTurns: 10
+skills: [review-conventions, review-rules]
 ---
 
 # Migration Reviewer

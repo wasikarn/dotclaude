@@ -1,3 +1,10 @@
+---
+name: debate-protocol
+description: "Adversarial debate rules for DLC review workflows — pre-debate triage, round-robin assignment, consensus rules, hard rule exceptions, lead decision template, anti-patterns"
+user-invocable: false
+disable-model-invocation: true
+---
+
 # Debate Protocol
 
 Rules for the adversarial debate phase in DLC review workflows (dlc-review, dlc-build Phase 4).

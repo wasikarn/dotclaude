@@ -4,6 +4,7 @@ description: "Post a structured implementation summary comment to the linked Jir
 tools: Read, Glob, Bash, mcp__mcp-atlassian__jira_get_issue, mcp__mcp-atlassian__jira_add_comment, mcp__mcp-atlassian__jira_transition_issue, mcp__mcp-atlassian__jira_get_transitions, mcp__plugin_atlassian-pm_atlassian-cache__cache_get_issue, mcp__plugin_atlassian-pm_atlassian-cache__cache_invalidate
 model: haiku
 maxTurns: 15
+skills: [jira-integration]
 ---
 
 # Jira Sync
