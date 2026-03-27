@@ -6,7 +6,7 @@ export interface Finding {
   severity: Severity
   rule: string
   file: string
-  line: number
+  line: number | null
   confidence: number
   issue: string
   fix: string

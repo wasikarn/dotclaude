@@ -7,7 +7,7 @@ export const DEFAULT_CONFIG = {
   model: 'sonnet' as const,
   confidenceThreshold: 80,
   autoPassConfidence: 90,
-  autoDropMaxConfidence: 80,
+  autoDropMaxConfidence: 79,
   patternCapCount: 3,
   signalThreshold: 0.6,
 }
@@ -19,4 +19,33 @@ export interface ReviewConfig {
   budgetUsd?: number
   hardRulesPath?: string
   noFalsification?: boolean
+}
+
+export interface ResolvedConfig {
+  effort: EffortLevel
+  maxBudgetPerReviewer: number
+  maxBudgetFalsification: number
+  maxTurnsReviewer: number
+  maxTurnsFalsification: number
+  model: 'sonnet' | 'opus' | 'haiku'
+  confidenceThreshold: number
+  autoPassConfidence: number
+  autoDropMaxConfidence: number
+  patternCapCount: number
+  signalThreshold: number
+  hardRulesPath?: string
+  noFalsification?: boolean
+}
+
+export function resolveConfig(userConfig?: ReviewConfig): ResolvedConfig {
+  return {
+    ...DEFAULT_CONFIG,
+    ...(userConfig?.effort && { effort: userConfig.effort }),
+    ...(userConfig?.budgetUsd && {
+      maxBudgetPerReviewer: userConfig.budgetUsd / 3,
+      maxBudgetFalsification: userConfig.budgetUsd * 0.15,
+    }),
+    ...(userConfig?.hardRulesPath && { hardRulesPath: userConfig.hardRulesPath }),
+    ...(userConfig?.noFalsification !== undefined && { noFalsification: userConfig.noFalsification }),
+  }
 }
