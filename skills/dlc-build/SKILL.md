@@ -27,6 +27,7 @@ Invoke as `/dlc-build [task-description-or-jira-key] [--quick?] [--full?] [--hot
 **Task:** $ARGUMENTS | **Today:** !`date +%Y-%m-%d`
 **Git branch:** !`git branch --show-current`
 **Recent commits:** !`git log --oneline -5 2>/dev/null || true`
+**Changed files:** !`git diff --name-only HEAD 2>/dev/null || echo "clean"`
 **Project:** !`bash "${CLAUDE_SKILL_DIR}/../../scripts/detect-project.sh" 2>/dev/null || true`
 **Artifacts dir:** !`bash "${CLAUDE_SKILL_DIR}/../../scripts/artifact-dir.sh" dlc-build "$0" 2>/dev/null || echo ""`
 
