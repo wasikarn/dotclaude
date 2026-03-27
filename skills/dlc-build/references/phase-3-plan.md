@@ -2,7 +2,7 @@
 
 ## Step 1: Write Plan
 
-Call `EnterPlanMode` — Claude switches to Opus, plan file created at `~/.claude/plans/{random}.md`.
+Write `{artifacts_dir}/{date}-{task-slug}/plan.md` directly — do NOT use `EnterPlanMode` or `~/.claude/plans/`. Lead writes this file inline using the Write tool.
 
 **Source material by mode:**
 
@@ -63,16 +63,7 @@ READY / NEEDS WORK / NOT READY
 5. TDD task ordering — test task must precede impl task for each truth
 6. Task granularity — each task must specify: exact file(s), what to change (specific), expected behavior after change, how to verify. Each task completable in one worker turn — split if needed.
 
-After writing the plan: call `ExitPlanMode`. Plan file path returned.
-
-**Copy plan to artifacts_dir:** Immediately copy the created file:
-
-```bash
-cp ~/.claude/plans/{returned-filename}.md {artifacts_dir}/{date}-{task-slug}/plan.md
-```
-
-Update `plan_file:` in `{artifacts_dir}/dev-loop-context.md` to the new artifacts_dir path.
-The `{artifacts_dir}/{date}-{task-slug}/plan.md` path is the canonical path for all downstream consumers.
+Update `plan_file:` in `{artifacts_dir}/dev-loop-context.md` to `{artifacts_dir}/{date}-{task-slug}/plan.md`.
 
 ---
 
@@ -100,7 +91,7 @@ Plan-challenger uses **dual-lens** challenge (see [agents/plan-challenger.md](..
 1. Present plan summary to user while plan-challenger runs
 2. Collect plan-challenger result (wait if still running)
 3. Apply challenger findings: remove YAGNI/scope-creep tasks, add missing tasks, correct ordering
-4. If user requests plan changes: apply edits, re-run EnterPlanMode/ExitPlanMode cycle, re-spawn plan-challenger against revised plan
+4. If user requests plan changes: apply edits directly to `plan.md`, re-spawn plan-challenger against revised plan
 5. If all CHALLENGED items are SUSTAINED or user overrides with explicit justification → proceed
 
 **GATE (Full mode):** plan-challenger addressed + user approves final plan → proceed to Phase 4.
