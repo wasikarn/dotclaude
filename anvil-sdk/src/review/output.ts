@@ -7,12 +7,6 @@ export function formatJson(report: ReviewReport): string {
   return JSON.stringify(report, null, 2)
 }
 
-function severityEmoji(severity: string): string {
-  if (severity === 'critical') return '🔴 Critical'
-  if (severity === 'warning') return '🟡 Warning'
-  return '🔵 Info'
-}
-
 function formatFinding(f: ConsolidatedFinding): string {
   const label = f.severity.toUpperCase()
   const location = f.line !== null && f.line !== undefined ? `${f.file}:${f.line}` : f.file

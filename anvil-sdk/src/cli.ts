@@ -16,6 +16,7 @@ interface ParsedArgs {
   falsification: boolean
   hardRulesPath: string | undefined
   budget: number | undefined
+  dismissedPatternsPath: string | undefined
 }
 
 function parseArgs(args: string[]): ParsedArgs {
@@ -26,6 +27,7 @@ function parseArgs(args: string[]): ParsedArgs {
     falsification: true,
     hardRulesPath: undefined,
     budget: undefined,
+    dismissedPatternsPath: undefined,
   }
 
   for (let i = 0; i < args.length; i++) {
@@ -40,13 +42,25 @@ function parseArgs(args: string[]): ParsedArgs {
     // Flags that consume the next argument
     const next = args[i + 1]
 
-    if (arg === '--branch' && next !== undefined) {
+    if (arg === '--branch') {
+      if (next === undefined) {
+        console.error(`[sdk-review] --branch requires a value`)
+        process.exit(1)
+      }
       result.branch = next
       i++
-    } else if (arg === '--base-branch' && next !== undefined) {
+    } else if (arg === '--base-branch') {
+      if (next === undefined) {
+        console.error(`[sdk-review] --base-branch requires a value`)
+        process.exit(1)
+      }
       result.baseBranch = next
       i++
-    } else if (arg === '--output' && next !== undefined) {
+    } else if (arg === '--output') {
+      if (next === undefined) {
+        console.error(`[sdk-review] --output requires a value`)
+        process.exit(1)
+      }
       if (next === 'json' || next === 'markdown') {
         result.output = next
       } else {
@@ -54,10 +68,18 @@ function parseArgs(args: string[]): ParsedArgs {
         process.exit(1)
       }
       i++
-    } else if (arg === '--hard-rules' && next !== undefined) {
+    } else if (arg === '--hard-rules') {
+      if (next === undefined) {
+        console.error(`[sdk-review] --hard-rules requires a value`)
+        process.exit(1)
+      }
       result.hardRulesPath = next
       i++
-    } else if (arg === '--budget' && next !== undefined) {
+    } else if (arg === '--budget') {
+      if (next === undefined) {
+        console.error(`[sdk-review] --budget requires a value`)
+        process.exit(1)
+      }
       const parsed = parseFloat(next)
       if (Number.isNaN(parsed) || parsed <= 0) {
         console.error(`[sdk-review] --budget must be a positive number, got: ${next}`)
@@ -65,6 +87,15 @@ function parseArgs(args: string[]): ParsedArgs {
       }
       result.budget = parsed
       i++
+    } else if (arg === '--dismissed') {
+      if (next === undefined) {
+        console.error('[sdk-review] --dismissed requires a path')
+        process.exit(1)
+      }
+      result.dismissedPatternsPath = next
+      i++
+    } else if (arg.startsWith('--')) {
+      console.warn(`[sdk-review] unknown flag: ${arg}`)
     }
   }
 
@@ -74,7 +105,7 @@ function parseArgs(args: string[]): ParsedArgs {
 function loadHardRules(path: string | undefined): string {
   if (path !== undefined && path.length > 0) {
     if (!existsSync(path)) {
-      console.warn(`[sdk-review] --hard-rules path not found: ${path}`)
+      console.error(`[sdk-review] --hard-rules path not found: ${path}`)
       process.exit(1)
     }
     return readFileSync(path, 'utf8')
@@ -85,6 +116,15 @@ function loadHardRules(path: string | undefined): string {
     if (existsSync(p)) return readFileSync(p, 'utf8')
   }
   return ''
+}
+
+function loadDismissedPatterns(path: string | undefined): string {
+  if (path === undefined) return ''
+  if (!existsSync(path)) {
+    console.warn(`[sdk-review] --dismissed path not found: ${path}`)
+    process.exit(1)
+  }
+  return readFileSync(path, 'utf8')
 }
 
 async function main(): Promise<void> {
@@ -121,7 +161,7 @@ async function main(): Promise<void> {
   const { results, totalCost, totalTokens } = await runReview({
     files,
     hardRules,
-    dismissedPatterns: '',
+    dismissedPatterns: loadDismissedPatterns(parsed.dismissedPatternsPath),
     config,
   })
 
