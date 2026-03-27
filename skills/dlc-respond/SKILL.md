@@ -43,11 +43,11 @@ Read CLAUDE.md first — auto-loaded, contains project patterns and conventions.
 
 | File | Load when |
 | --- | --- |
-| [references/teammate-prompts.md](references/teammate-prompts.md) | Phase 1: creating Fixer teammates |
+| [references/teammate-prompts.md](references/teammate-prompts.md) | Phase 2: creating Fixer teammates |
 | [references/phase-gates.md](references/phase-gates.md) | Any gate transition |
 | [references/operational.md](references/operational.md) | Mode detection, compression recovery, success criteria |
-| [../../references/review-conventions.md](../../references/review-conventions.md) | Phase 2: reply format and comment labels |
-| [../../references/jira-integration.md](../../references/jira-integration.md) | Phase 0 Step 0.5: when Jira key detected in `$1` |
+| [../../references/review-conventions.md](../../references/review-conventions.md) | Phase 3: reply format and comment labels |
+| [../../references/jira-integration.md](../../references/jira-integration.md) | Phase 1 Step 2: when Jira key detected in `$1` |
 | [references/examples.md](references/examples.md) | When calibrating reply quality, fix scope, or triage table format |
 
 ---
@@ -58,25 +58,25 @@ Detect mode per [references/operational.md](references/operational.md) Graceful 
 
 ---
 
-## Phase 0: Triage (Lead Only)
+## Phase 1: Triage (Lead Only)
 
 ### Step 1: Detect Project
 
 Use the `Project` JSON from the header. Load project-specific Hard Rules from `{project_root}/.claude/skills/review-rules/hard-rules.md` if present.
 
-### Step 0.5: Jira Context (if `$1` present)
+### Step 2: Jira Context (if `$1` present)
 
 If `$1` matches `ABC-\d+`, follow `## dlc-respond` section in [../../references/jira-integration.md](../../references/jira-integration.md) to fetch AC and enrich thread prioritization.
 
-### Steps 2 + 2.5: Fetch Threads + Dismissed Patterns (parallel)
+### Steps 3 + 4: Fetch Threads + Dismissed Patterns (parallel)
 
 Issue both in the same tool call round — they are independent reads:
 
-**Step 2 (Bash):** Fetch all open threads — see [references/operational.md](references/operational.md#phase-0-thread-fetch-commands) for gh API commands. Fetch both: inline review comments (by line) and review-level comments (CHANGES_REQUESTED + COMMENTED).
+**Step 3 (Bash):** Fetch all open threads — see [references/operational.md](references/operational.md#phase-1-thread-fetch-commands) for gh API commands. Fetch both: inline review comments (by line) and review-level comments (CHANGES_REQUESTED + COMMENTED).
 
-**Step 2.5 (Read):** Load `{review_memory_dir}/review-dismissed.md` if present. Threads matching dismissed patterns → note as "Previously dismissed" in triage table (still include — reviewer may have re-raised with new evidence).
+**Step 4 (Read):** Load `{review_memory_dir}/review-dismissed.md` if present. Threads matching dismissed patterns → note as "Previously dismissed" in triage table (still include — reviewer may have re-raised with new evidence).
 
-### Step 3: Classify Threads
+### Step 5: Classify Threads
 
 Build triage table.
 
@@ -117,11 +117,11 @@ Build triage table.
 - `(blocking)` in thread body → override to 🔴 Critical regardless of content
 - No decoration → use severity inference above
 
-### Step 3.5: Cluster Analysis
+### Step 6: Cluster Analysis
 
 Before routing threads to Fixers, group threads that share the same file:
 
-- Add a `GROUP` column to the triage table (from Step 3)
+- Add a `GROUP` column to the triage table (from Step 5)
 - Assign `[GROUP-N]` to all threads touching the same file (N = sequential number per file)
 - Threads touching unique files → leave `GROUP` as `—`
 - Max 5 threads per group: if a file has >5 threads, split into `GROUP-Xa` (Critical/Important) and `GROUP-Xb` (Suggestion)
@@ -134,14 +134,14 @@ Before routing threads to Fixers, group threads that share the same file:
 | 3 | auth.service.ts | 91 | GROUP-1 | reviewer | 🟡 | Inconsistent error msg | Open | — |
 | 2 | user.mapper.ts | 15 | — | reviewer | 🟡 | Wrong date format | Open | — |
 
-**Routing rule (used in Phase 1):**
+**Routing rule (used in Phase 2):**
 
 - Threads sharing a GROUP → assign to a single Fixer (sequential, not parallel) so it reads the file once and fixes all related threads
 - Independent threads (GROUP = —) → parallel Fixers as before
 
 Why file-based only: semantic grouping requires extra reasoning and adds complexity without proportional benefit. File-based grouping is deterministic and sufficient.
 
-### Step 4: Write `respond-context.md`
+### Step 7: Write `respond-context.md`
 
 Write to `{artifacts_dir}/respond-context.md` — thread triage table, project info, validate command, Jira context if fetched. Required for context compression recovery.
 
@@ -149,7 +149,7 @@ Write to `{artifacts_dir}/respond-context.md` — thread triage table, project i
 
 ---
 
-## Phase 1: Fix Threads
+## Phase 2: Fix Threads
 
 Fix in severity order: 🔴 Critical → 🟡 Important → 🔵 Suggestion (only if user requested).
 
@@ -163,7 +163,7 @@ shared context in each Fixer prompt to eliminate redundant per-Fixer reads.
 **Agent Teams mode:** Create 1 Fixer per non-overlapping file group using prompts from [references/teammate-prompts.md](references/teammate-prompts.md).
 **Solo/subagent mode:** Lead fixes sequentially using the same Fixer rules.
 
-**Lead verification gate (before Phase 2):**
+**Lead verification gate (before Phase 3):**
 
 1. Run validate independently: `{validate_command}` — if fails, revert and re-fix
 2. Check `git diff --stat` — scope must match thread scope only (scope crept → revert)
@@ -177,7 +177,7 @@ shared context in each Fixer prompt to eliminate redundant per-Fixer reads.
 
 ---
 
-## Phase 2: Reply to Threads
+## Phase 3: Reply to Threads
 
 Post a reply for each thread. Comment labels per [../../references/review-conventions.md](../../references/review-conventions.md).
 
@@ -188,7 +188,7 @@ gh api repos/{owner}/{repo}/pulls/comments/{comment_id}/replies \
 
 **Before posting replies:** Lead verifies `rtk git log --oneline -10` — confirm that the sha in each planned reply matches the commit whose message references that thread. Mismatched sha → fix the reply before posting.
 
-Reply format and PR summary template: [references/operational.md](references/operational.md#phase-2-reply-formats).
+Reply format and PR summary template: [references/operational.md](references/operational.md#phase-3-reply-formats).
 
 After all thread replies, post summary:
 
@@ -202,7 +202,7 @@ Update `{artifacts_dir}/respond-context.md` progress section after each thread r
 
 ---
 
-## Phase 3: Re-request Review (Lead Only)
+## Phase 4: Re-request Review (Lead Only)
 
 ```bash
 gh pr edit {pr} --add-reviewer {original_reviewer_login}
@@ -248,15 +248,15 @@ See [references/operational.md](references/operational.md) for Success Criteria 
 
 - **Run after review comments are posted, not before** — the skill fetches open threads from GitHub; if no review has been submitted yet, the thread list is empty and nothing gets fixed. Confirm reviewer comments are posted before invoking.
 - **fix-intent-verifier requires GitHub App permissions** — the verifier reads thread text via `gh api`. If the token lacks `pull_requests: read` scope, the intent verification step fails silently and Fixers proceed without the check.
-- **Parallel Fixers must not share files** — the file-group clustering (Step 3.5) prevents this, but if two threads touch the same file through different group assignments, write conflicts occur. Review the triage table's GROUP column before approving the fix phase.
-- **respond-context.md is ephemeral** — it is written to `{artifacts_dir}` (centralized, not the project repo) and deleted after Phase 3. If the session crashes mid-run, the file remains and must be cleaned up manually before re-running.
-- **Re-request review targets the original reviewer login** — the skill uses `gh pr edit --add-reviewer {original_reviewer_login}`. If the reviewer has left the org or changed their login, this step fails. Verify the login before Phase 3.
+- **Parallel Fixers must not share files** — the file-group clustering (Step 6) prevents this, but if two threads touch the same file through different group assignments, write conflicts occur. Review the triage table's GROUP column before approving the fix phase.
+- **respond-context.md is ephemeral** — it is written to `{artifacts_dir}` (centralized, not the project repo) and deleted after Phase 4. If the session crashes mid-run, the file remains and must be cleaned up manually before re-running.
+- **Re-request review targets the original reviewer login** — the skill uses `gh pr edit --add-reviewer {original_reviewer_login}`. If the reviewer has left the org or changed their login, this step fails. Verify the login before Phase 4.
 
 ---
 
 ## Constraints
 
-- **review-dismissed.md is read-only here** — dlc-review and dlc-build both write to this file; dlc-respond reads it only (Step 2.5 triage)
+- **review-dismissed.md is read-only here** — dlc-review and dlc-build both write to this file; dlc-respond reads it only (Step 4 triage)
 - **Fix scope = thread scope only** — why: scope creep makes re-review harder and risks introducing new issues unrelated to the review
 - **Validate BEFORE commit** — why: reverting uncommitted changes is cheaper than reverting commits; catches regressions before they enter history
 - **Never silently skip a Critical thread** — why: skipped Criticals become production incidents; if unfixable, the decision must be explicit and documented

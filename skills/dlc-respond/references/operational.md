@@ -12,7 +12,7 @@ Detect at Prerequisite Check and inform user of mode.
 
 ## Bootstrap
 
-Before spawning Fixers (Phase 1), Lead pre-gathers shared context:
+Before spawning Fixers (Phase 2), Lead pre-gathers shared context:
 
 1. Read all affected files (files listed in triage table)
 2. `git log --oneline -5 -- {affected_files}` — recent change context per file
@@ -70,7 +70,7 @@ Update this table after each thread fix and after each reply post. Used by crash
 - [ ] Re-review requested from original reviewer(s)
 - [ ] Team cleaned up (all teammates shut down)
 
-## Phase 0: Thread Fetch Commands
+## Phase 1: Thread Fetch Commands
 
 Inline review comments:
 
@@ -86,7 +86,7 @@ gh pr view {pr} --json reviews \
   --jq '.reviews[] | select(.state == "CHANGES_REQUESTED" or .state == "COMMENTED") | {id, author: .author.login, body, state}'
 ```
 
-## Phase 2: Reply Formats
+## Phase 3: Reply Formats
 
 **Fixed:** `แก้ไขแล้วครับ — {commit_sha_short}: {description}`
 
