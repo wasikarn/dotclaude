@@ -8,9 +8,13 @@ Step 1: Parallel triage (all concurrent)
   1a: Detect project + domain lenses
   1b: Check pending PRs
   1c: Fetch Jira context (if Jira key)
+  1d: Duplicate detection
+  1e: AC quality check
     ↓
 Step 2: Classify mode (decision tree → Full/Quick/Hotfix)
 GATE: User confirms mode ──────────────────────────────────────────┐
+    ↓                                                              │
+Step 2a: Auto-Transition to In Progress (atlassian-pm, if avail.)  │
     ↓                                                              │
 Step 2.5: Load Mode File                                            │
     ↓                                                              │
@@ -137,6 +141,42 @@ Per [workflow-modes.md](workflow-modes.md) — use the Mode Decision Tree:
 
 If validate is empty, follow up with a second AskUserQuestion or free-text prompt for the validate command.
 → proceed.
+
+## Step 2a: Auto-Transition to In Progress (atlassian-pm)
+
+**Run only if:** `$ARGUMENTS` contains a Jira key AND `issue-bootstrap` was used successfully in Step 1c (indicates atlassian-pm is installed).
+**Skip silently** if either condition is false — this step never blocks the workflow.
+
+Use the ticket status already fetched in Step 1c (no re-fetch needed).
+
+| Current Status | Action |
+| ---------------- | -------- |
+| To Do / Backlog / Open | Transition to In Progress (proceed below) |
+| In Progress / Reopened | Skip — note: `{JIRA-KEY} already In Progress — skipping` |
+| Done / Closed / Cancelled | Ask user (see below) |
+
+**If transition needed:**
+
+1. Call `jira_get_transitions(issue_key)` → find transition whose name contains "In Progress" (case-insensitive)
+2. Call `jira_transition_issue(issue_key, transition_name)` — the `pre_wip_limit_check` hook (atlassian-pm) fires automatically:
+   - If WIP blocked AND count ≥ wip_max → **STOP**: "WIP limit reached for In Progress ({count}/{wip_max}). Finish an existing item first."
+   - Otherwise → proceed
+3. Call `cache_invalidate(issue_key)` (HR6)
+4. Output: `{JIRA-KEY} → In Progress [OK]`
+
+**If Done / Closed / Cancelled:** Call AskUserQuestion:
+
+```text
+question: "Ticket {JIRA-KEY} is already {status}. Proceed anyway?"
+header: "Ticket Status Warning"
+options:
+  - { label: "Proceed", description: "Continue with dlc-build regardless of ticket status" }
+  - { label: "Stop",    description: "Exit — pick a different ticket" }
+```
+
+→ Stop: exit skill. → Proceed: continue without transitioning.
+
+---
 
 ## Step 2.5: Load Mode File
 
