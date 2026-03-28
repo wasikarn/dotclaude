@@ -210,3 +210,39 @@ Then exit Step 5.
 **5e. If no categories reach ≥3 hits:**
 
 Silent pass — output nothing.
+
+### 6. Reviewer Calibration Analysis (optional — runs standalone only)
+
+Skip this step if `session_dir` is set (Step 0 set it). Only run when invoked standalone (no arguments).
+
+```bash
+tail -200 ~/.claude/anvil-reviewer-calibration.jsonl 2>/dev/null
+```
+
+If file absent or empty → skip silently.
+
+Each line is a JSON object: `{ ts, pr, role, submitted, sustained, rejected, downgraded }`.
+
+Compute per-role aggregates (require ≥5 records per role):
+
+```text
+accuracy_rate[role] = sustained / submitted  (higher = findings hold up under challenge)
+rejection_rate[role] = rejected / submitted  (>40% = noisy reviewer)
+```
+
+Append to retrospective report if any role has ≥5 records:
+
+```markdown
+### Reviewer Calibration (last 200 reviews)
+
+| Reviewer | Submitted | Sustained | Rejected | Accuracy |
+| --- | --- | --- | --- | --- |
+| correctness | {N} | {N} | {N} | {N}% |
+| architecture | {N} | {N} | {N} | {N}% |
+| dx | {N} | {N} | {N} | {N}% |
+
+{If any role has rejection_rate > 40%: "⚠️ {role} reviewer rejection rate {N}% — consider tightening confidence threshold for this domain"}
+{If any role has accuracy_rate > 90%: "✅ {role} reviewer high accuracy — findings consistently sustained"}
+```
+
+Omit roles with fewer than 5 records.

@@ -81,7 +81,7 @@ export function formatMarkdown(report: ReviewReport): string {
     findingsSections,
     '',
     '## Cost',
-    `Total: $${report.cost.total_usd.toFixed(4)} | Tokens: ${report.tokens.total.toLocaleString()}`,
+    `Reviewers: $${(report.cost.total_usd - report.cost.falsification_usd).toFixed(4)} | Falsification: $${report.cost.falsification_usd.toFixed(4)} | Total: $${report.cost.total_usd.toFixed(4)} | Tokens: ${report.tokens.total.toLocaleString()}`,
   ]
 
   return sections.join('\n')

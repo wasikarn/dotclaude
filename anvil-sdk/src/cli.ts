@@ -1,5 +1,8 @@
 #!/usr/bin/env node
 import { existsSync, readFileSync } from 'node:fs'
+import { appendFile, mkdir } from 'node:fs/promises'
+import { homedir } from 'node:os'
+import { join } from 'node:path'
 import { resolveConfig, type EffortLevel } from './config.js'
 import { runFalsification } from './review/agents/falsifier.js'
 import { consolidate, findingKey } from './review/consolidator.js'
@@ -7,7 +10,37 @@ import { readDiff, readPrDiff } from './review/diff-reader.js'
 import { formatJson, formatMarkdown } from './review/output.js'
 import { runReview } from './review/orchestrator.js'
 import { triage } from './review/triage.js'
-import type { ReviewReport } from './types.js'
+import type { ReviewReport, ReviewRole, Verdict } from './types.js'
+
+// ─── reviewer calibration logging ────────────────────────────────────────────
+
+async function appendReviewerCalibration(
+  pr: string,
+  perReviewer: Array<{ role: ReviewRole; findings: ReturnType<typeof triage>['mustFalsify'] }>,
+  verdicts: Verdict[],
+): Promise<void> {
+  if (perReviewer.length === 0 || perReviewer.every(r => r.findings.length === 0)) return
+
+  const verdictByKey = new Map(verdicts.flatMap(v => v.findingKey !== undefined ? [[v.findingKey, v] as const] : []))
+  const ts = new Date().toISOString()
+  const lines = perReviewer
+    .filter(r => r.findings.length > 0)
+    .map(r => {
+      let sustained = 0, rejected = 0, downgraded = 0
+      for (const f of r.findings) {
+        const verdict = verdictByKey.get(findingKey(f))
+        if (verdict === undefined || verdict.verdict === 'SUSTAINED') sustained++
+        else if (verdict.verdict === 'REJECTED') rejected++
+        else if (verdict.verdict === 'DOWNGRADED') downgraded++
+      }
+      return JSON.stringify({ ts, pr, role: r.role, submitted: r.findings.length, sustained, rejected, downgraded })
+    })
+
+  if (lines.length === 0) return
+  const calibrationFile = join(homedir(), '.claude', 'anvil-reviewer-calibration.jsonl')
+  await mkdir(join(homedir(), '.claude'), { recursive: true })
+  await appendFile(calibrationFile, lines.join('\n') + '\n', 'utf8')
+}
 
 // ─── generic flag parser ──────────────────────────────────────────────────────
 
@@ -195,13 +228,17 @@ async function runReviewCommand(args: string[]): Promise<void> {
     process.exit(1)
   }
 
-  // Run reviewers in parallel
-  const { results, roles, totalCost, totalTokens } = await runReview({
+  // Run reviewers in parallel (trivial PRs get 1 reviewer via orchestrator complexity triage)
+  const { results, roles, totalCost, totalTokens, complexity } = await runReview({
     files,
     hardRules,
     dismissedPatterns: loadDismissedPatterns(parsed.dismissedPatternsPath),
     config,
   })
+
+  if (complexity === 'trivial') {
+    console.warn('[sdk-review] trivial PR detected — running single reviewer')
+  }
 
   // Build per-reviewer buckets (preserves attribution for role-based thresholds + consensus)
   // roles[i] must be defined — undefined means orchestrator/results mismatch
@@ -217,10 +254,15 @@ async function runReviewCommand(args: string[]): Promise<void> {
     { autoPassThreshold: config.autoPassThreshold, autoDropThreshold: config.autoDropThreshold },
   )
 
-  // Falsification
-  let verdicts: Awaited<ReturnType<typeof runFalsification>> = []
+  // Falsification — capture cost/tokens for per-phase breakdown
+  let verdicts: Verdict[] = []
+  let falsificationCost = 0
+  let falsificationTokens = 0
   if (!config.noFalsification && mustFalsify.length > 0) {
-    verdicts = await runFalsification({ findings: mustFalsify, config })
+    const falsResult = await runFalsification({ findings: mustFalsify, config })
+    verdicts = falsResult.verdicts
+    falsificationCost = falsResult.cost
+    falsificationTokens = falsResult.tokens
   }
 
   // Consolidate with full attribution — key-based Set prevents silent bug if objects were spread
@@ -236,6 +278,10 @@ async function runReviewCommand(args: string[]): Promise<void> {
     verdicts,
     patternCapCount: config.patternCapCount,
   })
+
+  // Log per-reviewer calibration stats (fire-and-forget — non-fatal)
+  const prLabel = parsed.pr !== undefined ? `#${parsed.pr}` : (parsed.branch ?? 'HEAD')
+  appendReviewerCalibration(prLabel, perReviewerMustFalsify, verdicts).catch(() => { /* ignore */ })
 
   // Build report
   let critical = 0, warning = 0, info = 0
@@ -253,19 +299,21 @@ async function runReviewCommand(args: string[]): Promise<void> {
   const noiseWarning = totalSignal > 0 && (critical + warning) / totalSignal < config.signalThreshold
 
   const report: ReviewReport = {
-    pr: parsed.pr !== undefined ? `#${parsed.pr}` : (parsed.branch ?? 'HEAD'),
+    pr: prLabel,
     summary: { critical, warning, info },
     findings: consolidated,
     strengths,
     verdict: critical > 0 ? 'REQUEST_CHANGES' : 'APPROVE',
     ...(noiseWarning && { noiseWarning: true }),
     cost: {
-      total_usd: totalCost,
+      total_usd: totalCost + falsificationCost,
       per_reviewer: results.map(r => r.cost),
+      falsification_usd: falsificationCost,
     },
     tokens: {
-      total: totalTokens,
+      total: totalTokens + falsificationTokens,
       per_reviewer: results.map(r => r.tokens),
+      falsification: falsificationTokens,
     },
   }
 

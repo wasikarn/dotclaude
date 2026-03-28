@@ -34,8 +34,8 @@ export interface ReviewReport {
   strengths: string[]
   verdict: 'APPROVE' | 'REQUEST_CHANGES'
   noiseWarning?: boolean
-  cost: { total_usd: number; per_reviewer: number[] }
-  tokens: { total: number; per_reviewer: number[] }
+  cost: { total_usd: number; per_reviewer: number[]; falsification_usd: number }
+  tokens: { total: number; per_reviewer: number[]; falsification: number }
 }
 
 export interface TriagedFindings {

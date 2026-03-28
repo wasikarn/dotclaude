@@ -6,11 +6,17 @@ import { findingKey } from '../consolidator.js'
 import { FALSIFICATION_PROMPT } from '../prompts/falsifier.js'
 import { VerdictResultSchema, verdictResultJsonSchema } from '../schemas/verdict.js'
 
+export interface FalsificationResult {
+  verdicts: Verdict[]
+  cost: number
+  tokens: number
+}
+
 export async function runFalsification(params: {
   findings: Finding[]
   config: ResolvedConfig
-}): Promise<Verdict[]> {
-  if (params.findings.length === 0) return []
+}): Promise<FalsificationResult> {
+  if (params.findings.length === 0) return { verdicts: [], cost: 0, tokens: 0 }
 
   const findingsSummary = params.findings
     .map((f, i) => {
@@ -33,20 +39,20 @@ export async function runFalsification(params: {
   } catch (err) {
     // Non-fatal: budget exceeded, rate limit, etc. — findings pass through unchanged
     console.warn(`[sdk-review] falsifier failed — skipping: ${String(err)}`)
-    return []
+    return { verdicts: [], cost: 0, tokens: 0 }
   }
 
   const raw = result.structuredOutput
   if (raw === undefined || raw === null) {
     console.warn('[sdk-review] falsifier returned no structured output — skipping')
-    return []
+    return { verdicts: [], cost: result.costUsd, tokens: result.tokens }
   }
 
   const parsed = VerdictResultSchema.safeParse(raw)
   if (!parsed.success) {
     console.warn(`[sdk-review] verdicts failed schema validation — skipping: ${JSON.stringify(parsed.error.issues)}`)
-    return []
+    return { verdicts: [], cost: result.costUsd, tokens: result.tokens }
   }
 
-  return parsed.data.verdicts
+  return { verdicts: parsed.data.verdicts, cost: result.costUsd, tokens: result.tokens }
 }
