@@ -9,20 +9,20 @@ export function buildReviewer1Prompt(config: {
 
 YOUR FOCUS: Functional correctness (#1), app helpers & util (#2), type safety (#10), error handling, and all Hard Rules.
 
+${config.sharedRules}
+
 HARD RULES:
 ${config.hardRules}
-
-DIFF TO REVIEW:
-${config.diffContent}
 
 ${config.lensContent ? `DOMAIN LENSES:\n${config.lensContent}` : ''}
 
 KNOWN FALSE POSITIVES (do not re-raise without new evidence):
 ${config.dismissedPatterns || 'None'}
 
-${config.sharedRules}
+DIFF TO REVIEW:
+${config.diffContent}
 
---- ROLE-SPECIFIC INSTRUCTIONS ---
+--- ROLE-SPECIFIC INSTRUCTIONS (apply after reviewing the diff above) ---
 
 BUG FIX COMPLETENESS (required when PR title/body matches: fix|bug|patch|repair|resolve|hotfix):
 Before writing "confirmed" for any fix:

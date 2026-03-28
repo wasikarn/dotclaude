@@ -46,8 +46,7 @@ Tests should assert *what* the code does, not *how*. Red flags:
 - Tests break when refactoring internal structure without changing behavior
 - Mocks verify that internal methods were called with exact arguments rather than asserting output
 
-#### T2 — Mock Fidelity
-
+**T2 — Mock Fidelity**
 Mocks should accurately represent the real dependency's contract. Red flags:
 
 - Mock returns a value that the real dependency never returns (invalid shape)

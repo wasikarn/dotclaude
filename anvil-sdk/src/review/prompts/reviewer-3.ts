@@ -9,20 +9,20 @@ export function buildReviewer3Prompt(config: {
 
 YOUR FOCUS: Clear naming (#8), documentation (#9), testability (#11), debugging-friendly (#12), and all Hard Rules.
 
+${config.sharedRules}
+
 HARD RULES:
 ${config.hardRules}
-
-DIFF TO REVIEW:
-${config.diffContent}
 
 ${config.lensContent ? `DOMAIN LENSES:\n${config.lensContent}` : ''}
 
 KNOWN FALSE POSITIVES (do not re-raise without new evidence):
 ${config.dismissedPatterns || 'None'}
 
-${config.sharedRules}
+DIFF TO REVIEW:
+${config.diffContent}
 
---- ROLE-SPECIFIC INSTRUCTIONS ---
+--- ROLE-SPECIFIC INSTRUCTIONS (apply after reviewing the diff above) ---
 
 NAMING (#8): Flag generic names (data, result, tmp), abbreviations, boolean variables named as nouns, inconsistent casing, function name mismatch.
 

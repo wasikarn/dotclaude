@@ -32,17 +32,23 @@ Output a JSON object — no markdown, no prose. Every finding must have an entry
   "verdicts": [
     {
       "findingIndex": 1,
+      "findingKey": "<copy of the [key:...] value from the finding line>",
+      "originalSummary": "<copy of finding summary>",
       "verdict": "SUSTAINED",
       "rationale": "one line"
     },
     {
       "findingIndex": 2,
+      "findingKey": "<copy of the [key:...] value from the finding line>",
+      "originalSummary": "<copy of finding summary>",
       "verdict": "DOWNGRADED",
-      "revisedSeverity": "warning",
+      "newSeverity": "warning",
       "rationale": "one line"
     },
     {
       "findingIndex": 3,
+      "findingKey": "<copy of the [key:...] value from the finding line>",
+      "originalSummary": "<copy of finding summary>",
       "verdict": "REJECTED",
       "rationale": "one line"
     }
@@ -55,10 +61,68 @@ Output a JSON object — no markdown, no prose. Every finding must have an entry
 ## Rules
 
 - **REJECTED** = finding is invalid or not supported by diff evidence — the code handles the case, the finding misreads the logic, or it flags intentional behavior
-- **DOWNGRADED** = finding is valid but severity is too high — set `revisedSeverity` to `"warning"` or `"info"` as appropriate
-- **SUSTAINED** = finding survives all three challenges at its original severity — omit `revisedSeverity`
+- **DOWNGRADED** = finding is valid but severity is too high — set `newSeverity` to `"warning"` or `"info"` as appropriate
+- **SUSTAINED** = finding survives all three challenges at its original severity — omit `newSeverity`
 - **Burden of proof is on the finding** — if uncertain whether to REJECT or DOWNGRADE, choose DOWNGRADE (not REJECT)
 - Hard Rule violations (type safety, empty catch, N+1, console.log, nesting >1) are almost never REJECTED — use DOWNGRADED only if there is direct evidence the rule was intentionally waived with documented justification
+
+## Examples
+
+Finding [0]: critical | no-null-check | src/user.ts:42 — user.profile accessed without null guard
+Challenge:
+
+- Intentional design? No — nullable type in schema shows this path can be null
+- Contradicting evidence? None in diff
+- Severity inflation? Critical is appropriate — crash on production traffic
+Output:
+`{"findingIndex":0,"findingKey":"no-null-check","originalSummary":"user.profile accessed without null guard","verdict":"SUSTAINED","rationale":"Nullable schema confirms null path exists; critical severity correct for production crash risk"}`
+
+Finding [1]: warning | magic-number | src/config.ts:15 — hardcoded 30000 timeout
+Challenge:
+
+- Intentional design? Possibly — could be intentional default for this service
+- Contradicting evidence? No constant defined elsewhere in diff; no comment explaining the value
+- Severity inflation? Warning → Info is defensible — no crash risk, purely style concern
+Output:
+`{"findingIndex":1,"findingKey":"magic-number","originalSummary":"hardcoded 30000 timeout","verdict":"DOWNGRADED","newSeverity":"info","rationale":"Intentional default plausible; no crash risk makes Info the minimum defensible severity"}`
+
+Finding [2]: critical | sql-injection | src/search.ts:88 — query built with string concat
+Challenge:
+
+- Intentional design? No — parameterized queries are standard practice
+- Contradicting evidence? Diff shows user input flows directly into concat without sanitization
+- Severity inflation? Critical is correct — direct injection vector with no mitigation
+Output:
+`{"findingIndex":2,"findingKey":"sql-injection","originalSummary":"query built with string concat","verdict":"SUSTAINED","rationale":"Unmitigated user input in SQL concat; critical severity appropriate for direct injection vector"}`
+
+Finding [3]: warning | unused-variable | src/handler.ts:77 — variable 'result' assigned but never read
+Challenge:
+
+- Intentional design? No — dead assignment with no side effect
+- Contradicting evidence? Diff confirms variable is never referenced after assignment
+- Severity inflation? Warning → Info is defensible — dead code, no runtime risk
+Output:
+`{"findingIndex":3,"findingKey":"unused-variable","originalSummary":"variable 'result' assigned but never read","verdict":"DOWNGRADED","newSeverity":"info","rationale":"Dead assignment; no runtime impact, Info is minimum defensible severity"}`
+
+Finding [4]: critical | missing-auth | src/api/admin.ts:12 — admin endpoint has no auth middleware
+Challenge:
+
+- Intentional design? Unlikely — no comment or test indicates intentional open access
+- Contradicting evidence? No auth middleware added anywhere in the diff
+- Severity inflation? Critical is correct — unauthenticated access to admin endpoint
+Output:
+`{"findingIndex":4,"findingKey":"missing-auth","originalSummary":"admin endpoint has no auth middleware","verdict":"SUSTAINED","rationale":"No auth middleware in diff; unauthenticated admin access is critical severity"}`
+
+Finding [5]: warning | missing-test | src/payments/processor.ts:34 — no unit test for processPayment function
+Challenge:
+
+- Intentional design? Reviewer saw no test added in the diff — but diff adds processPayment to an existing file; check if tests exist in the broader codebase (not just this diff)
+- Contradicting evidence? Look for existing spec file: src/payments/processor.spec.ts — if it exists and already covers processPayment, finding is invalid
+- Severity inflation? If existing tests are found, this finding is simply wrong regardless of severity
+Output: (assuming processor.spec.ts exists and covers processPayment)
+`{"findingIndex":5,"findingKey":"missing-test","originalSummary":"no unit test for processPayment function","verdict":"REJECTED","rationale":"processor.spec.ts exists with coverage for processPayment — reviewer flagged absence based on diff scope only, not codebase state"}`
+
+> **NOTE:** REJECTED is appropriate only when evidence directly contradicts the finding (e.g., the code handles the case elsewhere, the test already exists, the reviewer misread the control flow). When uncertain, use DOWNGRADED — not REJECTED.
 
 ## Error Handling
 

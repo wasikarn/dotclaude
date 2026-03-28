@@ -4,7 +4,7 @@ export const MinimalFindingSchema = z.object({
   taskNumber: z.number().int().min(1),
   taskName: z.string(),
   verdict: z.enum(['SUSTAINED', 'CHALLENGED']),
-  ground: z.string(), // '—' for SUSTAINED, 'YAGNI'|'SCOPE'|'ORDER'|'MISSING' for CHALLENGED
+  ground: z.enum(['—', 'YAGNI', 'SCOPE', 'ORDER', 'MISSING']), // '—' for SUSTAINED, the rest for CHALLENGED
   rationale: z.string(),
 })
 
@@ -29,13 +29,14 @@ export const challengeResultJsonSchema = {
   properties: {
     minimal: {
       type: 'array',
+      minItems: 2, // prompt requires ≥2 entries (SUSTAINED + CHALLENGED)
       items: {
         type: 'object',
         properties: {
           taskNumber: { type: 'integer', minimum: 1 },
           taskName: { type: 'string' },
           verdict: { type: 'string', enum: ['SUSTAINED', 'CHALLENGED'] },
-          ground: { type: 'string' },
+          ground: { type: 'string', enum: ['—', 'YAGNI', 'SCOPE', 'ORDER', 'MISSING'] },
           rationale: { type: 'string' },
         },
         required: ['taskNumber', 'taskName', 'verdict', 'ground', 'rationale'],

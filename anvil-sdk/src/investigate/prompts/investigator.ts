@@ -34,9 +34,7 @@ Step 6 — No alternative hypothesis needed; direct evidence found
 Output JSON:
 {
   "rootCause": {
-    "summary": "order.items.reduce() called without null/empty guard after guard was removed in discount refactor",
-    "file": "src/orders/order.service.ts",
-    "line": 58,
+    "hypothesis": "order.items.reduce() called without null/empty guard after guard was removed in discount refactor",
     "confidence": "high",
     "evidence": [{"file":"src/orders/order.service.ts","line":58,"snippet":"return order.items.reduce((sum, item) => sum + item.price, 0)"}],
     "alternativeHypotheses": []

@@ -57,6 +57,12 @@ Classify:
   the wrong abstraction level (e.g., reviewer asked to extract a method but the fix only renamed a
   variable)
 
+Edge cases:
+
+- Thread body is empty or unparseable → **MISALIGNED**, rationale: "thread body unavailable"
+- Diff has no changes near the thread's `file:line` → **MISALIGNED**, rationale: "no change found at cited location"
+- Tie-break between PARTIAL and MISALIGNED: use PARTIAL only when the fix is in the same file AND same concern area — if in a different file entirely, use MISALIGNED
+
 ### 4. Output Verdict Table
 
 ```markdown
