@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.2.0] — 2026-03-29
+
+### fix(sdk): add 'max' effort level — opus model, 30 turns, $0.60/reviewer budget
+
+- fix(sdk): add 'max' effort level — opus model, 30 turns, $0.60/reviewer budget
+- feat(safeguards): evidence-scored rule promotion pipeline
+- fix(intelligence): close 4 intelligence gaps
+
 ## [1.1.0] — 2026-03-29
 
 ### fix(qa): exclude node_modules from markdownlint + fix shellcheck SC2038 + broken links
