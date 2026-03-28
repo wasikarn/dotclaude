@@ -2,6 +2,29 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.1.0] — 2026-03-29
+
+### fix(qa): exclude node_modules from markdownlint + fix shellcheck SC2038 + broken links
+
+- fix(qa): exclude node_modules from markdownlint + fix shellcheck SC2038 + broken links
+- fix(hooks): fix SubagentStop/Start matchers + paths/effort/security improvements
+- feat(agents,skills): add effort + background fields per official docs
+- fix: use short model aliases for auto-update on new versions
+- fix: forward --model to claude -p subprocess + pin haiku versioned ID
+- perf: deep prompt engineering pass — examples, schema precision, ordering
+- improve(prompts): add few-shot examples, fix bugs, standardize formatting
+- feat(agents): research summarizer + Phase 6 parallel falsification + debug bootstrap fix
+- refactor(agents): structured JSON output + conditional lens activation + artifact re-injection
+- fix(sdk): set maxBuffer on execSync to prevent crash on large PR diffs
+- refactor(sdk): simplify + fix reuse/quality/efficiency issues
+- fix(sdk): capture real cost/tokens from claude -p JSON output
+- refactor(sdk): dead config cleanup, effort presets, structural fixes (E+G)
+- refactor(sdk): migrate all agents to claude -p subprocess, remove SDK dependencies
+- docs(sdk): prompt E-H — dead config, agent loop, structural fixes, remaining migrations
+- refactor(sdk): extract findingKey helper, centralize MODEL_ID, fuse consolidator passes
+- feat(sdk): fix-intent-verify subcommand + falsifier prompt caching
+- refactor(sdk): extract ModelName, derive Severity/VerdictType from Zod schemas
+
 ## [1.0.0] — 2026-03-28
 
 ### feat!: rename plugin dev-loop → anvil, drop dlc- prefix
