@@ -11,7 +11,7 @@ export const DEFAULT_CONFIG = {
   signalThreshold: 0.6,
 }
 
-export type EffortLevel = 'low' | 'medium' | 'high'
+export type EffortLevel = 'low' | 'medium' | 'high' | 'max'
 export type ModelName = 'sonnet' | 'opus' | 'haiku'
 
 // Short aliases — resolve to latest model of each family automatically.
@@ -34,6 +34,7 @@ const EFFORT_PRESETS: Record<EffortLevel, {
   low:    { model: 'haiku',  maxTurnsReviewer: 8,  maxBudgetPerReviewer: 0.10, maxBudgetFalsification: 0.05 },
   medium: { model: 'sonnet', maxTurnsReviewer: 15, maxBudgetPerReviewer: 0.20, maxBudgetFalsification: 0.10 },
   high:   { model: 'sonnet', maxTurnsReviewer: 20, maxBudgetPerReviewer: 0.30, maxBudgetFalsification: 0.15 },
+  max:    { model: 'opus',   maxTurnsReviewer: 30, maxBudgetPerReviewer: 0.60, maxBudgetFalsification: 0.25 },
 }
 
 export interface ReviewConfig {

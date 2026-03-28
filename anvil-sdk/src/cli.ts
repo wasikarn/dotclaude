@@ -122,7 +122,7 @@ function parseArgs(args: string[]): ParsedReviewArgs {
     { flag: '--budget', field: 'budget', type: 'positiveFloat', errorPrefix: '[sdk-review]', onError: 'exit' },
     { flag: '--dismissed', field: 'dismissedPatternsPath', type: 'string', errorPrefix: '[sdk-review]', onError: 'exit' },
     { flag: '--no-falsification', field: 'falsification', type: 'boolean', negate: true, errorPrefix: '[sdk-review]' },
-    { flag: '--effort', field: 'effort', type: 'enum', enum: ['low', 'medium', 'high'], errorPrefix: '[sdk-review]', onError: 'exit' },
+    { flag: '--effort', field: 'effort', type: 'enum', enum: ['low', 'medium', 'high', 'max'], errorPrefix: '[sdk-review]', onError: 'exit' },
   ], {
     pr: undefined as number | undefined,
     branch: undefined as string | undefined,
