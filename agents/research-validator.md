@@ -71,6 +71,20 @@ Also flag if fewer than 3 files are listed in the findings for non-trivial tasks
 
 ### 7. Output Verdict
 
+Begin with a JSON summary line (one line, no prose), then the markdown block.
+
+```json
+{"result":"PASS","tier":"Deep","fileLineCount":8,"tokenCount":1200,"tokenStatus":"ok","issues":[]}
+```
+
+For FAIL, include issues in the array:
+
+```json
+{"result":"FAIL","tier":"Deep","fileLineCount":2,"tokenCount":400,"tokenStatus":"thin","issues":["Missing section: ADDED","Insufficient evidence: only 2 file:line references found"]}
+```
+
+Then the markdown block:
+
 ```markdown
 ## Research Validation
 
@@ -91,6 +105,6 @@ Also flag if fewer than 3 files are listed in the findings for non-trivial tasks
 - ✅ Token count in acceptable range (1,100 tokens)
 ```
 
-On PASS, output only the summary line and passing checks (no issues table).
+On PASS, output JSON then summary line and passing checks only (no issues table).
 On FAIL, lead should re-dispatch the relevant explorer with a targeted prompt before proceeding to
 Phase 2.

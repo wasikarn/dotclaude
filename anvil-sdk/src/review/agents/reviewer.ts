@@ -16,24 +16,51 @@ import { buildReviewer3Prompt } from '../prompts/reviewer-3.js'
 import { SHARED_RULES } from '../prompts/shared-rules.js'
 import { FindingResultSchema, findingResultJsonSchema } from '../schemas/finding.js'
 
-// Lens assignment per role:
-// correctness: security, error-handling, typescript [+ adonisjs if detected]
-// architecture: performance, database, api-design, observability [+ adonisjs if detected]
-// dx: frontend, typescript, error-handling
+// Lens assignment per role — keyword-gated to avoid injecting irrelevant domain guidance.
+// Mirrors the Lens Selection table in skills/build/references/phase-6-review.md.
+// Each role has a fallback lens injected when no keywords match, ensuring reviewers always
+// receive at least one domain lens.
+//
+// correctness: security (auth/token/…), error-handling (try/catch/…), typescript (.ts/.tsx/…) [+ adonisjs]
+// architecture: performance (SELECT/loop/…), database (migration/schema/…), api-design (router/…), observability (logger/…) [+ adonisjs]
+// dx: frontend (.tsx/.jsx/useState/…), typescript (.ts/.tsx/…), error-handling (try/catch/…)
 
-function getLensesForRole(role: ReviewRole, isAdonisProject: boolean): string {
+function getLensesForRole(role: ReviewRole, isAdonisProject: boolean, diffContent: string): string {
   const parts: string[] = []
   switch (role) {
     case 'correctness':
-      parts.push(SECURITY_LENS, ERROR_HANDLING_LENS, TYPESCRIPT_LENS)
+      if (/auth|token|password|secret|jwt|cookie|csrf|sql|query|exec|eval/i.test(diffContent))
+        parts.push(SECURITY_LENS)
+      if (/try|catch|async|\.catch\(|Promise|new Error|throw/i.test(diffContent))
+        parts.push(ERROR_HANDLING_LENS)
+      if (/\.ts|\.tsx|interface|type |as any|generic|<T>|extends/i.test(diffContent))
+        parts.push(TYPESCRIPT_LENS)
+      // Fallback: TypeScript lens is always relevant for TS projects
+      if (parts.length === 0) parts.push(TYPESCRIPT_LENS)
       if (isAdonisProject) parts.push(ADONISJS_LENS)
       break
     case 'architecture':
-      parts.push(PERFORMANCE_LENS, DATABASE_LENS, API_DESIGN_LENS, OBSERVABILITY_LENS)
+      if (/SELECT|findAll|findMany|loop|forEach|\.map\(|\.filter\(|sort|cache|index/i.test(diffContent))
+        parts.push(PERFORMANCE_LENS)
+      if (/migration|schema|ALTER|CREATE TABLE|DROP|knex|prisma|typeorm|sequelize/i.test(diffContent))
+        parts.push(DATABASE_LENS)
+      if (/router|controller|handler|endpoint|route|REST|GraphQL|resolver/i.test(diffContent))
+        parts.push(API_DESIGN_LENS)
+      if (/logger|log\.|metric|trace|span|monitor|alert|newrelic|datadog/i.test(diffContent))
+        parts.push(OBSERVABILITY_LENS)
+      // Fallback: performance lens applies broadly to any code change
+      if (parts.length === 0) parts.push(PERFORMANCE_LENS)
       if (isAdonisProject) parts.push(ADONISJS_LENS)
       break
     case 'dx':
-      parts.push(FRONTEND_LENS, TYPESCRIPT_LENS, ERROR_HANDLING_LENS)
+      if (/\.tsx|\.jsx|useState|useEffect|component|render|style|css/i.test(diffContent))
+        parts.push(FRONTEND_LENS)
+      if (/\.ts|\.tsx|interface|type |as any|generic|<T>|extends/i.test(diffContent))
+        parts.push(TYPESCRIPT_LENS)
+      if (/try|catch|async|\.catch\(|Promise|new Error|throw/i.test(diffContent))
+        parts.push(ERROR_HANDLING_LENS)
+      // Fallback: TypeScript lens applies to any TS change
+      if (parts.length === 0) parts.push(TYPESCRIPT_LENS)
       break
   }
   return parts.join('\n\n')
@@ -46,10 +73,11 @@ export async function runReviewer(params: {
   isAdonisProject: boolean
   config: ResolvedConfig
 }): Promise<ReviewerResult> {
-  const lensContent = getLensesForRole(params.bucket.role, params.isAdonisProject)
   const diffContent = params.bucket.files
     .map(f => `### ${f.path}\n\`\`\`${f.language}\n${f.hunks}\n\`\`\``)
     .join('\n\n')
+
+  const lensContent = getLensesForRole(params.bucket.role, params.isAdonisProject, diffContent)
 
   const promptConfig = {
     diffContent,

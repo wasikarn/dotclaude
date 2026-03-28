@@ -47,3 +47,17 @@ if [ -n "$PROJECT_ROOT" ]; then
     cat "$HARD_RULES"
   fi
 fi
+
+# Re-inject last artifact state (top 5 lines of most recently modified anvil artifact)
+PLUGIN_DATA="${HOME}/.claude/plugins/data/anvil-anvil"
+if [ -d "$PLUGIN_DATA" ]; then
+  # Find most recently modified .md file (macOS-compatible: ls -t on find output)
+  # shellcheck disable=SC2012
+  LAST_ARTIFACT=$(find "$PLUGIN_DATA" -maxdepth 5 -name "*.md" 2>/dev/null \
+    | xargs ls -t1 2>/dev/null | head -1 || true)
+  if [ -n "$LAST_ARTIFACT" ] && [ -f "$LAST_ARTIFACT" ]; then
+    echo ""
+    echo "### Last Artifact State ($(basename "$LAST_ARTIFACT"))"
+    head -5 "$LAST_ARTIFACT"
+  fi
+fi

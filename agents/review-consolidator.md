@@ -53,7 +53,13 @@ The 60% threshold is from `review-conventions.md` §Signal check.
 
 ## Output Format
 
-Emoji format is canonical:
+Begin with a JSON summary line (one line, no prose), then the markdown findings block.
+
+```json
+{"critical":0,"warning":0,"info":0,"lowSignal":false}
+```
+
+Then the emoji markdown (canonical for human display):
 
 ````markdown
 **Summary: 🔴 X · 🟡 Y · 🔵 Z** (after dedup)
@@ -66,7 +72,8 @@ Emoji format is canonical:
 ````
 
 - `Consensus`: N/M where N = reviewers who raised this finding, M = **total** reviewers (not just surviving reviewers)
-- If zero findings after filter: output `**Summary: ✅ No issues found**` (no table)
+- If zero findings after filter: output `{"critical":0,"warning":0,"info":0,"lowSignal":false}` then `**Summary: ✅ No issues found**` (no table)
+- `lowSignal: true` when (🔴 + 🟡) / total surviving findings < 60%
 
 ## Error Handling
 

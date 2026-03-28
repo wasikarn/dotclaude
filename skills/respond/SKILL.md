@@ -156,11 +156,19 @@ Write to `{artifacts_dir}/respond-context.md` — thread triage table, project i
 Fix in severity order: 🔴 Critical → 🟡 Important → 🔵 Suggestion (only if user requested).
 
 **Bootstrap:** Run `anvil-respond-bootstrap` agent (Haiku) with PR #$0 before spawning Fixers. It
-pre-reads all affected files and fetches open thread text in one pass — inject its output block as
-shared context in each Fixer prompt to eliminate redundant per-Fixer reads.
+pre-reads all affected files and returns a JSON object with `fileContents` and `threadsByFile`.
+
+When building each Fixer's prompt, scope from the JSON bootstrap output:
+
+- Inject only `fileContents[file]` for the files in that Fixer's GROUP assignment
+- Inject only `threadsByFile[file]` threads for those same files
+- Inject `gitContext` (same for all Fixers)
+
+This eliminates redundant file content in each Fixer prompt — a Fixer handling 1 of 3 files
+receives only that file's content, not all 3.
 
 **Bootstrap fallback:** If agent unavailable, lead reads affected files and runs
-`git log --oneline -5 -- {affected_files}` inline and injects manually.
+`git log --oneline -5 -- {affected_files}` inline and injects all content into each Fixer manually.
 
 **Agent Teams mode:** Create 1 Fixer per non-overlapping file group using prompts from [references/teammate-prompts.md](references/teammate-prompts.md).
 **Solo/subagent mode:** Lead fixes sequentially using the same Fixer rules.

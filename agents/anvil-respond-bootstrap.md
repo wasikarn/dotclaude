@@ -52,31 +52,30 @@ git diff origin/main...HEAD -- {affected_files_space_separated} --stat
 
 ### 5. Output Structured Context
 
-Return this exact block — nothing else:
+Return a JSON object — nothing else. The calling lead will scope `fileContents` and
+`threadsByFile` per Fixer group, so each Fixer receives only its own files.
 
-```markdown
-## respond Bootstrap Context
-
-**PR:** #[number]
-**Open threads:** [count]
-**Affected files:** [count]
-
-### Open Threads Summary
-
-| # | File | Line | Reviewer | Summary |
-| --- | --- | --- | --- | --- |
-| 1 | src/foo.ts | 42 | reviewer | one-line summary |
-
-### Pre-read File Contents
-
-#### `src/foo.ts` ([line count] lines)
-[file content or first 300 lines if truncated]
-
-#### `src/bar.ts` ([line count] lines)
-[file content or first 300 lines if truncated]
-
-### Recent Git Context
-[git log --oneline -10 output for affected files]
+```json
+{
+  "pr": 42,
+  "openThreadCount": 3,
+  "affectedFileCount": 2,
+  "fileContents": {
+    "src/foo.ts": "...file content or first 300 lines...",
+    "src/bar.ts": "...file content or first 300 lines..."
+  },
+  "threadsByFile": {
+    "src/foo.ts": [
+      {"index": 1, "line": 42, "reviewer": "alice", "body": "one-line summary"}
+    ],
+    "src/bar.ts": [
+      {"index": 2, "line": 15, "reviewer": "bob", "body": "one-line summary"}
+    ]
+  },
+  "gitContext": "abc1234 Fix null check\nbcd2345 Add validation"
+}
 ```
 
-Keep each section concise — this is input to Fixer agents, not a human report.
+- `fileContents`: keyed by file path, value is raw file content (truncated at 300 lines with note appended if truncated)
+- `threadsByFile`: keyed by file path, value is array of thread objects for that file; `index` is 1-based and matches the triage table `#` column
+- `gitContext`: `git log --oneline -10` output for affected files as a plain string
