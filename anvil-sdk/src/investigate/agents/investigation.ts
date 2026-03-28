@@ -1,6 +1,6 @@
 import type { AgentDefinition, SDKResultSuccess } from '@anthropic-ai/claude-agent-sdk'
 import { query } from '@anthropic-ai/claude-agent-sdk'
-import type { ResolvedConfig } from '../../config.js'
+import type { ModelName, ResolvedConfig } from '../../config.js'
 import { DX_ANALYST_PROMPT } from '../prompts/dx-analyst.js'
 import { INVESTIGATOR_PROMPT } from '../prompts/investigator.js'
 import {
@@ -30,7 +30,7 @@ const dxAnalystOutputSchema = {
   required: ['dxFindings'],
 } as const
 
-function createInvestigator(model: 'sonnet' | 'opus' | 'haiku'): AgentDefinition {
+function createInvestigator(model: ModelName): AgentDefinition {
   return {
     description: 'Traces root cause of bugs — find file:line evidence, never guess',
     prompt: INVESTIGATOR_PROMPT,
@@ -40,7 +40,7 @@ function createInvestigator(model: 'sonnet' | 'opus' | 'haiku'): AgentDefinition
   }
 }
 
-function createDxAnalyst(model: 'sonnet' | 'opus' | 'haiku'): AgentDefinition {
+function createDxAnalyst(model: ModelName): AgentDefinition {
   return {
     description: 'Audits affected area for observability, error handling, and test coverage gaps',
     prompt: DX_ANALYST_PROMPT,

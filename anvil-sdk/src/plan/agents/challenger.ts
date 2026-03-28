@@ -1,11 +1,11 @@
 import { readFileSync } from 'node:fs'
 import type { AgentDefinition, SDKResultSuccess } from '@anthropic-ai/claude-agent-sdk'
 import { query } from '@anthropic-ai/claude-agent-sdk'
-import type { ResolvedConfig } from '../../config.js'
+import type { ModelName, ResolvedConfig } from '../../config.js'
 import { PLAN_CHALLENGE_PROMPT } from '../prompts/challenger.js'
 import { ChallengeResultSchema, challengeResultJsonSchema, type ChallengeResult } from '../schemas/challenge.js'
 
-function createChallenger(model: 'sonnet' | 'opus' | 'haiku'): AgentDefinition {
+function createChallenger(model: ModelName): AgentDefinition {
   return {
     description: 'Challenges implementation plans — goal is to remove scope creep and surface pre-work',
     prompt: PLAN_CHALLENGE_PROMPT,

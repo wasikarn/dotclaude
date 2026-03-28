@@ -2,10 +2,11 @@ export type { Finding } from './review/schemas/finding.js'
 export type { Verdict } from './review/schemas/verdict.js'
 
 import type { Finding } from './review/schemas/finding.js'
+import type { Verdict } from './review/schemas/verdict.js'
 
 export type ReviewRole = 'correctness' | 'architecture' | 'dx'
-export type Severity = 'critical' | 'warning' | 'info'
-export type VerdictType = 'SUSTAINED' | 'DOWNGRADED' | 'REJECTED'
+export type Severity = Finding['severity']
+export type VerdictType = Verdict['verdict']
 
 export interface FileDiff {
   path: string
@@ -28,7 +29,7 @@ export interface ConsolidatedFinding extends Finding {
 
 export interface ReviewReport {
   pr: string
-  summary: { critical: number; warning: number; info: number }
+  summary: Record<Severity, number>
   findings: ConsolidatedFinding[]
   strengths: string[]
   verdict: 'APPROVE' | 'REQUEST_CHANGES'

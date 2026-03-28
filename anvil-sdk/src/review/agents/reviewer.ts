@@ -1,4 +1,5 @@
 import type { AgentDefinition } from '@anthropic-ai/claude-agent-sdk'
+import type { ModelName } from '../../config.js'
 import type { DiffBucket, ReviewRole } from '../../types.js'
 import { ADONISJS_LENS } from '../lenses/adonisjs.js'
 import { API_DESIGN_LENS } from '../lenses/api-design.js'
@@ -42,7 +43,7 @@ export function createReviewer(params: {
   hardRules: string
   dismissedPatterns: string
   isAdonisProject: boolean
-  model: 'sonnet' | 'opus' | 'haiku'
+  model: ModelName
 }): AgentDefinition {
   const lensContent = getLensesForRole(params.bucket.role, params.isAdonisProject)
 

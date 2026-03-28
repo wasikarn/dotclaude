@@ -1,11 +1,11 @@
 import type { AgentDefinition } from '@anthropic-ai/claude-agent-sdk'
 import { query } from '@anthropic-ai/claude-agent-sdk'
-import type { ResolvedConfig } from '../../config.js'
+import type { ModelName, ResolvedConfig } from '../../config.js'
 import type { Finding, Verdict } from '../../types.js'
 import { FALSIFICATION_PROMPT } from '../prompts/falsifier.js'
 import { VerdictResultSchema, verdictResultJsonSchema } from '../schemas/verdict.js'
 
-function createFalsifier(model: 'sonnet' | 'opus' | 'haiku'): AgentDefinition {
+function createFalsifier(model: ModelName): AgentDefinition {
   return {
     description: 'Challenges review findings — goal is REJECT, not confirm',
     prompt: FALSIFICATION_PROMPT,

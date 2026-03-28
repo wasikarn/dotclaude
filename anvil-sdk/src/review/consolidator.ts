@@ -1,13 +1,13 @@
-import type { ConsolidatedFinding, Finding, Verdict } from '../types.js'
+import type { ConsolidatedFinding, Finding, Severity, Verdict } from '../types.js'
 
-const SEVERITY_ORDER: Record<string, number> = {
+const SEVERITY_ORDER: Record<Severity, number> = {
   critical: 0,
   warning: 1,
   info: 2,
 }
 
-function severityRank(severity: string): number {
-  return SEVERITY_ORDER[severity] ?? 99
+function severityRank(severity: Severity): number {
+  return SEVERITY_ORDER[severity]
 }
 
 /**

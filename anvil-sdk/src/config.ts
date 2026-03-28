@@ -4,7 +4,7 @@ export const DEFAULT_CONFIG = {
   maxBudgetFalsification: 0.15,
   maxTurnsReviewer: 20,
   maxTurnsFalsification: 5,
-  model: 'sonnet' as const,
+  model: 'sonnet' as ModelName,
   confidenceThreshold: 80,
   autoPassConfidence: 90,
   autoDropMaxConfidence: 79,
@@ -13,6 +13,7 @@ export const DEFAULT_CONFIG = {
 }
 
 export type EffortLevel = 'low' | 'medium' | 'high'
+export type ModelName = 'sonnet' | 'opus' | 'haiku'
 
 export interface ReviewConfig {
   effort?: EffortLevel
@@ -27,7 +28,7 @@ export interface ResolvedConfig {
   maxBudgetFalsification: number
   maxTurnsReviewer: number
   maxTurnsFalsification: number
-  model: 'sonnet' | 'opus' | 'haiku'
+  model: ModelName
   confidenceThreshold: number
   autoPassConfidence: number
   autoDropMaxConfidence: number
