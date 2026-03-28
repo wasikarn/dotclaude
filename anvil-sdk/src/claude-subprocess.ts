@@ -10,14 +10,15 @@
  *     outputSchema: someJsonSchema,
  *     maxTurns: 5,
  *     maxBudgetUsd: 0.15,
+ *     model: 'claude-haiku-4-5-20251001',
  *   })
  *   const data = SomeSchema.safeParse(result.structuredOutput)
  */
 import { execFile } from 'node:child_process'
+import { randomUUID } from 'node:crypto'
 import { writeFile, unlink } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
-import { randomUUID } from 'node:crypto'
 
 export interface SubprocessParams {
   systemPrompt: string
@@ -26,6 +27,8 @@ export interface SubprocessParams {
   outputSchema?: Record<string, unknown>
   maxTurns?: number
   maxBudgetUsd?: number
+  /** Full model ID (e.g. 'claude-sonnet-4-6') or alias ('sonnet', 'opus'). Passed as --model to claude -p. */
+  model?: string
 }
 
 export interface SubprocessResult {
@@ -79,6 +82,10 @@ export async function runClaudeSubprocess(params: SubprocessParams): Promise<Sub
 
     if (params.maxBudgetUsd !== undefined) {
       args.push('--max-budget-usd', String(params.maxBudgetUsd))
+    }
+
+    if (params.model !== undefined) {
+      args.push('--model', params.model)
     }
 
     const stdout = await new Promise<string>((resolve, reject) => {

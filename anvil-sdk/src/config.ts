@@ -17,7 +17,7 @@ export type ModelName = 'sonnet' | 'opus' | 'haiku'
 export const MODEL_ID: Record<ModelName, string> = {
   opus: 'claude-opus-4-6',
   sonnet: 'claude-sonnet-4-6',
-  haiku: 'claude-haiku-4-5',
+  haiku: 'claude-haiku-4-5-20251001',
 }
 
 // Effort controls model selection + turn budgets + spend limits.

@@ -1,14 +1,10 @@
 import { runClaudeSubprocess } from '../../claude-subprocess.js'
+import { MODEL_ID } from '../../config.js'
 import type { ResolvedConfig } from '../../config.js'
 import { DX_ANALYST_PROMPT } from '../prompts/dx-analyst.js'
 import { INVESTIGATOR_PROMPT } from '../prompts/investigator.js'
-import {
-  InvestigationResultSchema,
-  investigationResultJsonSchema,
-  type DxFinding,
-  type InvestigationResult,
-  type RootCause,
-} from '../schemas/investigation.js'
+import type { DxFinding, InvestigationResult, RootCause } from '../schemas/investigation.js'
+import { InvestigationResultSchema, investigationResultJsonSchema } from '../schemas/investigation.js'
 
 // Investigator returns root cause + fix plan items (no DX)
 const investigatorOutputSchema = {
@@ -40,6 +36,7 @@ async function runInvestigator(params: {
     outputSchema: investigatorOutputSchema as Record<string, unknown>,
     maxTurns: 15,
     maxBudgetUsd: params.config.maxBudgetPerReviewer,
+    model: MODEL_ID[params.config.model],
   })
 
   const raw = result.structuredOutput
@@ -68,6 +65,7 @@ async function runDxAnalyst(params: {
       outputSchema: dxAnalystOutputSchema as Record<string, unknown>,
       maxTurns: 10,
       maxBudgetUsd: params.config.maxBudgetFalsification,
+      model: MODEL_ID[params.config.model],
     })
   } catch (err) {
     console.warn(`[sdk-investigate] dx-analyst failed — returning empty: ${String(err)}`)

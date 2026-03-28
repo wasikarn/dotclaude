@@ -1,4 +1,5 @@
 import { runClaudeSubprocess } from '../../claude-subprocess.js'
+import { MODEL_ID } from '../../config.js'
 import type { ResolvedConfig } from '../../config.js'
 import type { DiffBucket, ReviewRole, ReviewerResult } from '../../types.js'
 import { ADONISJS_LENS } from '../lenses/adonisjs.js'
@@ -109,6 +110,7 @@ export async function runReviewer(params: {
       outputSchema: findingResultJsonSchema as Record<string, unknown>,
       maxTurns: params.config.maxTurnsReviewer,
       maxBudgetUsd: params.config.maxBudgetPerReviewer,
+      model: MODEL_ID[params.config.model],
     })
   } catch (err) {
     console.warn(`[sdk-review] reviewer (${params.bucket.role}) failed: ${String(err)}`)

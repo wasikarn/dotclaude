@@ -1,5 +1,6 @@
 import { readFileSync } from 'node:fs'
 import { runClaudeSubprocess } from '../../claude-subprocess.js'
+import { MODEL_ID } from '../../config.js'
 import type { ResolvedConfig } from '../../config.js'
 import { PLAN_CHALLENGE_PROMPT } from '../prompts/challenger.js'
 import { ChallengeResultSchema, challengeResultJsonSchema, type ChallengeResult } from '../schemas/challenge.js'
@@ -20,6 +21,7 @@ export async function runPlanChallenge(params: {
     outputSchema: challengeResultJsonSchema as Record<string, unknown>,
     maxTurns: 5,
     maxBudgetUsd: params.config.maxBudgetFalsification,
+    model: MODEL_ID[params.config.model],
   })
 
   const raw = result.structuredOutput

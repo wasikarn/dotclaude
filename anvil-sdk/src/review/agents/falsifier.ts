@@ -1,4 +1,5 @@
 import { runClaudeSubprocess } from '../../claude-subprocess.js'
+import { MODEL_ID } from '../../config.js'
 import type { ResolvedConfig } from '../../config.js'
 import type { Finding, Verdict } from '../../types.js'
 import { findingKey } from '../consolidator.js'
@@ -26,6 +27,7 @@ export async function runFalsification(params: {
       outputSchema: verdictResultJsonSchema as Record<string, unknown>,
       maxTurns: 1,
       maxBudgetUsd: params.config.maxBudgetFalsification,
+      model: MODEL_ID[params.config.model],
     })
   } catch (err) {
     // Non-fatal: budget exceeded, rate limit, etc. — findings pass through unchanged

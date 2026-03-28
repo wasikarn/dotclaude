@@ -1,4 +1,5 @@
 import { runClaudeSubprocess } from '../../claude-subprocess.js'
+import { MODEL_ID } from '../../config.js'
 import type { ResolvedConfig } from '../../config.js'
 import { VERIFIER_PROMPT } from '../prompts/verifier.js'
 import type { VerifierResult } from '../schemas/verifier.js'
@@ -18,6 +19,7 @@ export async function runIntentVerification(params: {
       outputSchema: verifierResultJsonSchema as Record<string, unknown>,
       maxTurns: 8,
       maxBudgetUsd: params.config.maxBudgetVerification,
+      model: MODEL_ID[params.config.model],
     })
   } catch (err) {
     // Budget exceeded and similar non-fatal errors — caller (respond lead) proceeds without verification
