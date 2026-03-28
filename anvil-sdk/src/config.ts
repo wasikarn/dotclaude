@@ -1,7 +1,7 @@
 export const DEFAULT_CONFIG = {
   effort: 'high' as const,
-  maxBudgetPerReviewer: 0.15,
-  maxBudgetFalsification: 0.08,
+  maxBudgetPerReviewer: 0.30,
+  maxBudgetFalsification: 0.15,
   maxTurnsReviewer: 20,
   maxTurnsFalsification: 5,
   model: 'sonnet' as const,

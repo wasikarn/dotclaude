@@ -3,13 +3,14 @@ import { existsSync, readFileSync } from 'node:fs'
 import { resolveConfig } from './config.js'
 import { runFalsification } from './review/agents/falsifier.js'
 import { consolidate } from './review/consolidator.js'
-import { readDiff } from './review/diff-reader.js'
+import { readDiff, readPrDiff } from './review/diff-reader.js'
 import { formatJson, formatMarkdown } from './review/output.js'
 import { runReview } from './review/orchestrator.js'
 import { triage } from './review/triage.js'
 import type { ReviewReport } from './types.js'
 
 interface ParsedArgs {
+  pr: number | undefined
   branch: string | undefined
   baseBranch: string | undefined
   output: 'json' | 'markdown'
@@ -21,6 +22,7 @@ interface ParsedArgs {
 
 function parseArgs(args: string[]): ParsedArgs {
   const result: ParsedArgs = {
+    pr: undefined,
     branch: undefined,
     baseBranch: undefined,
     output: 'json',
@@ -42,7 +44,19 @@ function parseArgs(args: string[]): ParsedArgs {
     // Flags that consume the next argument
     const next = args[i + 1]
 
-    if (arg === '--branch') {
+    if (arg === '--pr') {
+      if (next === undefined) {
+        console.error(`[sdk-review] --pr requires a value`)
+        process.exit(1)
+      }
+      const n = parseInt(next, 10)
+      if (Number.isNaN(n) || n <= 0) {
+        console.error(`[sdk-review] --pr must be a positive integer, got: ${next}`)
+        process.exit(1)
+      }
+      result.pr = n
+      i++
+    } else if (arg === '--branch') {
       if (next === undefined) {
         console.error(`[sdk-review] --branch requires a value`)
         process.exit(1)
@@ -140,10 +154,14 @@ async function main(): Promise<void> {
 
   let files: ReturnType<typeof readDiff>
   try {
-    const diffTarget: { branch?: string; baseBranch?: string } = {}
-    if (parsed.branch !== undefined) diffTarget.branch = parsed.branch
-    if (parsed.baseBranch !== undefined) diffTarget.baseBranch = parsed.baseBranch
-    files = readDiff(diffTarget)
+    if (parsed.pr !== undefined) {
+      files = readPrDiff(parsed.pr)
+    } else {
+      const diffTarget: { branch?: string; baseBranch?: string } = {}
+      if (parsed.branch !== undefined) diffTarget.branch = parsed.branch
+      if (parsed.baseBranch !== undefined) diffTarget.baseBranch = parsed.baseBranch
+      files = readDiff(diffTarget)
+    }
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err)
     console.error(`[sdk-review] failed to read diff: ${message}`)
@@ -196,7 +214,7 @@ async function main(): Promise<void> {
   const strengths = [...new Set(allStrengths)].slice(0, 5)
 
   const report: ReviewReport = {
-    pr: parsed.branch ?? 'HEAD',
+    pr: parsed.pr !== undefined ? `#${parsed.pr}` : (parsed.branch ?? 'HEAD'),
     summary: { critical, warning, info },
     findings: consolidated,
     strengths,

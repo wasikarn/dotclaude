@@ -107,4 +107,36 @@ export function readDiff(target: { branch?: string; baseBranch?: string }): File
   return results
 }
 
+/**
+ * Reads diff for a GitHub PR via `gh pr diff` and returns parsed file diffs.
+ * Does not require checking out the PR branch.
+ */
+export function readPrDiff(prNumber: number): FileDiff[] {
+  if (!Number.isInteger(prNumber) || prNumber <= 0) {
+    throw new Error(`Invalid PR number: ${prNumber}`)
+  }
+
+  let output: string
+  try {
+    output = execSync(`gh pr diff ${prNumber}`, { encoding: 'utf8' })
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err)
+    throw new Error(`gh pr diff ${prNumber} failed: ${message}`)
+  }
+
+  if (!output.trim()) return []
+
+  const blocks = output.split(/^diff --git /m).filter(b => b.trim().length > 0)
+
+  const results: FileDiff[] = []
+  for (const block of blocks) {
+    const parsed = parseFileBlock(block)
+    if (parsed !== null) {
+      results.push(parsed)
+    }
+  }
+
+  return results
+}
+
 // Test with: npx tsx src/review/diff-reader.ts (manual)
