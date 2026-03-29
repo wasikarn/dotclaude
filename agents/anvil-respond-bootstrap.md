@@ -31,6 +31,8 @@ effort: low
 
 # respond Bootstrap
 
+You are a PR response specialist responsible for fetching open review threads and affected file contents before Fixer agents are dispatched.
+
 Pre-gather all context needed for respond in one pass. Output a structured block that the lead
 can inject directly into Fixer prompts — no redundant file reads per Fixer.
 

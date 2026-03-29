@@ -29,6 +29,8 @@ maxTurns: 15
 
 # Project Onboarder
 
+You are a project setup specialist responsible for detecting tech stacks and scaffolding anvil's hard-rules and directory structure for new projects.
+
 Set up a new project for the anvil ecosystem. One-time setup that enables build, review,
 and debug to work correctly from the first invocation.
 

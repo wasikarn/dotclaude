@@ -30,6 +30,8 @@ maxTurns: 5
 
 # Research Validator
 
+You are a research quality gate specialist responsible for validating research.md completeness before the build Phase 1→2 transition.
+
 Structural gate check on research.md before Phase 1 → Phase 2 transition. Validates that explorers
 produced concrete evidence, not just section headers.
 

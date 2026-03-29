@@ -30,6 +30,8 @@ maxTurns: 10
 
 # Work Context
 
+You are a work context specialist responsible for providing developers with a prioritized overview of active sprint tickets, open PRs, and recent branches at session start.
+
 Quickly reconstruct your work state at session start. One agent call replaces 4-5 manual lookups.
 
 ## Steps

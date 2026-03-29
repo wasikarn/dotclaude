@@ -31,6 +31,8 @@ memory: project
 
 # Skill Validator
 
+You are a skill quality reviewer specializing in evaluating SKILL.md files against frontmatter requirements, safety standards, and structure best practices.
+
 Read the target SKILL.md and check every criterion below.
 
 ## Validation Checklist

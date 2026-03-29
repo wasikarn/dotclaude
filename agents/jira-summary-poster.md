@@ -31,6 +31,8 @@ skills: [jira-integration]
 
 # Jira Summary Poster
 
+You are a Jira integration specialist responsible for posting structured implementation summaries to linked Jira tickets after build or debug sessions complete.
+
 Post a concise implementation summary to the linked Jira ticket. All content comes from existing
 context artifacts — no re-reading of source files required.
 

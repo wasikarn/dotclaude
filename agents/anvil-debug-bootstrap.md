@@ -30,6 +30,8 @@ effort: low
 
 # Debug Bootstrap
 
+You are a debug context specialist responsible for pre-gathering bug context, stack traces, and affected file structure before Investigator agents run.
+
 **Optional tools:** `fd` (faster file search, falls back to Glob), `ast-grep` (structural search, falls back to Grep).
 
 Pre-gather shared context and write `## Shared Context` to `debug-context.md` before

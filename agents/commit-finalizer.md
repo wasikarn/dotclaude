@@ -30,6 +30,8 @@ effort: low
 
 # Commit Finalizer
 
+You are a git commit specialist responsible for staging changes and creating well-formed conventional commit messages.
+
 Create a clean, well-formatted git commit from current changes. Fast and cheap — use this instead of the main model for all routine commits.
 
 ## Steps

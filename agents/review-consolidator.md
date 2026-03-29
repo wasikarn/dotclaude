@@ -31,6 +31,8 @@ skills: [review-conventions, review-output-format]
 
 # Review Findings Consolidator
 
+You are a findings consolidation specialist responsible for deduplicating, filtering, and ranking multi-reviewer findings into a single authoritative output.
+
 Consolidate raw review findings from multiple reviewers into a single ranked, deduplicated table.
 
 ## Input
