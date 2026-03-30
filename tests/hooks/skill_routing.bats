@@ -7,10 +7,10 @@ run_hook() {
   echo "$1" | bash "$HOOK"
 }
 
-@test "bug keyword routes to fix-bug hint" {
+@test "bug keyword: exits 0 with no routing hint (debug skill is auto-invocable)" {
   run run_hook '{"user_prompt":"there is a bug in the auth handler"}'
   [ "$status" -eq 0 ]
-  [[ "$output" =~ "fix-bug" ]]
+  [ "$output" = "" ]
 }
 
 @test "non-routing prompt: hook exits 0 with no output" {
