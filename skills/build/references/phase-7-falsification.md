@@ -1,6 +1,6 @@
 # Phase 7: Falsification Pass
 
-> Skip this phase if Stage 2 used the SDK Review Engine — falsification was already applied internally.
+> Skip this phase if Stage 2 used the Review Engine — falsification was already applied internally.
 
 **Full mode iter 1 only.** Skip for: Quick/Hotfix mode, iter 2+ reviews.
 
@@ -23,21 +23,21 @@ if [ -d "$ENGINE_DIR" ] && [ -d "$ENGINE_DIR/node_modules" ]; then
   FINDINGS_FILE=$(mktemp /tmp/devflow-findings-XXXXXX.json)
   # Write pre-consolidation findings as JSON array to $FINDINGS_FILE
 
-  sdk_result=$(cd "$ENGINE_DIR" && bun src/cli.ts falsify \
+  engine_result=$(cd "$ENGINE_DIR" && bun src/cli.ts falsify \
     --findings-file "$FINDINGS_FILE" \
     2>&1)
-  sdk_exit=$?
+  engine_exit=$?
   rm -f "$FINDINGS_FILE"
 
 else
   echo "devflow-engine not available — skipping SDK-enhanced analysis"
-  sdk_exit=1
+  engine_exit=1
 fi
 ```
 
-If `sdk_exit=0` and `sdk_result` is valid JSON: verdicts are in `sdk_result.verdicts[]`.
+If `engine_exit=0` and `engine_result` is valid JSON: verdicts are in `engine_result.verdicts[]`.
 
-**If `sdk_exit != 0` or not valid JSON**, fall back to Agent Teams: spawn `falsification-agent` with the raw findings table inline. Wait for it to complete.
+**If `engine_exit != 0` or not valid JSON**, fall back to Agent Teams: spawn `falsification-agent` with the raw findings table inline. Wait for it to complete.
 
 ## Step 3: Wait for both and merge
 

@@ -41,15 +41,15 @@ if [ -d "$ENGINE_DIR" ] && [ -d "$ENGINE_DIR/node_modules" ]; then
   # Pass dismissed patterns if file exists
   DISMISSED_FILE="$(bash "${CLAUDE_SKILL_DIR}/../../scripts/artifact-dir.sh" review)/review-dismissed.md"
   if [ -f "$DISMISSED_FILE" ]; then
-    SDK_ARGS="$SDK_ARGS --dismissed $DISMISSED_FILE"
+    SDK_ARGS="$ENGINE_ARGS --dismissed $DISMISSED_FILE"
   fi
 
   # Pass hard rules explicitly (CLI also auto-discovers .build/hard-rules.md)
-  [ -n "${HARD_RULES_PATH}" ] && SDK_ARGS="$SDK_ARGS --hard-rules $HARD_RULES_PATH"
+  [ -n "${HARD_RULES_PATH}" ] && SDK_ARGS="$ENGINE_ARGS --hard-rules $HARD_RULES_PATH"
 
-  # Run SDK reviewer
-  sdk_result=$(cd "$ENGINE_DIR" && bun src/cli.ts review $SDK_ARGS 2>&1)
-  sdk_exit=$?
+  # Run engine reviewer
+  engine_result=$(cd "$ENGINE_DIR" && bun src/cli.ts review $ENGINE_ARGS 2>&1)
+  engine_exit=$?
 
   # Validate: must be JSON with findings array (not just any {})
   _is_valid_json() {
@@ -62,15 +62,15 @@ if [ -d "$ENGINE_DIR" ] && [ -d "$ENGINE_DIR/node_modules" ]; then
 
 else
   echo "devflow-engine not available — skipping SDK-enhanced analysis"
-  sdk_exit=1
+  engine_exit=1
 fi
 ```
 
-If `sdk_exit=0` and `_is_valid_json "$sdk_result"` succeeds:
+If `engine_exit=0` and `_is_valid_json "$engine_result"` succeeds:
 
 **Use SDK output directly:**
 
-- Parse `sdk_result` as the review report JSON
+- Parse `engine_result` as the review report JSON
 - Map `findings[]` to the standard findings table format per [review-output-format](../../review-output-format/SKILL.md):
   - `isHardRule: true` → append `[HR]` badge to finding row
   - `confidence` → display as `C:{value}` (e.g., `C:85`)
@@ -78,10 +78,10 @@ If `sdk_exit=0` and `_is_valid_json "$sdk_result"` succeeds:
 - Map `strengths[]` → Strengths section
 - If `noiseWarning: true` → prepend `⚠ Low signal` notice per review-conventions
 - Write to `{artifacts_dir}/review-findings-{iteration}.md`
-- Report: `SDK Review Engine (iter {N}): {summary.critical}c · {summary.warning}w · {summary.info}i · cost $X`
+- Report: `Review Engine (iter {N}): {summary.critical}c · {summary.warning}w · {summary.info}i · cost $X`
 - **Skip the Agent Teams reviewer spawning below** — proceed directly to Phase 6 output section
 
-**If `sdk_exit != 0` or result is not valid JSON**, log `SDK review failed (exit {sdk_exit}) — falling back to Agent Teams` and continue with the Agent Teams workflow below.
+**If `engine_exit != 0` or result is not valid JSON**, log `engine review failed (exit {engine_exit}) — falling back to Agent Teams` and continue with the Agent Teams workflow below.
 
 ---
 

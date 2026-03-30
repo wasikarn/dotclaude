@@ -19,7 +19,7 @@
 
 ถ้า `--micro` flag ระบุมา → ข้ามการตรวจ force-Agent-Teams conditions ข้างบน และ:
 
-1. ลองรัน SDK Review Engine ก่อน (ตาม block ด้านล่าง)
+1. ลองรัน Review Engine ก่อน (ตาม block ด้านล่าง)
 2. ถ้า SDK สำเร็จ → แสดงผลและ skip Phase 4, 5 (ไม่มี debate, ไม่มี falsification)
 3. ถ้า SDK ล้มเหลว → spawn Teammate 1 (Correctness & Security) คนเดียว → skip Phase 4, 5
 
@@ -27,7 +27,7 @@
 
 ถ้า `--quick` flag ระบุมา → ข้ามการตรวจ force-Agent-Teams conditions ข้างบน และ:
 
-1. ลองรัน SDK Review Engine ก่อน
+1. ลองรัน Review Engine ก่อน
 2. ถ้า SDK สำเร็จ → แสดงผลและ skip Phase 4 (ไม่มี debate) → proceed to Phase 5 (falsification)
 3. ถ้า SDK ล้มเหลว → spawn Teammate 1 (Correctness & Security) + Teammate 2 (Architecture & Performance) เท่านั้น → skip Phase 4 → proceed to Phase 5
 

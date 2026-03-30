@@ -25,28 +25,28 @@ if [ -d "$ENGINE_DIR" ] && [ -d "$ENGINE_DIR/node_modules" ]; then
   # Write findings as JSON array: [{"severity":"critical","rule":"...","file":"...","line":N,"confidence":N,"issue":"...","fix":"...","isHardRule":true}, ...]
   # echo '[...]' > "$FINDINGS_FILE"
 
-  sdk_result=$(cd "$ENGINE_DIR" && bun src/cli.ts falsify \
+  engine_result=$(cd "$ENGINE_DIR" && bun src/cli.ts falsify \
     --findings-file "$FINDINGS_FILE" \
     2>&1)
-  sdk_exit=$?
+  engine_exit=$?
   rm -f "$FINDINGS_FILE"
 
 else
   echo "devflow-engine not available — skipping SDK-enhanced analysis"
-  sdk_exit=1
+  engine_exit=1
 fi
 ```
 
-If `sdk_exit=0` and `sdk_result` is valid JSON (starts with `{`):
+If `engine_exit=0` and `engine_result` is valid JSON (starts with `{`):
 
 **Apply SDK verdicts directly:**
 
-- Parse `sdk_result.verdicts[]` — each has `findingIndex`, `verdict` (SUSTAINED/DOWNGRADED/REJECTED), `newSeverity?`, `rationale`
+- Parse `engine_result.verdicts[]` — each has `findingIndex`, `verdict` (SUSTAINED/DOWNGRADED/REJECTED), `newSeverity?`, `rationale`
 - REJECTED → remove finding; DOWNGRADED → update severity; SUSTAINED → pass through unchanged
 - Report: `SDK Falsifier: {rejected} rejected · {downgraded} downgraded`
 - **Skip Agent Teams `falsification-agent`** — proceed to `review-consolidator`
 
-**If `sdk_exit != 0` or not valid JSON**, log `SDK falsify failed (exit {sdk_exit}) — falling back to Agent Teams` and continue:
+**If `engine_exit != 0` or not valid JSON**, log `engine falsify failed (exit {engine_exit}) — falling back to Agent Teams` and continue:
 
 **Agent Teams fallback:** Spawn `falsification-agent` (defined in `agents/falsification-agent.md`) with the surviving debate findings table inline. The agent challenges each finding on three grounds and returns SUSTAINED / DOWNGRADED / REJECTED verdicts.
 

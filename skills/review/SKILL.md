@@ -55,8 +55,8 @@ Invoke as `/review [pr-number] [jira-key?] [--micro|--quick|--full|--focused are
 **PR title:** !`gh pr view $0 --json title,body,labels,author --jq '{title,body,labels: [.labels[].name],author: .author.login}' 2>/dev/null || true`
 **Changed files:** !`gh pr diff $0 --name-only 2>/dev/null || true`
 
-**Args:** `$0`=PR# (required) · `$1`=Jira key or Author/Reviewer · `$2`=Author/Reviewer · `--micro`=SDK-only fast path · `--quick`=2 reviewers no debate · `--full`=force 3-reviewer debate · `--focused [area]`=specialist only. Flags (`--micro`/`--quick`/`--full`/`--focused`) are detected by pattern matching — position-independent.
-**Modes:** Author = fix code · Reviewer = comment only (in Thai) · --micro = SDK-only, no Agent Teams · --quick = 2 reviewers, no debate · --focused [area] = specialist only (errors/types/tests/api/migrations)
+**Args:** `$0`=PR# (required) · `$1`=Jira key or Author/Reviewer · `$2`=Author/Reviewer · `--micro`=engine-only fast path · `--quick`=2 reviewers no debate · `--full`=force 3-reviewer debate · `--focused [area]`=specialist only. Flags (`--micro`/`--quick`/`--full`/`--focused`) are detected by pattern matching — position-independent.
+**Modes:** Author = fix code · Reviewer = comment only (in Thai) · --micro = engine-only, no Agent Teams · --quick = 2 reviewers, no debate · --focused [area] = specialist only (errors/types/tests/api/migrations)
 **Role:** Tech Lead — improve code health via architecture, mentoring, team standards.
 **Output format:** Follow [review-output-format](../review-output-format/SKILL.md) with debate additions described in phase files.
 
