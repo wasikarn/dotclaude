@@ -91,8 +91,15 @@ name: skill-name                                                     # required
 description: "What it does, when to use it, trigger keywords. Max 1024 chars."  # required
 argument-hint: "[required-arg] [optional-arg?]"                      # recommended if skill accepts arguments
 compatibility: "List required tools, e.g. Requires gh CLI and git."  # recommended if skill uses external tools
+effort: high                                                         # optional: low | medium | high | max
+allowed-tools: Read, Grep, Glob, Bash(git *), Bash(gh *)            # optional: auto-approved tools when active
+user-invocable: false                                                # optional: hide from / menu (Claude can still auto-trigger)
+context: fork                                                        # optional: run in isolated subagent context
+agent: Explore                                                       # optional: subagent type when context: fork
 ---
 ```
+
+All skills are auto-triggerable via `description` — Claude reads descriptions at startup and invokes matching skills automatically. Background skills (shared reference docs) use `user-invocable: false` to hide from the `/` menu while remaining auto-triggerable.
 
 See [`docs/references/skills-best-practices.md`](docs/references/skills-best-practices.md) for the full spec.
 
@@ -109,9 +116,15 @@ npx markdownlint-cli2 "skills/build/**/*.md"
 
 # Validate plugin structure (plugin.json, skill/agent frontmatter, hooks.json)
 claude plugin validate
+
+# Run full QA suite (13 gates: shellcheck, markdownlint, bats, plugin validate)
+bash scripts/qa-check.sh
+
+# Bump version (runs QA gates before release)
+bash scripts/bump-version.sh <patch|minor|major>
 ```
 
-The pre-commit hook runs `fix-tables.sh` + `markdownlint-cli2 --fix` on staged `.md` files automatically. Run `claude plugin validate` before opening a PR to catch frontmatter issues early.
+The pre-commit hook runs `fix-tables.sh` + `markdownlint-cli2 --fix` on staged `.md` files automatically. Run `bash scripts/qa-check.sh` before opening a PR to catch issues early.
 
 ---
 
@@ -137,11 +150,17 @@ devflow/
 ├── .claude-plugin/
 │   └── plugin.json           # Plugin manifest
 ├── skills/                   # Skill entry points (SKILL.md per skill)
-├── agents/                   # Custom subagent definitions
-├── hooks/                    # Lifecycle hooks
-│   └── hooks.json            # Plugin hook registry
+│   └── ...                   # 22 skills (16 user-facing + 6 background)
+├── agents/                   # Custom subagent definitions (24 agents)
+├── hooks/                    # Lifecycle hooks (18 hooks)
+│   ├── hooks.json            # Plugin hook registry
+│   └── lib/                  # Shared hook utilities
 ├── output-styles/            # Custom output styles
-├── scripts/                  # Dev tooling (link-assets.sh, fix-tables.sh)
+├── devflow-sdk/              # TypeScript SDK for programmatic PR review
+│   └── src/                  # Orchestrator, consolidator, triage, falsifier, CLI
+├── scripts/                  # Dev tooling (link-assets.sh, qa-check.sh, bump-version.sh)
+├── tests/
+│   └── hooks/                # bats test suite for hook scripts
 └── docs/
     └── references/           # Contributor reference docs (best practices, guides)
 ```
