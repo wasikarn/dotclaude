@@ -4,6 +4,7 @@ description: "Challenges a build Phase 2 plan before implementation begins. Uses
 tools: Read, Grep, Glob
 model: sonnet
 color: yellow
+memory: user
 effort: medium
 disallowedTools: Edit, Write, Bash
 maxTurns: 5

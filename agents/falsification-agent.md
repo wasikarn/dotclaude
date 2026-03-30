@@ -6,6 +6,7 @@ tools: Read, Grep, Glob
 maxTurns: 3
 description: "Challenges all review findings before consolidation. Receives raw findings table inline, outputs SUSTAINED/DOWNGRADED/REJECTED verdict per finding. Called by build Phase 4.5 and review Phase 4 Convergence."
 color: cyan
+memory: user
 disallowedTools: Edit, Write, Bash
 skills: [review-conventions, debate-protocol, review-output-format]
 ---

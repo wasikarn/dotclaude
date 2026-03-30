@@ -5,6 +5,7 @@ tools: Read, Grep, Glob, Bash
 model: sonnet
 effort: high
 color: blue
+memory: project
 paths: ["**/migrations/**", "**/*migration*.{ts,js,sql}", "**/*.sql", "**/db/**/*.ts"]
 disallowedTools: Edit, Write
 maxTurns: 10

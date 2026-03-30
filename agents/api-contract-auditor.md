@@ -5,6 +5,7 @@ tools: Read, Grep, Glob, Bash
 model: sonnet
 effort: high
 color: blue
+memory: user
 paths: ["**/routes/**", "**/controllers/**", "**/handlers/**", "**/*.routes.ts", "**/*.controller.ts", "**/*.handler.ts"]
 disallowedTools: Edit, Write
 maxTurns: 10

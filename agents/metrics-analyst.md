@@ -4,6 +4,7 @@ description: "Reads devflow-metrics.jsonl and produces a retrospective report: i
 tools: Bash, Read, Write
 model: sonnet
 color: magenta
+memory: project
 effort: low
 disallowedTools: Edit
 maxTurns: 5
