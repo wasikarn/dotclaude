@@ -96,6 +96,29 @@ OUTPUT FORMAT:
 Send your findings to the team lead when done.
 ```
 
+## Shared Fixer Rules
+
+```text
+COMMIT CONVENTION:
+- fix(area): {root cause fix description}
+- test(area): add regression test for {bug}
+- dx(area): {DX improvement description}
+
+RULES:
+1. After each commit, **wait for lead confirmation** before continuing
+   - Lead will run validate independently and send you the result
+   - If lead sends "Validate failed with: {error}" — retry that item (attempt counter increments)
+   - If lead confirms "Passed" — proceed to next item
+2. If a fix introduces a new test failure, revert and try different approach
+3. If blocked after 3 attempts on the same item, message the team lead with all attempts — do not guess
+4. Do NOT self-report "tests pass" — the lead verifies independently
+
+CONVENTIONS: See CLAUDE.md (auto-loaded) for project patterns, commit format, and coding style.
+
+HARD RULES:
+{hard_rules}
+```
+
 ## Fixer (Phase 3 — Fix + Harden)
 
 ### Full Mode Fixer
@@ -116,25 +139,7 @@ FIX ORDER — follow strictly:
    - Info → skip unless user requests
    - Each DX improvement = separate commit
 
-COMMIT CONVENTION:
-- fix(area): {root cause fix description}
-- test(area): add regression test for {bug}
-- dx(area): {DX improvement description}
-
-RULES:
-1. Follow investigation.md Fix Plan exactly — no scope creep
-2. After each commit, **wait for lead confirmation** before continuing to next Fix Plan item
-   - Lead will run validate independently and send you the result
-   - If lead sends "Validate failed with: {error}" — retry that item (attempt counter increments)
-   - If lead confirms "Passed" — proceed to next item
-3. If a fix introduces a new test failure, revert and try different approach
-4. If blocked after 3 attempts on the same item, message the team lead with all attempts — do not guess
-5. Do NOT self-report "tests pass" — the lead verifies independently
-
-CONVENTIONS: See CLAUDE.md (auto-loaded) for project patterns, commit format, and coding style.
-
-HARD RULES:
-{hard_rules}
+Follow Shared Fixer Rules above. Rule 1 addition: follow investigation.md Fix Plan exactly — no scope creep.
 
 Message the team lead when all Fix Plan items are done.
 ```
@@ -160,24 +165,7 @@ FIX ORDER — follow strictly:
    5. Missing test: no existing test covers the code path that broke (→ P3 Warning)
    If you find any Critical items (1, 2, 4), fix them as separate commits.
 
-COMMIT CONVENTION:
-- fix(area): {root cause fix description}
-- test(area): add regression test for {bug}
-- dx(area): {DX improvement description}
-
-RULES:
-1. After each commit, **wait for lead confirmation** before continuing
-   - Lead will run validate independently and send you the result
-   - If lead sends "Validate failed with: {error}" — retry that item (attempt counter increments)
-   - If lead confirms "Passed" — proceed to next item
-2. If a fix introduces a new test failure, revert and try different approach
-3. If blocked after 3 attempts on the same item, message the team lead with all attempts — do not guess
-4. Do NOT self-report "tests pass" — the lead verifies independently
-
-CONVENTIONS: See CLAUDE.md (auto-loaded) for project patterns, commit format, and coding style.
-
-HARD RULES:
-{hard_rules}
+Follow Shared Fixer Rules above.
 
 Message the team lead when all fixes are done.
 ```
@@ -201,13 +189,11 @@ YOUR FOCUS — review only the fix commits (not the whole codebase):
    - If PR title contains "fix": enumerate the *class* of inputs that caused the bug; verify fix handles all of them
 
 2. SAFETY:
-   - **New null paths**: does the fix introduce a code path where a previously-guaranteed value is now nullable?
-   - **Race condition**: if the fix touches shared state, a cache, or a counter — is access atomic or guarded?
-   - **TOCTOU (time-of-check-time-of-use)**: does the fix read a value then use it later assuming it hasn't changed?
-     Pattern: `const balance = await getBalance(); if (balance >= amount) { await deduct(amount) }` — deduct without re-checking
-   - **Error swallowing**: does the fix add a try/catch that silently swallows the new error path?
-   - **Type safety regression**: does the fix use `as any` or `as T` cast to work around a type error?
-   - **Missing input guard**: if the fix adds a new code path, does it guard against null/undefined/empty at entry?
+   - **TOCTOU**: verify atomic operations — no read-then-act on values that can change between the two
+   - **Error swallowing**: re-throw or log after handling — no silent `catch (e) {}`
+   - **Type safety**: no added `as any` / `as T` cast to work around a type error
+   - **Race conditions**: check concurrent access on any shared state, cache, or counter touched by the fix
+   - **Null paths**: verify the fix doesn't make a previously-guaranteed value nullable without a guard
 
 3. SCOPE CREEP:
    - Does the fix change more than necessary?

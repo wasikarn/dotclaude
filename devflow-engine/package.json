@@ -1,0 +1,18 @@
+{
+  "name": "devflow-engine",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "review": "bun src/cli.ts review",
+    "test": "bun test",
+    "test:watch": "bun test --watch"
+  },
+  "dependencies": {
+    "zod": "^4.0.0"
+  },
+  "devDependencies": {
+    "bun-types": "^1.3.11",
+    "typescript": "5.9.3"
+  }
+}

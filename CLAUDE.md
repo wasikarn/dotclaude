@@ -63,35 +63,20 @@ Custom subagents live at `agents/<name>.md` with YAML frontmatter. Distributed a
 Key fields: `description` (include "proactively" to auto-trigger), `memory` (`user`/`project`/`local` for cross-session persistence), `skills` (preload into agent context). All fields: `name`, `tools`/`disallowedTools`, `model`, `hooks`, `permissionMode`, `maxTurns`, `background`, `isolation`.
 
 > **Plugin limitation:** `hooks`, `mcpServers`, and `permissionMode` are silently ignored when agents are loaded from a plugin. To use these fields, copy the agent to `.claude/agents/` instead.
-
-Current agents (24):
+Current agents (26):
 
 | Agent | Model | Purpose |
 | --- | --- | --- |
 | `commit-finalizer` | haiku | Fast git commit with conventional commits format |
-| `devflow-build-bootstrap` | haiku | Pre-gather Phase 2 context before build explorer spawns |
-| `build-research-summarizer` | haiku | Compress research.md to JSON summary after Phase 2 gate — eliminates re-reads at later phases |
-| `devflow-debug-bootstrap` | haiku | Pre-gather debug context before debug Investigator spawns |
-| `devflow-respond-bootstrap` | haiku | Pre-gather open PR threads + affected files before respond Fixers spawn |
-| `pr-review-bootstrap` | haiku | Fetch PR diff + Jira AC in one pass before review |
 | `review-consolidator` | haiku | Dedup/sort multi-reviewer findings into single ranked table |
-| `research-validator` | haiku | Validate research.md completeness (file:line evidence gate) before Phase 2→3 |
-| `fix-intent-verifier` | haiku | Verify each respond fix addresses reviewer intent (ADDRESSED/PARTIAL/MISALIGNED) |
-| `jira-summary-poster` | haiku | Post structured implementation summary to Jira after build/debug completes |
-| `work-context` | haiku | Session start digest: active sprint tickets + PRs awaiting action + unmerged branches |
-| `merge-preflight` | haiku | Pre-merge go/no-go safety checklist before merge-pr Confirmation Gate |
-| `metrics-analyst` | haiku | Retrospective from devflow-metrics.jsonl: iteration patterns, recurring findings, Hard Rule candidates |
 | `falsification-agent` | sonnet | Challenges review findings before consolidation — outputs SUSTAINED/DOWNGRADED/REJECTED per finding |
 | `plan-challenger` | sonnet | Challenges build Phase 3 plan for YAGNI/scope/ordering issues before implementation |
 | `test-quality-reviewer` | sonnet | Dedicated test quality reviewer (T1–T9): behavior vs implementation, mock fidelity, edge cases, assertion presence (Hard Rule), boundary operators, stale contracts, test isolation |
-| `code-explorer` | sonnet | Trace feature execution paths: entry points → data layer, map abstraction layers, identify extension points — read-only, explicit trigger only |
-| `comment-analyzer` | sonnet | Verify comment accuracy against code, detect stale references and comment rot — explicit trigger; build lead may optionally spawn after Phase 4 |
-| `code-simplifier` | sonnet | Post-review polish: flatten nesting, remove redundant comments, improve naming — no behavior changes; triggered optionally in build Phase 7 (optional) or standalone |
-| `migration-reviewer` | sonnet | Reviews DB migration files (M1–M10): DDL safety, reversibility, FK indexes, table-lock risk, zero-downtime violations, expand/contract, data batching, index types, deadlock risk |
-| `api-contract-auditor` | sonnet | Detects API breaking changes (A1–A10): removed/renamed fields, changed status codes, new required params, type narrowing, enum reordering, idempotency, pagination, error envelopes, deprecation |
-| `skill-validator` | sonnet | Validates SKILL.md against best practices |
-| `project-onboarder` | sonnet | Bootstrap a new project into devflow: scaffold hard-rules.md + build directory |
+| `silent-failure-hunter` | sonnet | Hunts for silent failures — swallowed exceptions, empty catch blocks, optional chain fallbacks (CRITICAL/HIGH/MEDIUM) |
 | `code-reviewer` | sonnet | General-purpose code reviewer with cross-session persistent memory |
+| `type-design-analyzer` | sonnet | TypeScript type design quality — 4 dimensions rated 1-10 (Encapsulation, Invariant Expression, Invariant Usefulness, Invariant Enforcement) |
+
+> Full agent list: see [agents/](agents/) — 26 agents total.
 
 <important if="editing or adding hooks">
 
@@ -101,24 +86,13 @@ Hooks live at `hooks/`. All hooks are registered in `hooks/hooks.json` and distr
 
 | Event | Matcher | Script |
 | --- | --- | --- |
-| `SessionStart` | `startup` | `check-deps.sh`, `session-start-context.sh`, `cleanup-artifacts.sh` (async) |
+| `SessionStart` | `startup` | `check-deps.sh`, `session-start-context.sh` |
 | `UserPromptSubmit` | — | `skill-routing.sh` |
 | `PreToolUse` | `Edit\|Write` | `protect-files.sh` |
-| `PreToolUse` | `Skill` | `skill-usage-tracker.sh` |
-| `PreToolUse` | `Bash` | `safe-command-approver.sh` |
 | `PostToolUse` | `Edit\|Write` | _(inline markdownlint)_ |
-| `PostToolUse` | `Write` | `shellcheck-written-scripts.sh` |
-| `TaskCompleted` | `review-debate\|devflow\|respond` | `task-gate.sh` |
-| `TeammateIdle` | `review-pr\|devflow\|respond\|debug-` | `idle-nudge.sh` |
-| `PostCompact` | — | `post-compact-context.sh` |
-| `PreCompact` | — | `pre-compact-save.sh` |
-| `PostToolUseFailure` | `Bash` | `bash-failure-hint.sh` |
-| `StopFailure` | `rate_limit\|...` | `stop-failure-log.sh` |
 | `SubagentStop` | reviewer agent names | `subagent-stop-gate.sh` |
-| `SubagentStart` | reviewer agent names | `subagent-start-context.sh` |
-| `SessionEnd` | — | `session-end-cleanup.sh` (async) |
 
-Notes: `task-gate.sh`/`idle-nudge.sh` use `GATE_PATTERN`/`NUDGE_PATTERN` env vars. `stop-failure-log.sh`: file logging via `LOG=1`, macOS notify via `NOTIFY=1`. Markdownlint + shellcheck hooks degrade gracefully if tools missing.
+> Full hook list: see [hooks/hooks.json](hooks/hooks.json) — 16 hooks total.
 
 </important>
 
@@ -161,15 +135,15 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for the full step-by-step guide. Key rule
 
 All four require `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` (degrades gracefully). One team per session; team cleanup by lead; Hard Rules cannot be dropped via debate.
 
-## devflow-sdk
+## devflow-engine
 
-TypeScript SDK at `devflow-sdk/` — programmatic PR review pipeline (orchestrator, triage, consolidator, falsifier, CLI). `private: true`; not published to npm. Uses `vitest` for tests.
+TypeScript SDK at `devflow-engine/` — programmatic PR review pipeline (orchestrator, triage, consolidator, falsifier, CLI). `private: true`; not published to npm. Uses `bun test` (built-in).
 
 | Task | Command |
 | --- | --- |
-| Run SDK tests | `cd devflow-sdk && npm test` |
-| Watch tests | `cd devflow-sdk && npm run test:watch` |
-| Run CLI review | `cd devflow-sdk && npm run review -- --pr <number>` |
+| Run SDK tests | `cd devflow-engine && bun test` |
+| Watch tests | `cd devflow-engine && bun test --watch` |
+| Run CLI review | `cd devflow-engine && bun run review -- --pr <number>` |
 
 ## Repo Commands
 

@@ -74,32 +74,32 @@ Update `plan_file:` in `{artifacts_dir}/devflow-context.md` to `{artifacts_dir}/
 **Full mode only:** Try the SDK Plan-Challenger first (faster, lower token cost):
 
 ```bash
-SDK_DIR="${CLAUDE_SKILL_DIR}/../../devflow-sdk"
+ENGINE_DIR="${CLAUDE_SKILL_DIR}/../../devflow-engine"
 
-if [ -d "$SDK_DIR" ] && [ -d "$SDK_DIR/node_modules" ]; then
+if [ -d "$ENGINE_DIR" ] && [ -d "$ENGINE_DIR/node_modules" ]; then
 
-  sdk_result=$(cd "$SDK_DIR" && node_modules/.bin/tsx src/cli.ts plan-challenge \
+  engine_result=$(cd "$ENGINE_DIR" && bun src/cli.ts plan-challenge \
     --plan-file {plan_file_path} \
     --research-file {artifacts_dir}/research.md \
     2>&1)
-  sdk_exit=$?
+  engine_exit=$?
 
 else
-  echo "devflow-sdk not available — skipping SDK-enhanced analysis"
-  sdk_exit=1
+  echo "devflow-engine not available — skipping SDK-enhanced analysis"
+  engine_exit=1
 fi
 ```
 
-If `sdk_exit=0` and `sdk_result` is valid JSON (starts with `{`):
+If `engine_exit=0` and `engine_result` is valid JSON (starts with `{`):
 
 **Use SDK output directly:**
 
-- Parse `sdk_result` as `ChallengeResult` JSON
+- Parse `engine_result` as `ChallengeResult` JSON
 - Present challenge findings inline — `minimal[]` as Minimal-Lens table, `clean[]` as Clean-Lens table
 - Report: `SDK Plan-Challenger: {challenged} tasks challenged · {missingTasks.length} missing tasks`
 - **Skip Agent Teams `plan-challenger` spawn** — proceed to Step 3 with the SDK findings applied
 
-**If `sdk_exit != 0` or result is not valid JSON**, log `SDK plan-challenge failed (exit {sdk_exit}) — falling back to Agent Teams` and continue:
+**If `engine_exit != 0` or result is not valid JSON**, log `engine plan-challenge failed (exit {engine_exit}) — falling back to Agent Teams` and continue:
 
 **Agent Teams fallback:** Immediately spawn `plan-challenger` agent with the plan file path + `{artifacts_dir}/research.md`. Do **not** wait — continue to Step 3 (readiness gate) while plan-challenger runs.
 

@@ -25,32 +25,32 @@ SHARED CONTEXT: {contents of ## Shared Context section from debug-context.md}
 **Try the SDK Investigator first (faster, lower token cost):**
 
 ```bash
-SDK_DIR="${CLAUDE_SKILL_DIR}/../../devflow-sdk"
+ENGINE_DIR="${CLAUDE_SKILL_DIR}/../../devflow-engine"
 
-if [ -d "$SDK_DIR" ] && [ -d "$SDK_DIR/node_modules" ]; then
+if [ -d "$ENGINE_DIR" ] && [ -d "$ENGINE_DIR/node_modules" ]; then
 
   # Full mode: runs Investigator + DX Analyst concurrently
   # Quick mode: Investigator only (--quick flag)
   SDK_MODE_FLAG=""
   [ "{mode}" = "Quick" ] && SDK_MODE_FLAG="--quick"
 
-  sdk_result=$(cd "$SDK_DIR" && node_modules/.bin/tsx src/cli.ts investigate \
+  engine_result=$(cd "$ENGINE_DIR" && bun src/cli.ts investigate \
     --bug "{bug_description}" \
     $SDK_MODE_FLAG \
     2>&1)
-  sdk_exit=$?
+  engine_exit=$?
 
 else
-  echo "devflow-sdk not available — skipping SDK-enhanced analysis"
-  sdk_exit=1
+  echo "devflow-engine not available — skipping SDK-enhanced analysis"
+  engine_exit=1
 fi
 ```
 
-If `sdk_exit=0` and `sdk_result` is valid JSON (starts with `{`):
+If `engine_exit=0` and `engine_result` is valid JSON (starts with `{`):
 
 **Use SDK output directly:**
 
-- Parse `sdk_result` as `InvestigationResult` JSON
+- Parse `engine_result` as `InvestigationResult` JSON
 - Map to `investigation.md` format per [artifact-templates.md](artifact-templates.md#investigation.md):
   - Root Cause section from `rootCause` (hypothesis, confidence, evidence[])
   - DX Findings table from `dxFindings[]` (Quick mode: empty)
@@ -61,7 +61,7 @@ If `sdk_exit=0` and `sdk_result` is valid JSON (starts with `{`):
 
 **If confidence is "low"** in SDK result — escalate to user regardless of source. Present `alternativeHypotheses` and ask for additional context.
 
-**If `sdk_exit != 0` or result is not valid JSON**, log `SDK investigate failed (exit {sdk_exit}) — falling back to Agent Teams` and continue:
+**If `engine_exit != 0` or result is not valid JSON**, log `engine investigate failed (exit {engine_exit}) — falling back to Agent Teams` and continue:
 
 ## Step 1 (fallback): Create Team
 

@@ -2,68 +2,87 @@
 
 ## SDK Fast-Path (try before spawning Agent Teams)
 
-**Skip fast-path → force Agent Teams ถ้า:**
+**Auto-escalation — evaluate signals in priority order:**
 
-- PR argument มี Jira key (e.g., `ABC-123`) → ต้องการ AC verification ที่ Agent Teams ทำได้
-- PR มี >500 changed lines (from diff stat) → SDK อาจ truncate diff
-- `--full` flag ระบุมา explicitly → user ต้องการ full debate
+**Force `--full` (3 reviewers + debate) ถ้า:**
 
-**Otherwise, try the SDK Review Engine first (faster, deterministic, lower token cost):**
+- `--full` flag ระบุมา explicitly
+- Security/infra files changed: `auth/`, `migrations/`, `.env*`, CI/CD configs (`*.yml` in `.github/`), public API route handlers
+- PR มี >400 changed lines AND (Jira key present OR security/infra files detected)
+
+**Use `--quick` (2 reviewers + falsification, no debate) ถ้า:**
+
+- PR มี >400 changed lines (large diff — SDK อาจ truncate, 400 LOC = empirical review-quality cliff)
+- Jira key present (ต้องการ AC verification)
+
+**Force SDK-only (--micro flag):**
+
+ถ้า `--micro` flag ระบุมา → ข้ามการตรวจ force-Agent-Teams conditions ข้างบน และ:
+
+1. ลองรัน Review Engine ก่อน (ตาม block ด้านล่าง)
+2. ถ้า SDK สำเร็จ → แสดงผลและ skip Phase 4, 5 (ไม่มี debate, ไม่มี falsification)
+3. ถ้า SDK ล้มเหลว → spawn Teammate 1 (Correctness & Security) คนเดียว → skip Phase 4, 5
+
+**2 reviewers, no debate (--quick flag):**
+
+ถ้า `--quick` flag ระบุมา → ข้ามการตรวจ force-Agent-Teams conditions ข้างบน และ:
+
+1. ลองรัน Review Engine ก่อน
+2. ถ้า SDK สำเร็จ → แสดงผลและ skip Phase 4 (ไม่มี debate) → proceed to Phase 5 (falsification)
+3. ถ้า SDK ล้มเหลว → spawn Teammate 1 (Correctness & Security) + Teammate 2 (Architecture & Performance) เท่านั้น → skip Phase 4 → proceed to Phase 5
+
+**Otherwise, try the devflow-engine resolve first (determines review mode from PR signals):**
 
 ```bash
-SDK_DIR="${CLAUDE_SKILL_DIR}/../../devflow-sdk"
+ENGINE_DIR="${CLAUDE_SKILL_DIR}/../../devflow-engine"
 
-if [ -d "$SDK_DIR" ] && [ -d "$SDK_DIR/node_modules" ]; then
-
-  # Build CLI args
-  SDK_ARGS="--pr $0 --output json"
-
-  # Pass dismissed patterns if file exists
+if [ -d "$ENGINE_DIR" ] && [ -d "$ENGINE_DIR/node_modules" ]; then
+  # Build resolve args — note: $0 is skill template substitution for PR number (not shell $0)
+  RESOLVE_ARGS="--pr $0"
   DISMISSED_FILE="$(bash "${CLAUDE_SKILL_DIR}/../../scripts/artifact-dir.sh" review)/review-dismissed.md"
   if [ -f "$DISMISSED_FILE" ]; then
-    SDK_ARGS="$SDK_ARGS --dismissed $DISMISSED_FILE"
+    RESOLVE_ARGS="$RESOLVE_ARGS --dismissed $DISMISSED_FILE"
   fi
+  # Check for Jira key in arguments
+  echo "$ARGUMENTS" | grep -qE '[A-Z]+-[0-9]+' && RESOLVE_ARGS="$RESOLVE_ARGS --jira"
+  # Pass explicit mode flags from user args
+  echo "$ARGUMENTS" | grep -q '\-\-micro' && RESOLVE_ARGS="$RESOLVE_ARGS --micro"
+  echo "$ARGUMENTS" | grep -q '\-\-quick' && RESOLVE_ARGS="$RESOLVE_ARGS --quick"
+  echo "$ARGUMENTS" | grep -q '\-\-full'  && RESOLVE_ARGS="$RESOLVE_ARGS --full"
+  # Extract --focused area using perl (portable; grep -oP is macOS-incompatible)
+  focused_area=$(echo "$ARGUMENTS" | perl -ne 'if (/--focused\s+(\S+)/) { print $1; exit }')
+  [ -n "$focused_area" ] && RESOLVE_ARGS="$RESOLVE_ARGS --focused $focused_area"
 
-  # Pass hard rules if loaded in Phase 2
-  if [ -f "{hard_rules_path}" ]; then
-    SDK_ARGS="$SDK_ARGS --hard-rules {hard_rules_path}"
-  fi
+  # Capture stdout only; redirect stderr to /dev/null to prevent tsx warnings corrupting JSON
+  resolve_result=$(cd "$ENGINE_DIR" && bun src/cli.ts resolve $RESOLVE_ARGS 2>/dev/null)
+  resolve_exit=$?
 
-  # Run SDK reviewer
-  sdk_result=$(cd "$SDK_DIR" && node_modules/.bin/tsx src/cli.ts review $SDK_ARGS 2>&1)
-  sdk_exit=$?
-
-  # Validate: must be JSON with findings array (not just any {})
-  _is_valid_json() {
+  _extract_mode() {
     if command -v jq >/dev/null 2>&1; then
-      echo "$1" | jq -e '.findings' >/dev/null 2>&1
+      echo "$1" | jq -r '.mode' 2>/dev/null
     else
-      echo "$1" | node -e "const d=JSON.parse(require('fs').readFileSync('/dev/stdin','utf8')); process.exit(Array.isArray(d.findings)?0:1)" 2>/dev/null
+      echo "$1" | node -e "process.stdout.write(JSON.parse(require('fs').readFileSync('/dev/stdin','utf8')).mode)" 2>/dev/null
     fi
   }
 
+  if [ "$resolve_exit" -eq 0 ]; then
+    resolved_mode=$(_extract_mode "$resolve_result")
+    echo "Review Engine: mode=$resolved_mode score=$(echo "$resolve_result" | jq -r '.score // "?"' 2>/dev/null)"
+  else
+    echo "devflow-engine resolve failed (exit $resolve_exit) — falling back to rule-based escalation"
+    resolve_exit=1
+  fi
 else
-  echo "devflow-sdk not available — skipping SDK-enhanced analysis"
-  sdk_exit=1
+  echo "devflow-engine not available — falling back to rule-based escalation"
+  resolve_exit=1
 fi
+
+# Fallback: if engine unavailable or failed, use rule-based prose escalation (existing logic below)
 ```
 
-If `sdk_exit=0` and `_is_valid_json "$sdk_result"` succeeds:
+**If `$resolve_exit` = 0:** Use `$resolved_mode` directly as the review mode — skip the rule-based escalation below.
 
-**Use SDK output directly:**
-
-- Parse `sdk_result` as the review report JSON
-- Map `findings[]` to the standard findings table format per [review-output-format](../../review-output-format/SKILL.md):
-  - `isHardRule: true` → append `[HR]` badge to finding row
-  - `confidence` → display as `C:{value}` (e.g., `C:85`)
-  - `consensus` → use N/M format directly (e.g., `"2/3"`)
-- Map `strengths[]` → Strengths section
-- Use `verdict` field (`"APPROVE"` | `"REQUEST_CHANGES"`) for final decision
-- If `noiseWarning: true` → prepend `⚠ Low signal` notice per review-conventions
-- Report: `SDK Review Engine: {summary.critical} critical · {summary.warning} warnings · {summary.info} info · cost $X`
-- **Skip Agent Teams spawning (Phases 3-5)** — proceed directly to Phase 6 (action phase)
-
-**If `sdk_exit != 0` or result is not valid JSON**, log `SDK review failed (exit {sdk_exit}) — falling back to Agent Teams` and continue with the steps below.
+**If `$resolve_exit` ≠ 0:** Apply rule-based escalation:
 
 ---
 
@@ -110,15 +129,34 @@ Create an agent team named `review-pr-$0` with 3 reviewer teammates using prompt
 - **Teammate 2 — Architecture & Performance:** Focus on N+1 (#3), DRY (#4), flatten (#5), SOLID (#6), elegance (#7)
 - **Teammate 3 — DX & Testing:** Focus on naming (#8), docs (#9), testability (#11), debugging (#12)
 
-**Conditional specialist agent** — spawn at most 1, evaluated in priority order. Skip all specialists if PR has < 200 lines changed (from diff stat).
+**Conditional specialist agents** — spawn at most 1 primary specialist (Priority 1-3), plus up to 2 secondary specialists (Priority 4-5). Skip all specialists if PR has < 200 lines changed (from diff stat).
 
 | Priority | Condition | Agent to spawn |
 | --- | --- | --- |
 | 1 | Test files changed (`*.spec.*`, `*.test.*`) OR new exported functions without spec changes | `test-quality-reviewer` |
 | 2 | Controller/route/handler/interface/DTO files changed | `api-contract-auditor` |
 | 3 | Migration files changed (`*.migration.*`, files with `CREATE TABLE` / `ALTER TABLE` / `addColumn`) | `migration-reviewer` |
+| 4 | `try/catch`, `.catch()`, optional chaining (`?.`), or nullish coalescing (`??`) changed | `silent-failure-hunter` |
+| 5 | TypeScript `interface`, `type`, or `class` definitions changed | `type-design-analyzer` |
 
-Evaluate in priority order — spawn the **first matching condition only**. The specialist agent sends findings to the team lead and enters the same debate pipeline as standard teammates.
+Evaluate in priority order — spawn the **first matching condition only** from Priority 1-3 (primary). Additionally, evaluate Priority 4-5 independently and spawn up to 2 secondary specialists if conditions match. All specialist agents send findings to the team lead and enter the same debate pipeline as standard teammates.
+
+**Severity mapping:** `silent-failure-hunter` uses `CRITICAL/HIGH/MEDIUM` — map to pipeline labels before consolidation: `CRITICAL → Critical`, `HIGH → Warning`, `MEDIUM → Suggestion`.
+
+## --focused Mode: Specialist-Only Review
+
+ถ้า `--focused [area]` flag ระบุมา → ข้าม 3 main reviewers, spawn เฉพาะ specialist ที่ตรงกับ area:
+
+| area | Agent |
+| --- | --- |
+| `errors` | `silent-failure-hunter` |
+| `types` | `type-design-analyzer` |
+| `tests` | `test-quality-reviewer` |
+| `api` | `api-contract-auditor` |
+| `migrations` | `migration-reviewer` |
+
+Specialist ส่งผลโดยตรงไปยัง lead → skip Phase 4 (debate) → proceed to Phase 5 (falsification) → Phase 6 (action).
+ถ้า area ไม่ตรงกับ table → แจ้ง user: "Unknown area '{area}'. Valid areas: errors, types, tests, api, migrations"
 
 Insert into each teammate prompt:
 
@@ -131,5 +169,8 @@ Insert into each teammate prompt:
 All teammates are READ-ONLY.
 
 ## Step 3: Wait for all reviews
+
+ถ้า `--focused` flag → wait for **1 specialist** only, then skip directly to Phase 6 (no debate).
+ถ้า `--quick` flag → wait for **2 teammates** only (T1 + T2), then skip Phase 4.
 
 Wait for all 3 teammates to complete. Track progress: show each teammate's status and key finding. **CHECKPOINT** — all 3 reviews must complete before proceeding to Phase 4 debate.

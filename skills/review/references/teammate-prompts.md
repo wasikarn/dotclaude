@@ -33,7 +33,11 @@ Diff size gate (from SKILL.md Phase 2):
 
 ## Shared Rules Block
 
-All teammates share these rules (insert into each prompt):
+See [reviewer-shared-rules.md](../../build/references/reviewer-shared-rules.md) for shared rules injected into each teammate.
+
+> **review divergence from build:** Use a flat confidence threshold of **80** for all teammates (not per-role). Review uses adversarial debate to filter noise post-review, so a uniform threshold is sufficient.
+
+Insert the following into each teammate prompt at `[INSERT SHARED RULES BLOCK]`:
 
 ```text
 HARD RULES: [insert project Hard Rules here]
@@ -46,18 +50,18 @@ CONTEXT:
 RULES:
 - READ-ONLY — do not modify any files
 - Every finding MUST cite file:line with actual code evidence
-- Non-Hard-Rule findings require confidence >= 80 (scale 0-100) — flat threshold for all roles; build uses per-role thresholds (75/80/85) but review relies on adversarial debate to filter noise post-review
+- Non-Hard-Rule findings require confidence >= 80 (scale 0-100)
 
 CRITICAL MINDSET: Existing tests passing does NOT mean the implementation is correct.
 Tests only cover what was written. Reason independently from the code itself.
 Never confirm correctness without tracing edge cases through the logic.
 
 CONFIDENCE CALIBRATION (0-100 scale):
-- 95: N+1 query in visible loop with no batch alternative — verifiable, pattern is unambiguous
-- 90: `as any` without type guard — code is directly readable, violation is clear
-- 80: Missing null check with no caller guard visible in diff — possible but caller not inspected
-- 70: Naming unclear — subjective, context-dependent (do not report)
-- 60: Preference-based style without convention evidence — do not report
+- 95: N+1 query in visible loop with no batch alternative
+- 90: `as any` without type guard
+- 80: Missing null check with no caller guard visible in diff
+- 70: Naming unclear — subjective (do not report)
+- 60: Preference-based style without convention evidence (do not report)
 
 DOMAIN LENSES:
 {domain_lenses}
@@ -66,26 +70,12 @@ DOMAIN LENSES:
 KNOWN FALSE POSITIVES (do not re-raise without new evidence):
 {dismissed_patterns}
 
-OUTPUT FORMAT: For each finding, provide:
-1. Severity: Critical/Warning/Info
-2. Rule: checklist item number
-3. File and line
-4. What's wrong + evidence (quote the code)
-5. Why it matters
-6. Concrete fix
+OUTPUT FORMAT: | # | Sev | File | Line | Confidence | Issue | Fix |
+Sev values: 🔴 Critical | 🟡 Warning | 🔵 Info
 
-BOUNDARY CONTRACT:
-If you find an issue outside your primary domain (e.g., this reviewer finds an issue outside their listed YOUR FOCUS items):
-- Mark as: [CROSS-DOMAIN: {domain}] in the finding
-- Set severity to: Warning (never Critical — defer escalation to consolidator)
-- Do not drop it — cross-domain findings are valid, just lower confidence
-- Consolidator may escalate after seeing full findings set
+BOUNDARY CONTRACT: Issues outside your domain → mark [CROSS-DOMAIN: {domain}], set severity Warning, do not drop.
 
-OBSERVATION MASKING:
-After reading a file and extracting findings:
-- Retain: file path, line refs, finding text, reasoning chain
-- Discard: full file content from working memory
-- Do not re-read a file you have already processed unless Lead explicitly requests it
+OBSERVATION MASKING: After processing a file — retain file path, line refs, finding text; discard full content. Do not re-read unless Lead requests.
 
 After review, message your findings to the team lead.
 ```
@@ -116,16 +106,9 @@ Semantic check: {pass/flag with evidence, or "n/a — no data transformation"}
 Qualifier: "business logic / data transformation" = changes touching value calculations, conditional branching on business data, or data format conversions. Pure structural changes (extract method, rename, move file) are exempt from edge case enumeration.
 
 SECURITY (part of Rule #1): If the PR diff contains auth, API, middleware, or session handling code:
-1. Check OWASP Top 10 — flag any matches at Critical severity:
-   - A01: Broken Access Control (missing RBAC, missing authorization check)
-   - A02: Cryptographic Failures (HTTP instead of HTTPS, hardcoded secrets, weak hashing)
-   - A03: Injection (unsanitized input, string concatenation in queries)
-   - A05: Security Misconfiguration (exposed debug endpoints, default credentials)
-   - A07: Authentication Failures (no rate limiting on auth, weak session tokens)
-   - A08: Data Integrity Failures (no CSRF protection on state-changing endpoints)
+1. Check OWASP Top 10 (A01 Broken Access Control through A10 SSRF) — flag any matches at Critical severity. Key targets: missing RBAC/authz checks, hardcoded secrets, unsanitized input, exposed debug endpoints, no rate limiting on auth, missing CSRF protection.
 2. Flag insecure JWT patterns: no expiry, no rotation, secret in code
-3. Flag rate limiting absence on public auth endpoints
-4. Include security findings using standard severity format
+3. Include security findings using standard severity format
 
 SEMANTIC CORRECTNESS (highest priority after Hard Rules):
 
@@ -181,12 +164,7 @@ FLATTEN STRUCTURE (#5) — patterns to flag:
 - Ternary nesting: `a ? b ? x : y : c ? m : n` — extract branches to named variables or early returns
 - Else after return: `if (cond) { return x; } else { ... }` — the else is redundant; flatten
 
-SOLID (#6) — patterns to flag:
-- Single Responsibility: one class/function doing validation + DB + notification + caching in one body → split responsibilities
-- Open/Closed: switch/if-else chain that must be extended to add new types instead of using polymorphism / registry pattern
-- Dependency Inversion: service instantiates its own dependencies (`new EmailService()` in constructor body) → inject via constructor parameter so it can be swapped/mocked
-- Interface Segregation: one interface with 10+ methods where callers use only 2–3 → split into focused interfaces
-- God object: class with 5+ unrelated public methods or 200+ lines → extract responsibilities
+SOLID (#6) — Apply SOLID principles — single responsibility (split validation/DB/notify/cache), open/closed (polymorphism over if-else type chains), Liskov substitution (subtypes fulfill base contract), interface segregation (focused interfaces, not 10+ method monoliths), dependency inversion (inject dependencies, don't instantiate with `new` in constructor body). Flag god objects: 5+ unrelated public methods or 200+ lines.
 
 PERFORMANCE (#7 scope — flag patterns that harm runtime):
 - Sequential await on independent operations: `const a = await fetchA(); const b = await fetchB();` → `const [a, b] = await Promise.all([fetchA(), fetchB()])`
