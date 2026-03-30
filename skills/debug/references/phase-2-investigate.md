@@ -25,23 +25,23 @@ SHARED CONTEXT: {contents of ## Shared Context section from debug-context.md}
 **Try the SDK Investigator first (faster, lower token cost):**
 
 ```bash
-SDK_DIR="${CLAUDE_SKILL_DIR}/../../devflow-sdk"
+ENGINE_DIR="${CLAUDE_SKILL_DIR}/../../devflow-engine"
 
-if [ -d "$SDK_DIR" ] && [ -d "$SDK_DIR/node_modules" ]; then
+if [ -d "$ENGINE_DIR" ] && [ -d "$ENGINE_DIR/node_modules" ]; then
 
   # Full mode: runs Investigator + DX Analyst concurrently
   # Quick mode: Investigator only (--quick flag)
   SDK_MODE_FLAG=""
   [ "{mode}" = "Quick" ] && SDK_MODE_FLAG="--quick"
 
-  sdk_result=$(cd "$SDK_DIR" && node_modules/.bin/tsx src/cli.ts investigate \
+  sdk_result=$(cd "$ENGINE_DIR" && node_modules/.bin/tsx src/cli.ts investigate \
     --bug "{bug_description}" \
     $SDK_MODE_FLAG \
     2>&1)
   sdk_exit=$?
 
 else
-  echo "devflow-sdk not available — skipping SDK-enhanced analysis"
+  echo "devflow-engine not available — skipping SDK-enhanced analysis"
   sdk_exit=1
 fi
 ```

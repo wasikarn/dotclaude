@@ -31,9 +31,9 @@ Increment `iteration_count` in devflow-context.md before returning to Phase 4.
 **SDK path (faster, deterministic):** Run `bash "${CLAUDE_SKILL_DIR}/../../scripts/sdk-review-engine.sh" "{base_branch}"` and skip to Stage 2 result handling if exit code 0.
 
 ```bash
-SDK_DIR="${CLAUDE_SKILL_DIR}/../../devflow-sdk"
+ENGINE_DIR="${CLAUDE_SKILL_DIR}/../../devflow-engine"
 
-if [ -d "$SDK_DIR" ] && [ -d "$SDK_DIR/node_modules" ]; then
+if [ -d "$ENGINE_DIR" ] && [ -d "$ENGINE_DIR/node_modules" ]; then
 
   # Build CLI args
   SDK_ARGS="--base-branch {base_branch} --output json"
@@ -48,7 +48,7 @@ if [ -d "$SDK_DIR" ] && [ -d "$SDK_DIR/node_modules" ]; then
   [ -n "${HARD_RULES_PATH}" ] && SDK_ARGS="$SDK_ARGS --hard-rules $HARD_RULES_PATH"
 
   # Run SDK reviewer
-  sdk_result=$(cd "$SDK_DIR" && node_modules/.bin/tsx src/cli.ts review $SDK_ARGS 2>&1)
+  sdk_result=$(cd "$ENGINE_DIR" && node_modules/.bin/tsx src/cli.ts review $SDK_ARGS 2>&1)
   sdk_exit=$?
 
   # Validate: must be JSON with findings array (not just any {})
@@ -61,7 +61,7 @@ if [ -d "$SDK_DIR" ] && [ -d "$SDK_DIR/node_modules" ]; then
   }
 
 else
-  echo "devflow-sdk not available — skipping SDK-enhanced analysis"
+  echo "devflow-engine not available — skipping SDK-enhanced analysis"
   sdk_exit=1
 fi
 ```

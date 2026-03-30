@@ -1,6 +1,6 @@
 ## Mode Check
 
-ถ้า `--quick` flag ระบุมา → **skip Phase 4 entirely** (ข้ามทั้ง debate round ไปยัง Phase 5).
+ถ้า `--micro` หรือ `--quick` flag ระบุมา → **skip Phase 4 entirely** (ข้ามทั้ง debate round ไปยัง Phase 5).
 ถ้า `--focused` flag ระบุมา → **skip Phase 4** (specialist ไม่มี debate ระหว่าง reviewer อื่น).
 
 ---

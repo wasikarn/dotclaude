@@ -135,15 +135,15 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for the full step-by-step guide. Key rule
 
 All four require `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` (degrades gracefully). One team per session; team cleanup by lead; Hard Rules cannot be dropped via debate.
 
-## devflow-sdk
+## devflow-engine
 
-TypeScript SDK at `devflow-sdk/` — programmatic PR review pipeline (orchestrator, triage, consolidator, falsifier, CLI). `private: true`; not published to npm. Uses `vitest` for tests.
+TypeScript SDK at `devflow-engine/` — programmatic PR review pipeline (orchestrator, triage, consolidator, falsifier, CLI). `private: true`; not published to npm. Uses `vitest` for tests.
 
 | Task | Command |
 | --- | --- |
-| Run SDK tests | `cd devflow-sdk && npm test` |
-| Watch tests | `cd devflow-sdk && npm run test:watch` |
-| Run CLI review | `cd devflow-sdk && npm run review -- --pr <number>` |
+| Run SDK tests | `cd devflow-engine && npm test` |
+| Watch tests | `cd devflow-engine && npm run test:watch` |
+| Run CLI review | `cd devflow-engine && npm run review -- --pr <number>` |
 
 ## Repo Commands
 

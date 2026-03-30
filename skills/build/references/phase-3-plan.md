@@ -74,18 +74,18 @@ Update `plan_file:` in `{artifacts_dir}/devflow-context.md` to `{artifacts_dir}/
 **Full mode only:** Try the SDK Plan-Challenger first (faster, lower token cost):
 
 ```bash
-SDK_DIR="${CLAUDE_SKILL_DIR}/../../devflow-sdk"
+ENGINE_DIR="${CLAUDE_SKILL_DIR}/../../devflow-engine"
 
-if [ -d "$SDK_DIR" ] && [ -d "$SDK_DIR/node_modules" ]; then
+if [ -d "$ENGINE_DIR" ] && [ -d "$ENGINE_DIR/node_modules" ]; then
 
-  sdk_result=$(cd "$SDK_DIR" && node_modules/.bin/tsx src/cli.ts plan-challenge \
+  sdk_result=$(cd "$ENGINE_DIR" && node_modules/.bin/tsx src/cli.ts plan-challenge \
     --plan-file {plan_file_path} \
     --research-file {artifacts_dir}/research.md \
     2>&1)
   sdk_exit=$?
 
 else
-  echo "devflow-sdk not available — skipping SDK-enhanced analysis"
+  echo "devflow-engine not available — skipping SDK-enhanced analysis"
   sdk_exit=1
 fi
 ```

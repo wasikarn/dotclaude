@@ -41,6 +41,6 @@ Parse `Diff stat` from header. Classify per [review-conventions](../../review-co
 
 | Size | Lines | Behavior |
 | --- | --- | --- |
-| Normal | <=400 | Full review with debate |
-| Large | 401-1000 | Full review + suggest split |
-| Massive | >1000 | Spawn Correctness reviewer (Hard Rules + confidence ≥85 only) · skip debate · lightweight falsification on Hard Rule findings · warn prominently |
+| Normal | ≤400 | SDK-first → escalate to --quick on failure or risk signals |
+| Large | 401–1000 | --quick (2 reviewers + falsification, no debate) · suggest split if >600 |
+| Massive | >1000 | Hard Rules only (confidence ≥85) · skip debate · lightweight falsification · warn to split |

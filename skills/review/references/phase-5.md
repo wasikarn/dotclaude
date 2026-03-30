@@ -1,6 +1,6 @@
 ## Mode Check
 
-ถ้า `--quick` หรือ `--focused` flag ระบุมา → **skip falsification** (ข้ามไปยัง Phase 6 โดยตรง).
+ถ้า `--micro` หรือ `--focused` flag ระบุมา → **skip falsification** (ข้ามไปยัง Phase 6 โดยตรง).
 
 ---
 
@@ -16,23 +16,23 @@
 **Try the SDK Falsifier first (faster, lower token cost):**
 
 ```bash
-SDK_DIR="${CLAUDE_SKILL_DIR}/../../devflow-sdk"
+ENGINE_DIR="${CLAUDE_SKILL_DIR}/../../devflow-engine"
 
-if [ -d "$SDK_DIR" ] && [ -d "$SDK_DIR/node_modules" ]; then
+if [ -d "$ENGINE_DIR" ] && [ -d "$ENGINE_DIR/node_modules" ]; then
 
   # Serialize surviving debate findings to a temp JSON file
   FINDINGS_FILE=$(mktemp /tmp/devflow-findings-XXXXXX.json)
   # Write findings as JSON array: [{"severity":"critical","rule":"...","file":"...","line":N,"confidence":N,"issue":"...","fix":"...","isHardRule":true}, ...]
   # echo '[...]' > "$FINDINGS_FILE"
 
-  sdk_result=$(cd "$SDK_DIR" && node_modules/.bin/tsx src/cli.ts falsify \
+  sdk_result=$(cd "$ENGINE_DIR" && node_modules/.bin/tsx src/cli.ts falsify \
     --findings-file "$FINDINGS_FILE" \
     2>&1)
   sdk_exit=$?
   rm -f "$FINDINGS_FILE"
 
 else
-  echo "devflow-sdk not available — skipping SDK-enhanced analysis"
+  echo "devflow-engine not available — skipping SDK-enhanced analysis"
   sdk_exit=1
 fi
 ```

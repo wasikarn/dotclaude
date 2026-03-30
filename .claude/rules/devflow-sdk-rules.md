@@ -1,18 +1,18 @@
 ---
 paths:
-  - "devflow-sdk/**"
+  - "devflow-engine/**"
 ---
 
-# Devflow SDK Conventions
+# Devflow Engine Conventions
 
-TypeScript SDK at `devflow-sdk/` — programmatic PR review pipeline. `private: true`, not published to npm.
+TypeScript engine at `devflow-engine/` — programmatic PR review pipeline. `private: true`, not published to npm.
 
 **Tech stack:** TypeScript strict · vitest · tsx for running
 
 **Structure:**
 
 ```text
-devflow-sdk/src/
+devflow-engine/src/
 ├── review/        # orchestrator, triage, consolidator, falsifier, domain-mapper, output
 ├── cli.ts         # CLI entry point (tsx src/cli.ts review|falsify|plan-challenge)
 ├── config.ts      # configuration
@@ -23,9 +23,9 @@ devflow-sdk/src/
 
 | Task | Command |
 | --- | --- |
-| Run tests | `cd devflow-sdk && npm test` |
-| Watch tests | `cd devflow-sdk && npm run test:watch` |
-| Run CLI review | `cd devflow-sdk && npm run review -- --pr <number>` |
+| Run tests | `cd devflow-engine && npm test` |
+| Watch tests | `cd devflow-engine && npm run test:watch` |
+| Run CLI review | `cd devflow-engine && npm run review -- --pr <number>` |
 
 **Rules:**
 
@@ -33,4 +33,4 @@ devflow-sdk/src/
 - Each domain module has a corresponding `.test.ts` file
 - Test behavior not implementation — mock only external I/O (gh CLI, git)
 - CLI exits with code 0 on success, 1 on fatal error — structured JSON output on stdout
-- SDK is a fallback/accelerator for Agent Teams — it complements, doesn't replace agents
+- Engine is a fallback/accelerator for Agent Teams — it complements, doesn't replace agents

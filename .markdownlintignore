@@ -6,4 +6,4 @@ skill-creator-workspace/
 prompts/
 
 # Node dependencies — not plugin source
-devflow-sdk/node_modules/
+devflow-engine/node_modules/

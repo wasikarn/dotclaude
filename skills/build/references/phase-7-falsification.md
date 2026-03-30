@@ -16,21 +16,21 @@ Dispatch `review-consolidator` agent with the raw findings table from all review
 Try the SDK Falsifier while the consolidator runs:
 
 ```bash
-SDK_DIR="${CLAUDE_SKILL_DIR}/../../devflow-sdk"
+ENGINE_DIR="${CLAUDE_SKILL_DIR}/../../devflow-engine"
 
-if [ -d "$SDK_DIR" ] && [ -d "$SDK_DIR/node_modules" ]; then
+if [ -d "$ENGINE_DIR" ] && [ -d "$ENGINE_DIR/node_modules" ]; then
 
   FINDINGS_FILE=$(mktemp /tmp/devflow-findings-XXXXXX.json)
   # Write pre-consolidation findings as JSON array to $FINDINGS_FILE
 
-  sdk_result=$(cd "$SDK_DIR" && node_modules/.bin/tsx src/cli.ts falsify \
+  sdk_result=$(cd "$ENGINE_DIR" && node_modules/.bin/tsx src/cli.ts falsify \
     --findings-file "$FINDINGS_FILE" \
     2>&1)
   sdk_exit=$?
   rm -f "$FINDINGS_FILE"
 
 else
-  echo "devflow-sdk not available — skipping SDK-enhanced analysis"
+  echo "devflow-engine not available — skipping SDK-enhanced analysis"
   sdk_exit=1
 fi
 ```

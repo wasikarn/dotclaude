@@ -37,7 +37,7 @@
 | **Agents** | 24 | Specialized subagents for bootstrapping, reviewing, and committing |
 | **Hooks** | 18 | Lifecycle automation — dependency checks, skill routing, quality gates |
 | **Output Styles** | 2 | Senior Software Engineer, Coding Mentor |
-| **SDK** | 1 | `devflow-sdk` — TypeScript SDK for programmatic PR review |
+| **SDK** | 1 | `devflow-engine` — TypeScript SDK for programmatic PR review |
 
 ---
 
@@ -793,7 +793,7 @@ devflow/
 ├── hooks/                    # Plugin-distributed lifecycle hook scripts
 │   └── hooks.json            # Plugin hook registry (auto-loaded on install)
 ├── output-styles/            # Custom output styles
-├── devflow-sdk/              # TypeScript SDK for programmatic PR review
+├── devflow-engine/              # TypeScript SDK for programmatic PR review
 │   └── src/                  # Orchestrator, consolidator, triage, falsifier, CLI
 ├── scripts/                  # Dev tooling (link-assets.sh, bump-version.sh, qa-check.sh)
 ├── tests/
@@ -804,12 +804,12 @@ devflow/
 
 ---
 
-## devflow-sdk
+## devflow-engine
 
-`devflow-sdk/` is a TypeScript SDK for running the Devflow PR review pipeline programmatically — outside of Claude Code. It implements the same multi-reviewer debate loop as the `review` skill, but as a Node.js CLI you can call from scripts or CI.
+`devflow-engine/` is a TypeScript SDK for running the Devflow PR review pipeline programmatically — outside of Claude Code. It implements the same multi-reviewer debate loop as the `review` skill, but as a Node.js CLI you can call from scripts or CI.
 
 ```bash
-cd devflow-sdk
+cd devflow-engine
 npm install
 
 # Review a PR by number (requires GH_TOKEN or gh CLI)

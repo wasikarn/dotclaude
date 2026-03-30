@@ -2,26 +2,41 @@
 
 ## SDK Fast-Path (try before spawning Agent Teams)
 
-**Skip fast-path → force Agent Teams ถ้า:**
+**Auto-escalation — evaluate signals in priority order:**
 
-- PR argument มี Jira key (e.g., `ABC-123`) → ต้องการ AC verification ที่ Agent Teams ทำได้
-- PR มี >500 changed lines (from diff stat) → SDK อาจ truncate diff
-- `--full` flag ระบุมา explicitly → user ต้องการ full debate
+**Force `--full` (3 reviewers + debate) ถ้า:**
 
-**Force SDK-only (--quick flag):**
+- `--full` flag ระบุมา explicitly
+- Security/infra files changed: `auth/`, `migrations/`, `.env*`, CI/CD configs (`*.yml` in `.github/`), public API route handlers
+- PR มี >400 changed lines AND (Jira key present OR security/infra files detected)
 
-ถ้า `--quick` flag ระบุมา → ข้ามการตรวจ force-Agent-Teams conditions ข้างบน และ:
+**Use `--quick` (2 reviewers + falsification, no debate) ถ้า:**
+
+- PR มี >400 changed lines (large diff — SDK อาจ truncate, 400 LOC = empirical review-quality cliff)
+- Jira key present (ต้องการ AC verification)
+
+**Force SDK-only (--micro flag):**
+
+ถ้า `--micro` flag ระบุมา → ข้ามการตรวจ force-Agent-Teams conditions ข้างบน และ:
 
 1. ลองรัน SDK Review Engine ก่อน (ตาม block ด้านล่าง)
 2. ถ้า SDK สำเร็จ → แสดงผลและ skip Phase 4, 5 (ไม่มี debate, ไม่มี falsification)
 3. ถ้า SDK ล้มเหลว → spawn Teammate 1 (Correctness & Security) คนเดียว → skip Phase 4, 5
 
+**2 reviewers, no debate (--quick flag):**
+
+ถ้า `--quick` flag ระบุมา → ข้ามการตรวจ force-Agent-Teams conditions ข้างบน และ:
+
+1. ลองรัน SDK Review Engine ก่อน
+2. ถ้า SDK สำเร็จ → แสดงผลและ skip Phase 4 (ไม่มี debate) → proceed to Phase 5 (falsification)
+3. ถ้า SDK ล้มเหลว → spawn Teammate 1 (Correctness & Security) + Teammate 2 (Architecture & Performance) เท่านั้น → skip Phase 4 → proceed to Phase 5
+
 **Otherwise, try the SDK Review Engine first (faster, deterministic, lower token cost):**
 
 ```bash
-SDK_DIR="${CLAUDE_SKILL_DIR}/../../devflow-sdk"
+ENGINE_DIR="${CLAUDE_SKILL_DIR}/../../devflow-engine"
 
-if [ -d "$SDK_DIR" ] && [ -d "$SDK_DIR/node_modules" ]; then
+if [ -d "$ENGINE_DIR" ] && [ -d "$ENGINE_DIR/node_modules" ]; then
 
   # Build CLI args
   SDK_ARGS="--pr $0 --output json"
@@ -38,7 +53,7 @@ if [ -d "$SDK_DIR" ] && [ -d "$SDK_DIR/node_modules" ]; then
   fi
 
   # Run SDK reviewer
-  sdk_result=$(cd "$SDK_DIR" && node_modules/.bin/tsx src/cli.ts review $SDK_ARGS 2>&1)
+  sdk_result=$(cd "$ENGINE_DIR" && node_modules/.bin/tsx src/cli.ts review $SDK_ARGS 2>&1)
   sdk_exit=$?
 
   # Validate: must be JSON with findings array (not just any {})
@@ -51,7 +66,7 @@ if [ -d "$SDK_DIR" ] && [ -d "$SDK_DIR/node_modules" ]; then
   }
 
 else
-  echo "devflow-sdk not available — skipping SDK-enhanced analysis"
+  echo "devflow-engine not available — skipping SDK-enhanced analysis"
   sdk_exit=1
 fi
 ```
@@ -160,5 +175,6 @@ All teammates are READ-ONLY.
 ## Step 3: Wait for all reviews
 
 ถ้า `--focused` flag → wait for **1 specialist** only, then skip directly to Phase 6 (no debate).
+ถ้า `--quick` flag → wait for **2 teammates** only (T1 + T2), then skip Phase 4.
 
 Wait for all 3 teammates to complete. Track progress: show each teammate's status and key finding. **CHECKPOINT** — all 3 reviews must complete before proceeding to Phase 4 debate.

@@ -156,7 +156,7 @@ devflow/
 │   ├── hooks.json            # Plugin hook registry
 │   └── lib/                  # Shared hook utilities
 ├── output-styles/            # Custom output styles
-├── devflow-sdk/              # TypeScript SDK for programmatic PR review
+├── devflow-engine/              # TypeScript SDK for programmatic PR review
 │   └── src/                  # Orchestrator, consolidator, triage, falsifier, CLI
 ├── scripts/                  # Dev tooling (link-assets.sh, qa-check.sh, bump-version.sh)
 ├── tests/
