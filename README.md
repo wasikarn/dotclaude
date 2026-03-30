@@ -6,9 +6,9 @@
 
 [![Version](https://img.shields.io/badge/version-1.3.2-blue?style=flat-square)](https://github.com/wasikarn/devflow/releases)
 [![License](https://img.shields.io/badge/license-MIT-green?style=flat-square)](LICENSE)
-[![Skills](https://img.shields.io/badge/skills-16-blue?style=flat-square)](#skills)
+[![Skills](https://img.shields.io/badge/skills-22-blue?style=flat-square)](#skills)
 [![Agents](https://img.shields.io/badge/agents-24-purple?style=flat-square)](#agents)
-[![Hooks](https://img.shields.io/badge/hooks-17-orange?style=flat-square)](#hooks)
+[![Hooks](https://img.shields.io/badge/hooks-18-orange?style=flat-square)](#hooks)
 
 <p>
   <a href="#installation">Installation</a> •
@@ -33,9 +33,9 @@
 
 | Component | Count | Purpose |
 | --- | --- | --- |
-| **Skills** | 16 | Workflow automation — dev loop, PR review, debugging, utilities |
+| **Skills** | 22 | Workflow automation — dev loop, PR review, debugging, utilities (all auto-triggerable) |
 | **Agents** | 24 | Specialized subagents for bootstrapping, reviewing, and committing |
-| **Hooks** | 17 | Lifecycle automation — dependency checks, skill routing, quality gates |
+| **Hooks** | 18 | Lifecycle automation — dependency checks, skill routing, quality gates |
 | **Output Styles** | 2 | Senior Software Engineer, Coding Mentor |
 | **SDK** | 1 | `devflow-sdk` — TypeScript SDK for programmatic PR review |
 
@@ -830,7 +830,7 @@ npm test
 | `src/review/triage.ts` | Classifies PR complexity — trivial (<50 lines) runs 1 reviewer |
 | `src/review/consolidator.ts` | Deduplicates and ranks findings from all reviewers |
 | `src/review/output.ts` | Formats output as Markdown or JSON; includes per-phase cost breakdown |
-| `src/cli.ts` | CLI entry point; appends reviewer calibration stats to `~/.claude/anvil-reviewer-calibration.jsonl` |
+| `src/cli.ts` | CLI entry point; appends reviewer calibration stats to `~/.claude/devflow-reviewer-calibration.jsonl` |
 
 > The SDK is `private: true` — it ships as part of this repo for contributors, not as an npm package.
 
