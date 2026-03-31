@@ -225,8 +225,9 @@ const mockReport: ReviewReport = {
   findings: [],
   strengths: [],
   verdict: 'REQUEST_CHANGES',
-  cost: { total_usd: 0.1234, per_reviewer: [0.04, 0.04, 0.04] },
-  tokens: { total: 5000, per_reviewer: [1500, 2000, 1500] },
+  complexity: 'standard',
+  cost: { total_usd: 0.1234, per_reviewer: [0.04, 0.04, 0.04], falsification_usd: 0.0034 },
+  tokens: { total: 5000, per_reviewer: [1500, 2000, 1500], falsification: 500 },
 }
 test('formatJson produces valid JSON', () => {
   const json = formatJson(mockReport)
