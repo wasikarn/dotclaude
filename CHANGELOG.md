@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.6.4] — 2026-03-31
+
+### fix(detect-project): read base_branch from hard-rules.md before falling back to git default
+
+- Previously hardcoded `base_branch="main"` which ignored project-specific base branches like `develop`
+- Now reads from `.claude/skills/review-rules/hard-rules.md` if present
+- Falls back to `git symbolic-ref refs/remotes/origin/HEAD`, then `"main"` as last resort
+
 ## [1.6.3] — 2026-03-31
 
 ### docs: update version badge to v1.6.3
