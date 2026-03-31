@@ -622,6 +622,103 @@ async function runResolveCommand(args: string[]): Promise<void> {
   console.log(JSON.stringify(result, null, 2))
 }
 
+// ─── audit subcommand ─────────────────────────────────────────────────────────
+
+interface ParsedAuditArgs {
+  path: string | undefined
+  npmAuditFile: string | undefined
+  budget: number | undefined
+  noAgent: boolean
+}
+
+export function parseAuditArgs(args: string[]): ParsedAuditArgs {
+  return parseFlags(args, [
+    { flag: '--path', field: 'path', type: 'string', errorPrefix: '[sdk-audit]', onError: 'exit' },
+    { flag: '--npm-audit-file', field: 'npmAuditFile', type: 'string', errorPrefix: '[sdk-audit]', onError: 'exit' },
+    { flag: '--budget', field: 'budget', type: 'positiveFloat', errorPrefix: '[sdk-audit]' },
+    { flag: '--no-agent', field: 'noAgent', type: 'boolean', errorPrefix: '[sdk-audit]' },
+  ], {
+    path: undefined as string | undefined,
+    npmAuditFile: undefined as string | undefined,
+    budget: undefined as number | undefined,
+    noAgent: false as boolean,
+  })
+}
+
+async function runAuditCommand(args: string[]): Promise<void> {
+  const parsed = parseAuditArgs(args)
+  const config = resolveConfig({ ...(parsed.budget !== undefined && { budgetUsd: parsed.budget }) })
+
+  const output: {
+    vulnerabilities: unknown[]
+    securityFindings?: unknown[]
+    cost?: number
+    tokens?: number
+  } = { vulnerabilities: [] }
+
+  // Dependency check — parse npm audit JSON file if provided
+  if (parsed.npmAuditFile !== undefined) {
+    if (!existsSync(parsed.npmAuditFile)) {
+      console.error(`[sdk-audit] --npm-audit-file not found: ${parsed.npmAuditFile}`)
+      process.exit(1)
+    }
+    const { parseNpmAuditOutput } = await import('./audit/dependency-checker.js')
+    const raw = readFileSync(parsed.npmAuditFile, 'utf8')
+    output.vulnerabilities = parseNpmAuditOutput(raw)
+  }
+
+  // Security scanner — run agent on path if not suppressed
+  if (!parsed.noAgent && parsed.path !== undefined) {
+    const { runSecurityScanner } = await import('./audit/agents/security-scanner.js')
+    const result = await runSecurityScanner({ targetPath: parsed.path, config })
+    output.securityFindings = result.vulnerabilities
+    output.cost = result.cost
+    output.tokens = result.tokens
+  }
+
+  console.log(JSON.stringify(output, null, 2))
+}
+
+// ─── test-gen subcommand ──────────────────────────────────────────────────────
+
+interface ParsedTestGenArgs {
+  files: string | undefined
+  packageJson: string | undefined
+  budget: number | undefined
+}
+
+export function parseTestGenArgs(args: string[]): ParsedTestGenArgs {
+  return parseFlags(args, [
+    { flag: '--files', field: 'files', type: 'string', required: true, errorPrefix: '[sdk-test-gen]', onError: 'exit' },
+    { flag: '--package-json', field: 'packageJson', type: 'string', errorPrefix: '[sdk-test-gen]', onError: 'exit' },
+    { flag: '--budget', field: 'budget', type: 'positiveFloat', errorPrefix: '[sdk-test-gen]' },
+  ], {
+    files: undefined as string | undefined,
+    packageJson: undefined as string | undefined,
+    budget: undefined as number | undefined,
+  })
+}
+
+async function runTestGenCommand(args: string[]): Promise<void> {
+  const parsed = parseTestGenArgs(args)
+  if (parsed.files === undefined) {
+    console.error('[sdk-test-gen] --files is required (comma-separated list of file paths)')
+    process.exit(1)
+  }
+
+  const targetFiles = parsed.files.split(',').map(f => f.trim()).filter(f => f.length > 0)
+  if (targetFiles.length === 0) {
+    console.error('[sdk-test-gen] --files must contain at least one file path')
+    process.exit(1)
+  }
+
+  const config = resolveConfig({ ...(parsed.budget !== undefined && { budgetUsd: parsed.budget }) })
+  const { runTestWriter } = await import('./test-gen/agents/test-writer.js')
+  const result = await runTestWriter({ targetFiles, packageJsonPath: parsed.packageJson, config })
+
+  console.log(JSON.stringify(result, null, 2))
+}
+
 // ─── main dispatcher ──────────────────────────────────────────────────────────
 
 async function main(): Promise<void> {
@@ -651,6 +748,14 @@ async function main(): Promise<void> {
   }
   if (subcommand === 'resolve') {
     await runResolveCommand(args)
+    return
+  }
+  if (subcommand === 'audit') {
+    await runAuditCommand(args)
+    return
+  }
+  if (subcommand === 'test-gen') {
+    await runTestGenCommand(args)
     return
   }
 
