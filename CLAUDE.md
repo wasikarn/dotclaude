@@ -63,7 +63,7 @@ Custom subagents live at `agents/<name>.md` with YAML frontmatter. Distributed a
 Key fields: `description` (include "proactively" to auto-trigger), `memory` (`user`/`project`/`local` for cross-session persistence), `skills` (preload into agent context). All fields: `name`, `tools`/`disallowedTools`, `model`, `hooks`, `permissionMode`, `maxTurns`, `background`, `isolation`.
 
 > **Plugin limitation:** `hooks`, `mcpServers`, and `permissionMode` are silently ignored when agents are loaded from a plugin. To use these fields, copy the agent to `.claude/agents/` instead.
-Current agents (26):
+Current agents (27):
 
 | Agent | Model | Purpose |
 | --- | --- | --- |
@@ -76,7 +76,7 @@ Current agents (26):
 | `code-reviewer` | sonnet | General-purpose code reviewer with cross-session persistent memory |
 | `type-design-analyzer` | sonnet | TypeScript type design quality — 4 dimensions rated 1-10 (Encapsulation, Invariant Expression, Invariant Usefulness, Invariant Enforcement) |
 
-> Full agent list: see [agents/](agents/) — 26 agents total.
+> Full agent list: see [agents/](agents/) — 27 agents total.
 
 <important if="editing or adding hooks">
 
