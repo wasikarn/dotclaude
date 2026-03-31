@@ -49,6 +49,11 @@ Prefer reading source before editing — key references:
 | `plugin-qa` | Run QA check suite to verify all hooks, skills, and plugin structure |
 | `analyze-claude-features` | Audit project against official Claude Code features and score adoption coverage |
 | `promote-hard-rule` | Review auto-detected Hard Rule candidates (from metrics-analyst) and approve/reject/defer each one — never auto-applies |
+| `generate-tests` | Framework-aware test generation (vitest/jest/bun/japa); self-reviews via test-quality-reviewer |
+| `refactor` | Safe refactoring — runs tests before/after; modes: `--simplify`, `--extract`, `--restructure` |
+| `audit` | Security + dependency audit; `--deps` (npm audit), `--security` (OWASP via security-reviewer), `--all` |
+| `generate-docs` | API, README, and inline JSDoc/TSDoc documentation generation |
+| `dashboard` | Terminal-friendly metrics summary from all devflow tracking files; anomaly alerts |
 | `review-rules` | _(background)_ 12-point review framework — preloaded into reviewer agents |
 | `review-conventions` | _(background)_ Comment labels, dedup protocol, PR size thresholds — preloaded into reviewer agents |
 | `review-output-format` | _(background)_ PR review output format templates — preloaded into reviewer agents |
@@ -102,7 +107,7 @@ Custom output styles live at `output-styles/<name>.md` with frontmatter (`name`,
 
 Output styles replace the default system prompt's coding instructions unless `keep-coding-instructions: true`. Use for consistent formatting/tone across sessions.
 
-Current styles: `senior-software-engineer` (Thai language, pragmatic senior engineer tone with trade-off focus), `coding-mentor` (Thai language, teaches through doing — adds "Why" explanations after significant changes, good for onboarding)
+Current styles: `senior-software-engineer` + `senior-software-engineer-en` (Thai/English, pragmatic senior engineer tone with trade-off focus), `coding-mentor` + `coding-mentor-en` (Thai/English, teaches through doing — adds "Why" explanations after significant changes, good for onboarding)
 
 ## Plugin
 

@@ -164,15 +164,16 @@ devflow/
 ├── .claude-plugin/
 │   └── plugin.json           # Plugin manifest
 ├── skills/                   # Skill entry points (SKILL.md per skill)
-│   └── ...                   # 22 skills (16 user-facing + 6 background)
-├── agents/                   # Custom subagent definitions (24 agents)
-├── hooks/                    # Lifecycle hooks (18 hooks)
+│   └── ...                   # 26 skills (20 user-facing + 6 background)
+├── agents/                   # Custom subagent definitions (27 agents)
+├── hooks/                    # Lifecycle hooks (25 hooks)
 │   ├── hooks.json            # Plugin hook registry
 │   └── lib/                  # Shared hook utilities
-├── output-styles/            # Custom output styles
-├── devflow-engine/              # TypeScript SDK for programmatic PR review
-│   └── src/                  # Orchestrator, consolidator, triage, falsifier, CLI
-├── scripts/                  # Dev tooling (link-assets.sh, qa-check.sh, bump-version.sh)
+├── output-styles/            # Custom output styles (4: Thai + English variants)
+├── devflow-engine/           # TypeScript SDK for programmatic PR review, audit, test-gen
+│   └── src/                  # Orchestrator, consolidator, triage, falsifier, audit, test-gen, CLI
+├── scripts/                  # Dev tooling (link-assets.sh, qa-check.sh, bump-version.sh, dashboard.sh)
+│   └── git-hooks/            # Tracked pre-commit hook (install via scripts/install-hooks.sh)
 ├── tests/
 │   └── hooks/                # bats test suite for hook scripts
 └── docs/

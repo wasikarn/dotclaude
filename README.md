@@ -4,11 +4,11 @@
 
 **A Claude Code plugin for structured development, PR review, and debugging — powered by Agent Teams.**
 
-[![Version](https://img.shields.io/badge/version-1.3.2-blue?style=flat-square)](https://github.com/wasikarn/devflow/releases)
+[![Version](https://img.shields.io/badge/version-1.6.0-blue?style=flat-square)](https://github.com/wasikarn/devflow/releases)
 [![License](https://img.shields.io/badge/license-MIT-green?style=flat-square)](LICENSE)
-[![Skills](https://img.shields.io/badge/skills-22-blue?style=flat-square)](#skills)
-[![Agents](https://img.shields.io/badge/agents-24-purple?style=flat-square)](#agents)
-[![Hooks](https://img.shields.io/badge/hooks-18-orange?style=flat-square)](#hooks)
+[![Skills](https://img.shields.io/badge/skills-26-blue?style=flat-square)](#skills)
+[![Agents](https://img.shields.io/badge/agents-27-purple?style=flat-square)](#agents)
+[![Hooks](https://img.shields.io/badge/hooks-25-orange?style=flat-square)](#hooks)
 
 <p>
   <a href="#installation">Installation</a> •
@@ -33,11 +33,11 @@
 
 | Component | Count | Purpose |
 | --- | --- | --- |
-| **Skills** | 22 | Workflow automation — dev loop, PR review, debugging, utilities (all auto-triggerable) |
-| **Agents** | 24 | Specialized subagents for bootstrapping, reviewing, and committing |
-| **Hooks** | 18 | Lifecycle automation — dependency checks, skill routing, quality gates |
-| **Output Styles** | 2 | Senior Software Engineer, Coding Mentor |
-| **SDK** | 1 | `devflow-engine` — TypeScript SDK for programmatic PR review |
+| **Skills** | 26 | Workflow automation — dev loop, PR review, debugging, utilities (all auto-triggerable) |
+| **Agents** | 27 | Specialized subagents for bootstrapping, reviewing, and committing |
+| **Hooks** | 25 | Lifecycle automation — dependency checks, skill routing, quality gates |
+| **Output Styles** | 4 | Senior Software Engineer, Coding Mentor (Thai + English variants) |
+| **SDK** | 1 | `devflow-engine` — TypeScript SDK for programmatic PR review and security audit |
 
 ---
 
@@ -577,6 +577,65 @@ Reviews auto-detected Hard Rule candidates from `metrics-analyst` and walks thro
 
 ---
 
+#### `generate-tests` — Test Generation
+
+Detects the test framework in use (vitest/jest/bun/japa), generates tests following existing conventions, and self-reviews via `test-quality-reviewer`.
+
+```bash
+/devflow:generate-tests src/auth/middleware.ts
+/devflow:generate-tests src/auth/            # all files in directory
+```
+
+---
+
+#### `refactor` — Safe Refactoring
+
+Refactors code with a safety net: runs tests before and after to verify no behavior changes.
+
+```bash
+/devflow:refactor src/utils/parser.ts --simplify    # delegate to code-simplifier
+/devflow:refactor src/utils/parser.ts --extract     # extract function/module
+/devflow:refactor src/utils/parser.ts --restructure # structural reorganization
+```
+
+---
+
+#### `audit` — Security & Dependency Audit
+
+Runs a security and/or dependency audit. `--security` spawns the `security-reviewer` agent; `--deps` runs `npm audit` or `pip-audit`.
+
+```bash
+/devflow:audit --deps       # dependency vulnerability scan
+/devflow:audit --security   # OWASP-focused code security review
+/devflow:audit --all        # both
+```
+
+---
+
+#### `generate-docs` — Documentation Generation
+
+Generates documentation from source code. Supports API docs, README sections, and inline JSDoc/TSDoc.
+
+```bash
+/devflow:generate-docs --api src/routes/      # OpenAPI-style endpoint docs
+/devflow:generate-docs --readme               # update README from code
+/devflow:generate-docs --inline src/auth/     # add JSDoc/TSDoc comments
+```
+
+---
+
+#### `dashboard` — Metrics Dashboard
+
+Reads all three devflow tracking files and renders a terminal-friendly metrics summary with anomaly alerts.
+
+```bash
+/devflow:dashboard
+```
+
+**Sections:** session summary, anomaly alerts (avg iterations >3, critical findings shipped, rejection rate >40%), reviewer calibration, top-10 skill usage.
+
+---
+
 ### Skill Guides
 
 Detailed contributor docs for each skill live in `skills/<name>/CLAUDE.md`. For skill creation guidelines and best practices, see [`docs/references/`](docs/references/).
@@ -604,15 +663,18 @@ Specialized subagents spawned automatically by Devflow skills. Can also be invok
 | `metrics-analyst` | Haiku | `metrics` | Retrospective from devflow-metrics.jsonl: iteration patterns and Hard Rule candidates |
 | `falsification-agent` | Sonnet | `build` Phase 6, `review` Phase 5 | Challenges every finding — outputs SUSTAINED/DOWNGRADED/REJECTED per finding |
 | `plan-challenger` | Sonnet | `build` Phase 3 gate | Challenges plan for YAGNI/scope/ordering issues before implementation |
-| `test-quality-reviewer` | Sonnet | `review` Phase 3 | Test quality (T1–T9): behavior vs implementation, mock fidelity, assertion presence |
+| `test-quality-reviewer` | Sonnet | `review` Phase 3, `/generate-tests` | Test quality (T1–T9): behavior vs implementation, mock fidelity, assertion presence; cross-session memory |
 | `migration-reviewer` | Sonnet | `review` Phase 3 | DB migration safety (M1–M10): DDL reversibility, FK indexes, table-lock risk |
-| `api-contract-auditor` | Sonnet | `review` Phase 3 | API breaking changes (A1–A10): removed fields, status codes, required params |
+| `api-contract-auditor` | Sonnet | `review` Phase 3 | API breaking changes (A1–A10): removed fields, status codes, required params; cross-session memory |
+| `security-reviewer` | Sonnet | `/audit --security`, `review` | OWASP-focused security review — cross-session memory for recurring patterns per project |
 | `skill-validator` | Sonnet | Manually | Validates SKILL.md frontmatter and description quality |
 | `project-onboarder` | Sonnet | `onboard` | Scaffolds hard-rules.md and build directory for new projects |
 | `code-explorer` | Sonnet | Manually | Traces execution paths and maps feature architecture — read-only, no code changes |
-| `comment-analyzer` | Sonnet | Manually / `build` Phase 4 (optional) | Verifies comment accuracy against code; flags stale references and comment rot |
-| `code-simplifier` | Sonnet | Manually / `build` Phase 7 (optional) | Simplifies recently changed code for clarity and maintainability without altering behavior |
+| `comment-analyzer` | Sonnet | Manually / `build` Phase 4 (optional) | Verifies comment accuracy against code; flags stale references and comment rot; cross-session memory |
+| `code-simplifier` | Sonnet | Manually / `/refactor --simplify` | Simplifies recently changed code for clarity and maintainability without altering behavior |
 | `code-reviewer` | Sonnet | Manually | General-purpose code reviewer with cross-session persistent memory; includes 6 inline domain lenses (security, database, TypeScript, frontend, error handling, API design) applied per diff content |
+| `silent-failure-hunter` | Sonnet | `review` Phase 3 | Hunts for swallowed exceptions, empty catch blocks, optional chain fallbacks; cross-session memory |
+| `type-design-analyzer` | Sonnet | Manually | TypeScript type design quality — 4 dimensions rated 1-10; cross-session memory |
 
 ---
 
@@ -625,19 +687,22 @@ Distributed automatically with the plugin — no manual configuration required.
 | `check-deps.sh` | `SessionStart` | Warns in context if `jq`, `git`, or `gh` are missing |
 | `session-start-context.sh` | `SessionStart` | Injects current git branch and uncommitted file count |
 | `cleanup-artifacts.sh` | `SessionStart` (async) | Purges stale artifact directories from prior sessions |
+| `migrate-legacy-data.sh` | `SessionStart` (async) | Migrates `anvil-*` → `devflow-*` JSONL files (runs once; sentinel-guarded) |
 | `skill-routing.sh` | `UserPromptSubmit` | Detects workflow keywords and suggests the matching skill |
 | `protect-files.sh` | `PreToolUse[Edit\|Write]` | Blocks Claude from editing `.claude/settings.json` directly |
+| _(freeze inline)_ | `PreToolUse[Edit\|Write]` | Blocks edits outside the frozen path when `/devflow:freeze` is active |
 | `skill-usage-tracker.sh` | `PreToolUse[Skill]` | Logs skill invocations for analytics and usage tracking |
 | `safe-command-approver.sh` | `PreToolUse[Bash]` | Auto-approves allowlisted read-only commands to reduce permission friction |
 | _(inline)_ | `PostToolUse[Edit\|Write]` | Auto-lints `.md` files with `markdownlint-cli2 --fix` |
 | `shellcheck-written-scripts.sh` | `PostToolUse[Write]` | Auto-validates `.sh` files Claude writes |
+| `edit-write-failure-hint.sh` | `PostToolUseFailure[Edit\|Write]` | Injects diagnostic hints for "old_string not found", permission, and path errors |
 | `task-gate.sh` | `TaskCompleted` | Requires `file:line` evidence before agent tasks are marked complete |
 | `idle-nudge.sh` | `TeammateIdle` | Nudges idle Agent Teams teammates back on task |
 | `pre-compact-save.sh` | `PreCompact` | Saves session state before context compaction |
 | `post-compact-context.sh` | `PostCompact` | Re-injects session context after compaction |
 | `bash-failure-hint.sh` | `PostToolUseFailure[Bash]` | Injects diagnostic hints after Bash tool failures |
-| `stop-failure-log.sh` | `StopFailure` | Logs API errors (rate limit, token overflow) to session log |
-| `subagent-start-context.sh` | `SubagentStart` | Injects branch/project context into reviewer agents at spawn |
+| `stop-failure-log.sh` | `StopFailure` | Logs API errors (rate limit, token overflow) to session log; rotates logs >500KB |
+| `subagent-start-context.sh` | `SubagentStart` | Injects branch/project context into reviewer agents; warns when hard-rules.md exceeds 60-line limit |
 | `subagent-stop-gate.sh` | `SubagentStop` | Blocks reviewer agents that finish without `file:line` evidence |
 | `session-end-cleanup.sh` | `SessionEnd` (async) | Cleans up temporary session files after session ends |
 
@@ -661,7 +726,9 @@ Activate an output style to change how Claude communicates throughout a session.
 | Style | Activate with | Description |
 | --- | --- | --- |
 | `senior-software-engineer` | `/output-style senior-software-engineer` | Thai language. Pragmatic senior engineer tone — trade-offs, production quality, practical solutions. |
+| `senior-software-engineer-en` | `/output-style senior-software-engineer-en` | English variant of the above. |
 | `coding-mentor` | `/output-style coding-mentor` | Thai language. Teaches through doing — adds concise "Why" explanations after significant changes. Good for onboarding. |
+| `coding-mentor-en` | `/output-style coding-mentor-en` | English variant of the above. |
 
 ---
 
@@ -788,6 +855,11 @@ devflow/
 │   ├── plugin-qa/
 │   ├── analyze-claude-features/
 │   ├── promote-hard-rule/
+│   ├── generate-tests/       # v1.6.0: framework-aware test generation
+│   ├── refactor/             # v1.6.0: safe refactoring with before/after tests
+│   ├── audit/                # v1.6.0: security + dependency audit
+│   ├── generate-docs/        # v1.6.0: API / README / inline docs
+│   ├── dashboard/            # v1.6.0: metrics dashboard
 │   └── ...                   # background skills (review-rules, debate-protocol, etc.)
 ├── agents/                   # Custom subagent definitions (.md files)
 ├── hooks/                    # Plugin-distributed lifecycle hook scripts
@@ -810,16 +882,19 @@ devflow/
 
 ```bash
 cd devflow-engine
-npm install
+bun install
 
 # Review a PR by number (requires GH_TOKEN or gh CLI)
-npm run review -- --pr 42
+bun run review -- --pr 42
 
-# Review a local diff file
-npm run review -- --diff path/to/changes.diff
+# Run a security + dependency audit
+bun run audit -- --pr 42 --all
+
+# Generate tests for a file
+bun run test-gen -- --file src/auth/middleware.ts
 
 # Run the test suite
-npm test
+bun test
 ```
 
 **Key modules:**
@@ -830,7 +905,11 @@ npm test
 | `src/review/triage.ts` | Classifies PR complexity — trivial (<50 lines) runs 1 reviewer |
 | `src/review/consolidator.ts` | Deduplicates and ranks findings from all reviewers |
 | `src/review/output.ts` | Formats output as Markdown or JSON; includes per-phase cost breakdown |
-| `src/cli.ts` | CLI entry point; appends reviewer calibration stats to `~/.claude/devflow-reviewer-calibration.jsonl` |
+| `src/cli.ts` | CLI entry point (`review`, `audit`, `test-gen` subcommands); appends reviewer calibration stats |
+| `src/audit/dependency-checker.ts` | Parses `npm audit` JSON; extracts CVEs by severity |
+| `src/audit/agents/security-scanner.ts` | Invokes `security-reviewer` agent for OWASP analysis |
+| `src/test-gen/framework-detector.ts` | Detects test framework from package.json (vitest/jest/bun/japa) |
+| `src/test-gen/agents/test-writer.ts` | Spawns test-gen subagent with framework context |
 
 > The SDK is `private: true` — it ships as part of this repo for contributors, not as an npm package.
 
