@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.7.0] — 2026-04-03
+
+### Token optimization: field filtering, PR diff filters, metrics tracking
+
+- fix: resolve QA issues - fenced code language, heading format, broken link
+- feat(skills): add token metrics display to /metrics and /dashboard
+- feat: add --exclude parameter to review skill and auto-filter
+- feat(agents): add jira presets to debug and pr-review bootstrap
+- feat(agents): pass --preset=build to jira fetch in build-bootstrap
+- feat(skills): add field presets to jira-integration
+- docs: add injection points mechanism documentation
+- feat(devflow-engine): add metrics.ts with token tracking schema v1.1
+- docs: add token optimization implementation plan
+- docs: revise token optimization spec after expert review
+- docs: add token optimization design spec
+
 ## [1.6.5] — 2026-04-03
 
 ### Skill quality improvements: comprehensive audit, token optimization, CLAUDE.md updates
