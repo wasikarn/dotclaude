@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.6.5] — 2026-04-03
+
+### Skill quality improvements: comprehensive audit, token optimization, CLAUDE.md updates
+
+- fix: remove extra blank line in hard-rules.md
+- fix: resolve QA issues - markdownlint, test-patterns-workspace removal
+- fix(skills): comprehensive skill quality improvements
+- feat(skills): add test-patterns skill
+- fix: suppress SC2016 false positive in detect-project.sh
+
 ## [1.6.4] — 2026-03-31
 
 ### fix(detect-project): read base_branch from hard-rules.md before falling back to git default
