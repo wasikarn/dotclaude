@@ -22,7 +22,7 @@ Display a terminal-friendly metrics summary from all devflow tracking files with
 
 ## Output Format
 
-```
+```text
 📊 Devflow Dashboard — 2024-01-15
 
 Sessions: 23 total

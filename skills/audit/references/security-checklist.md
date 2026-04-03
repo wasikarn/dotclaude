@@ -74,25 +74,20 @@ Common patterns for detecting hardcoded secrets:
 
 **API Keys:**
 
-
 - Pattern: `api_key`, `apikey`, `API_KEY` followed by value
 - Example: `api_key: "sk-1234567890abcdef"`
-
 
 **AWS Keys:**
 
 - Pattern: `AKIA` followed by 16 alphanumeric chars
 - Example: `AKIAIOSFODNN7EXAMPLE`
 
-
 **Private Keys:**
 
 - Pattern: `-----BEGIN PRIVATE KEY-----`
-
 - Check for: RSA, EC, DSA private key headers
 
 **JWT Secrets:**
-
 
 - Pattern: `jwt_secret`, `JWT_SECRET` followed by value
 - Minimum length: 256 bits (32 chars)
@@ -149,7 +144,6 @@ Common patterns for detecting hardcoded secrets:
 ```
 
 ## Remediation Priority
-
 
 1. **Critical** — Fix immediately, block release
 2. **High** — Fix before production deployment

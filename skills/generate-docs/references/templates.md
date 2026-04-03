@@ -79,6 +79,8 @@ Brief description of what this endpoint does.
 | 429 | RATE_LIMIT | Too many requests |
 | 500 | INTERNAL_ERROR | Server error |
 
+```text
+(no content after this line - end of example)
 ```
 
 ### Full API Doc Template
@@ -152,6 +154,8 @@ const result = feature({ option: 'value' });
 
 Environment variables or config file settings.
 
+```text
+(no content after this line - end of example)
 ```
 
 ### Installation Section
@@ -197,6 +201,8 @@ npm run migrate
 npm start
 ```
 
+```text
+(no content after this line - end of installation)
 ```
 
 ### Configuration Section
@@ -229,6 +235,8 @@ Configuration can also be set in `config/default.json`:
 }
 ```
 
+```text
+(no content after this line - end of config example)
 ```
 
 ## JSDoc/TSDoc Templates

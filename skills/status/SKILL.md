@@ -51,7 +51,7 @@ fi
 
 ## Report Format
 
-```
+```text
 📁 Active Session: ~/.claude/artifacts/build-2024-01-15-abc123/
 
 📄 Artifacts:
