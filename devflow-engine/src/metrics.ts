@@ -93,7 +93,7 @@ export function validateEntry(entry: unknown): MetricsEntry {
     skill: e.skill as string,
     phase: e.phase as string,
     mode: e.mode as string,
-    tokens
+    ...(tokens !== undefined ? { tokens } : {})
   }
 }
 
