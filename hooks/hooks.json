@@ -27,18 +27,6 @@
             "type": "command",
             "command": "${CLAUDE_PLUGIN_ROOT}/hooks/session-start-context.sh",
             "timeout": 10
-          },
-          {
-            "type": "command",
-            "async": true,
-            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/cleanup-artifacts.sh",
-            "timeout": 15
-          },
-          {
-            "type": "command",
-            "async": true,
-            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/../scripts/migrate-legacy-data.sh\"",
-            "timeout": 10
           }
         ]
       }
@@ -85,29 +73,7 @@
         ]
       }
     ],
-    "PostToolUse": [
-      {
-        "matcher": "Edit|Write",
-        "hooks": [
-          {
-            "type": "command",
-            "async": true,
-            "timeout": 30,
-            "command": "command -v jq > /dev/null 2>&1 && FILE=$(jq -r '.tool_input.file_path // empty') && [ -n \"$FILE\" ] && echo \"$FILE\" | grep -qE '\\.md$' && npx markdownlint-cli2 --fix \"$FILE\" 2>/dev/null; exit 0"
-          }
-        ]
-      },
-      {
-        "matcher": "Write",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/shellcheck-written-scripts.sh",
-            "timeout": 10
-          }
-        ]
-      }
-    ],
+    "PostToolUse": [],
     "PostToolUseFailure": [
       {
         "matcher": "Bash",
@@ -130,19 +96,7 @@
         ]
       }
     ],
-    "StopFailure": [
-      {
-        "matcher": "rate_limit|max_output_tokens|billing_error|server_error",
-        "hooks": [
-          {
-            "type": "command",
-            "async": true,
-            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/stop-failure-log.sh",
-            "timeout": 5
-          }
-        ]
-      }
-    ],
+    "StopFailure": [],
     "TaskCompleted": [
       {
         "matcher": "review-debate",
@@ -210,18 +164,7 @@
         ]
       }
     ],
-    "SessionEnd": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "async": true,
-            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/session-end-cleanup.sh",
-            "timeout": 15
-          }
-        ]
-      }
-    ],
+    "SessionEnd": [],
     "TeammateIdle": [
       {
         "matcher": "review-pr",
