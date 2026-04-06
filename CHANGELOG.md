@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.7.3] — 2026-04-06
+
+### Hook cleanup and skill rename
+
+- docs: update README and CLAUDE.md for v1.7.2
+- fix: move evidence requirement from SubagentStop gate to SubagentStart context
+- refactor: rename debug skill to debug-parallel — avoids name collision with oh-my-claudecode:debug
+- perf: remove UserPromptSubmit skill-routing hook (conflicts with OMC skill-injector)
+- perf: remove non-essential hooks to reduce hook density
+- fix: remove extra blank line in CHANGELOG.md (MD012)
+
 ## [1.7.2] — 2026-04-04
 
 ### Release 1.7.2
