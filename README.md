@@ -4,11 +4,11 @@
 
 **A Claude Code plugin for structured development, PR review, and debugging — powered by Agent Teams.**
 
-[![Version](https://img.shields.io/badge/version-1.7.1-blue?style=flat-square)](https://github.com/wasikarn/devflow/releases)
+[![Version](https://img.shields.io/badge/version-1.7.2-blue?style=flat-square)](https://github.com/wasikarn/devflow/releases)
 [![License](https://img.shields.io/badge/license-MIT-green?style=flat-square)](LICENSE)
 [![Skills](https://img.shields.io/badge/skills-29-blue?style=flat-square)](#skills)
 [![Agents](https://img.shields.io/badge/agents-27-purple?style=flat-square)](#agents)
-[![Hooks](https://img.shields.io/badge/hooks-25-orange?style=flat-square)](#hooks)
+[![Hooks](https://img.shields.io/badge/hooks-17-orange?style=flat-square)](#hooks)
 
 <p>
   <a href="#installation">Installation</a> •
@@ -73,7 +73,7 @@ Done (or review cycle if issues found)
 | --- | --- | --- |
 | **Skills** | 29 | Workflow automation — dev loop, PR review, debugging, utilities |
 | **Agents** | 27 | Specialized subagents for bootstrapping, reviewing, committing |
-| **Hooks** | 25 | Lifecycle automation — dependency checks, skill routing, quality gates |
+| **Hooks** | 17 | Lifecycle automation — dependency checks, context injection, quality gates |
 | **Output Styles** | 4 | Senior Software Engineer, Coding Mentor (Thai + English) |
 | **SDK** | 1 | `devflow-engine` — TypeScript SDK for programmatic PR review |
 
@@ -169,7 +169,7 @@ claude plugin install devflow
 
 #### Step 5 — Enable Agent Teams
 
-Devflow skills (`build`, `review`, `respond`, `debug`) spawn parallel agents using Agent Teams. Without this flag, they degrade to solo mode.
+Devflow skills (`build`, `review`, `respond`, `debug-parallel`) spawn parallel agents using Agent Teams. Without this flag, they degrade to solo mode.
 
 ```bash
 claude config set env.CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS 1
@@ -259,7 +259,7 @@ flowchart TD
     RESPOND["/devflow:respond 42
     Fix all threads → commit → reply"]
 
-    DEBUG["/devflow:debug 'error msg'
+    DEBUG["/devflow:debug-parallel 'error msg'
     Root cause + DX hardening → fix PR"]
 
     BUILD --> MERGE
@@ -337,7 +337,7 @@ flowchart TD
     RESPOND -->|All threads resolved| MERGE
     RESPOND -->|Another review cycle| REVIEW
 
-    DEBUG["**debug**
+    DEBUG["**debug-parallel**
     Investigator + DX Analyst in parallel
     → Root cause + Fix + Hardening"]
 
@@ -461,17 +461,17 @@ Fetches all open GitHub review threads on a PR, fixes each issue in parallel, co
 
 ---
 
-#### `debug` — Parallel Root Cause Analysis
+#### `debug-parallel` — Parallel Root Cause Analysis
 
 Two agents run in parallel: an Investigator traces the root cause, while a DX Analyst audits the affected area across 19 DX patterns (error handling E1–E8, observability O1–O6, prevention P1–P5). A Fixer agent then applies the fix; an optional Fix Reviewer checks safety patterns including TOCTOU, null paths, and race conditions.
 
 **When to use:** Complex bugs, production incidents, or when you want to harden the affected area alongside the fix.
 
 ```bash
-/devflow:debug "NullPointerException in UserService"
-/devflow:debug PROJ-5678           # from a Jira bug ticket
-/devflow:debug PROJ-5678 --quick   # fix only, skip DX analysis
-/devflow:debug PROJ-5678 --review  # add Fix Reviewer after Fixer (forced on P0)
+/devflow:debug-parallel "NullPointerException in UserService"
+/devflow:debug-parallel PROJ-5678           # from a Jira bug ticket
+/devflow:debug-parallel PROJ-5678 --quick   # fix only, skip DX analysis
+/devflow:debug-parallel PROJ-5678 --review  # add Fix Reviewer after Fixer (forced on P0)
 ```
 
 ---
@@ -593,6 +593,18 @@ Runs the full QA check suite to verify hooks, skills, and plugin structure are h
 
 ---
 
+#### `setup` — Post-Install Setup
+
+Installs `devflow-engine` dependencies via `bun install` and runs a smoke test. Idempotent — detects what is already configured and skips those steps.
+
+```bash
+/devflow:setup
+```
+
+**When to use:** After installing or reinstalling the plugin. Not for project onboarding (use `/devflow:onboard` instead).
+
+---
+
 #### `analyze-claude-features` — Claude Feature Adoption Audit
 
 Audits the current project against all official Claude Code features and scores adoption coverage. Reports which features are used, unused, or partially adopted.
@@ -689,13 +701,13 @@ Specialized subagents spawned automatically by Devflow skills. Can also be invok
 | `commit-finalizer` | Haiku | Manually | Fast git commit with conventional commit formatting |
 | `devflow-build-bootstrap` | Haiku | `build` Phase 2 | Pre-gathers project structure and type definitions |
 | `build-research-summarizer` | Haiku | `build` Phase 2→3 gate | Compresses research.md into a compact JSON summary — eliminates re-reads at later phases |
-| `devflow-debug-bootstrap` | Haiku | `debug` Phase 1 | Pre-gathers stack trace context and affected files |
+| `devflow-debug-bootstrap` | Haiku | `debug-parallel` Phase 1 | Pre-gathers stack trace context and affected files |
 | `devflow-respond-bootstrap` | Haiku | `respond` Phase 1 | Pre-gathers open PR threads and affected files |
 | `pr-review-bootstrap` | Haiku | `review` Phase 1 | Fetches PR diff, Jira AC, and groups changed files |
 | `review-consolidator` | Haiku | `review` Phase 5 | Deduplicates and ranks findings from multiple reviewers |
 | `research-validator` | Haiku | `build` Phase 2→3 gate | Validates research.md completeness (file:line evidence) |
 | `fix-intent-verifier` | Haiku | `respond` Phase 2 | Verifies each fix addresses reviewer intent (ADDRESSED/PARTIAL/MISALIGNED) |
-| `jira-summary-poster` | Haiku | `build`/`debug` end | Posts ADF implementation summary to Jira; AC coverage check; optional status transition; spawns atlassian-pm agents when available |
+| `jira-summary-poster` | Haiku | `build`/`debug-parallel` end | Posts ADF implementation summary to Jira; AC coverage check; optional status transition; spawns atlassian-pm agents when available |
 | `work-context` | Haiku | Session start | Sprint tickets + PRs awaiting action + unmerged branches digest |
 | `merge-preflight` | Haiku | `merge-pr` Confirmation Gate | Pre-merge go/no-go safety checklist |
 | `metrics-analyst` | Haiku | `metrics` | Retrospective from devflow-metrics.jsonl: iteration patterns and Hard Rule candidates |
@@ -724,36 +736,16 @@ Distributed automatically with the plugin — no manual configuration required.
 | --- | --- | --- |
 | `check-deps.sh` | `SessionStart` | Warns in context if `jq`, `git`, or `gh` are missing |
 | `session-start-context.sh` | `SessionStart` | Injects current git branch and uncommitted file count |
-| `cleanup-artifacts.sh` | `SessionStart` (async) | Purges stale artifact directories from prior sessions |
-| `migrate-legacy-data.sh` | `SessionStart` (async) | Migrates `anvil-*` → `devflow-*` JSONL files (runs once; sentinel-guarded) |
-| `skill-routing.sh` | `UserPromptSubmit` | Detects workflow keywords and suggests the matching skill |
 | `protect-files.sh` | `PreToolUse[Edit\|Write]` | Blocks Claude from editing `.claude/settings.json` directly |
-| _(freeze inline)_ | `PreToolUse[Edit\|Write]` | Blocks edits outside the frozen path when `/devflow:freeze` is active |
 | `skill-usage-tracker.sh` | `PreToolUse[Skill]` | Logs skill invocations for analytics and usage tracking |
 | `safe-command-approver.sh` | `PreToolUse[Bash]` | Auto-approves allowlisted read-only commands to reduce permission friction |
-| _(inline)_ | `PostToolUse[Edit\|Write]` | Auto-lints `.md` files with `markdownlint-cli2 --fix` |
-| `shellcheck-written-scripts.sh` | `PostToolUse[Write]` | Auto-validates `.sh` files Claude writes |
+| `bash-failure-hint.sh` | `PostToolUseFailure[Bash]` | Injects diagnostic hints after Bash tool failures |
 | `edit-write-failure-hint.sh` | `PostToolUseFailure[Edit\|Write]` | Injects diagnostic hints for "old_string not found", permission, and path errors |
 | `task-gate.sh` | `TaskCompleted` | Requires `file:line` evidence before agent tasks are marked complete |
-| `idle-nudge.sh` | `TeammateIdle` | Nudges idle Agent Teams teammates back on task |
+| `subagent-start-context.sh` | `SubagentStart` | Injects branch/project context into reviewer agents; warns when hard-rules.md exceeds 60-line limit |
 | `pre-compact-save.sh` | `PreCompact` | Saves session state before context compaction |
 | `post-compact-context.sh` | `PostCompact` | Re-injects session context after compaction |
-| `bash-failure-hint.sh` | `PostToolUseFailure[Bash]` | Injects diagnostic hints after Bash tool failures |
-| `stop-failure-log.sh` | `StopFailure` | Logs API errors (rate limit, token overflow) to session log; rotates logs >500KB |
-| `subagent-start-context.sh` | `SubagentStart` | Injects branch/project context into reviewer agents; warns when hard-rules.md exceeds 60-line limit |
-| `subagent-stop-gate.sh` | `SubagentStop` | Blocks reviewer agents that finish without `file:line` evidence |
-| `session-end-cleanup.sh` | `SessionEnd` (async) | Cleans up temporary session files after session ends |
-
-### Skill Routing Keywords
-
-`skill-routing.sh` detects these patterns and suggests a skill before Claude responds:
-
-| Pattern | Suggested skill |
-| --- | --- |
-| `bug`, `broken`, `failing`, `crash`, `test fail` | `debug` |
-| `ready to merge`, `feature complete`, `ready for PR` | `review` → ship workflow |
-| `review PR`, `review pull request`, `review code` | `review` |
-| `implement`, `add feature`, `build component`, `create page` | `build` |
+| `idle-nudge.sh` | `TeammateIdle` | Nudges idle Agent Teams teammates back on task |
 
 ---
 
@@ -798,7 +790,7 @@ claude plugin install <name>
 | `qmd@qmd` | Local semantic search over your codebase and docs. Speeds up `build` research phase significantly. |
 | `feature-dev@claude-plugins-official` | Specialized subagents for feature exploration and architecture analysis. Pairs well with `build`. |
 | `commit-commands@claude-plugins-official` | Quick `/commit` and `/commit-push-pr` skills for the Ship phase of `build`. |
-| `playwright@claude-plugins-official` | Browser automation via MCP. Useful for `debug` when diagnosing UI or end-to-end failures. |
+| `playwright@claude-plugins-official` | Browser automation via MCP. Useful for `debug-parallel` when diagnosing UI or end-to-end failures. |
 | `typescript-lsp@claude-plugins-official` | TypeScript language server — real-time type errors and go-to-definition. Reduces hallucinated types in TypeScript projects. |
 | `pr-review-toolkit@claude-plugins-official` | Additional review agents (silent-failure hunter, type-design analyzer, test coverage analyzer). Complements `review`. |
 

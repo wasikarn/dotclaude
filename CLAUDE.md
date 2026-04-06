@@ -35,7 +35,7 @@ Prefer reading source before editing — key references:
 | --- | --- |
 | `build` | Full development loop (Research → Plan → Implement → Review → Ship) |
 | `review` | Adversarial PR review with 3-reviewer debate |
-| `debug` | Parallel root cause analysis + DX hardening |
+| `debug-parallel` | Parallel root cause analysis + DX hardening |
 | `respond` | Address PR review comments as author |
 | `merge-pr` | Git-flow merge and deploy (feature/hotfix/release modes) |
 | `refactor` | Safe refactoring — runs tests before/after; modes: `--simplify`, `--extract`, `--restructure` |
@@ -47,6 +47,7 @@ Prefer reading source before editing — key references:
 | `status` | Show active Devflow session artifacts and current phase |
 | `onboard` | Bootstrap a new project into the devflow ecosystem — scaffold hard-rules.md and build directories |
 | `plugin-qa` | Run QA check suite to verify all hooks, skills, and plugin structure |
+| `setup` | Post-install setup — installs devflow-engine dependencies and runs smoke test |
 | `optimize-claude-md` | Audit and optimize CLAUDE.md files |
 | `analyze-claude-features` | Audit project against official Claude Code features and score adoption coverage |
 | `promote-hard-rule` | Review auto-detected Hard Rule candidates and approve/reject/defer each one |
@@ -92,12 +93,23 @@ Hooks live at `hooks/`. All hooks are registered in `hooks/hooks.json` and distr
 | Event | Matcher | Script |
 | --- | --- | --- |
 | `SessionStart` | `startup` | `check-deps.sh`, `session-start-context.sh` |
-| `UserPromptSubmit` | — | `skill-routing.sh` |
 | `PreToolUse` | `Edit\|Write` | `protect-files.sh` |
-| `PostToolUse` | `Edit\|Write` | _(inline markdownlint)_ |
-| `SubagentStop` | reviewer agent names | `subagent-stop-gate.sh` |
+| `PreToolUse` | `Skill` | `skill-usage-tracker.sh` |
+| `PreToolUse` | `Bash` | `safe-command-approver.sh` |
+| `PostToolUseFailure` | `Bash` | `bash-failure-hint.sh` |
+| `PostToolUseFailure` | `Edit\|Write` | `edit-write-failure-hint.sh` |
+| `TaskCompleted` | `review-debate` | `task-gate.sh` |
+| `TaskCompleted` | `devflow` | `task-gate.sh` |
+| `TaskCompleted` | `respond` | `task-gate.sh` |
+| `SubagentStart` | reviewer agents | `subagent-start-context.sh` |
+| `PreCompact` | — | `pre-compact-save.sh` |
+| `PostCompact` | — | `post-compact-context.sh` |
+| `TeammateIdle` | `review-pr` | `idle-nudge.sh` |
+| `TeammateIdle` | `devflow` | `idle-nudge.sh` |
+| `TeammateIdle` | `respond` | `idle-nudge.sh` |
+| `TeammateIdle` | `debug-` | `idle-nudge.sh` |
 
-> Full hook list: see [hooks/hooks.json](hooks/hooks.json) — 25 hooks total.
+> Full hook list: see [hooks/hooks.json](hooks/hooks.json) — 17 hooks total.
 
 </important>
 
@@ -135,7 +147,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for the full step-by-step guide. Key rule
 
 ## Skill Comparison & Agent Teams Constraints
 
-| Aspect | review | build | debug | respond |
+| Aspect | review | build | debug-parallel | respond |
 | --- | --- | --- | --- | --- |
 | Scope | PR review + debate | Full dev loop | Debug + DX harden | PR comment response |
 | Execution | 3 teammates (debate) | Dynamic roster per phase | Investigator + DX + Fixer | 1 Fixer per file group |
