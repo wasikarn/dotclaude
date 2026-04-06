@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.7.5] — 2026-04-06
+
+### Namespace all skills with df- prefix
+
+- refactor: rename all skills with df- prefix for consistent namespace
+
 ## [1.7.4] — 2026-04-06
 
 ### Rename setup to devflow-setup
