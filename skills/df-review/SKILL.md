@@ -25,10 +25,10 @@ Invoke as `/review [pr-number] [jira-key?] [--micro|--quick|--full|--focused are
 
 | File |
 | --- |
-| [debate-protocol](../debate-protocol/SKILL.md) |
+| [debate-protocol](../df-debate-protocol/SKILL.md) |
 | [teammate-prompts.md](references/teammate-prompts.md) |
-| [review-output-format](../review-output-format/SKILL.md) |
-| [review-conventions](../review-conventions/SKILL.md) |
+| [review-output-format](../df-review-output-format/SKILL.md) |
+| [review-conventions](../df-review-conventions/SKILL.md) |
 
 **Load on-demand:**
 
@@ -40,10 +40,10 @@ Invoke as `/review [pr-number] [jira-key?] [--micro|--quick|--full|--focused are
 | [references/phase-4.md](references/phase-4.md) | Entering Phase 4 (adversarial debate) |
 | [references/phase-5.md](references/phase-5.md) | Entering Phase 5 (convergence, falsification, log schemas) |
 | [references/phase-6.md](references/phase-6.md) | Entering Phase 6 (action, comprehension gate) |
-| [jira-integration](../jira-integration/SKILL.md) | When Jira key detected in arguments |
+| [jira-integration](../df-jira-integration/SKILL.md) | When Jira key detected in arguments |
 | [references/operational.md](references/operational.md) | Graceful degradation, compression recovery, gotchas |
 | [references/examples.md](references/examples.md) | When calibrating finding quality, debate depth, or output format |
-| [review-examples](../review-examples/SKILL.md) | Code pattern examples for all 12 rules — inject into teammate prompts |
+| [review-examples](../df-review-examples/SKILL.md) | Code pattern examples for all 12 rules — inject into teammate prompts |
 
 **PR:** #$0 | **Mode:** $2 (default: Author)
 **Today:** !`date +%Y-%m-%d`
@@ -58,7 +58,7 @@ Invoke as `/review [pr-number] [jira-key?] [--micro|--quick|--full|--focused are
 **Args:** `$0`=PR# (required) · `$1`=Jira key or Author/Reviewer · `$2`=Author/Reviewer · `--micro`=engine-only fast path · `--quick`=2 reviewers no debate · `--full`=force 3-reviewer debate · `--focused [area]`=specialist only · `--exclude pattern`=exclude files from diff (can repeat). Flags (`--micro`/`--quick`/`--full`/`--focused`/`--exclude`) are detected by pattern matching — position-independent.
 **Modes:** Author = fix code · Reviewer = comment only (in Thai) · --micro = engine-only, no Agent Teams · --quick = 2 reviewers, no debate · --focused [area] = specialist only (errors/types/tests/api/migrations)
 **Role:** Tech Lead — improve code health via architecture, mentoring, team standards.
-**Output format:** Follow [review-output-format](../review-output-format/SKILL.md) with debate additions described in phase files.
+**Output format:** Follow [review-output-format](../df-review-output-format/SKILL.md) with debate additions described in phase files.
 
 ## Phase 7: Cleanup
 
@@ -67,7 +67,7 @@ After Phase 6 completes:
 1. Shut down all teammates
 2. Clean up the team
 
-Output final verdict per [review-output-format](../review-output-format/SKILL.md).
+Output final verdict per [review-output-format](../df-review-output-format/SKILL.md).
 
 In Reviewer mode: `git worktree remove /tmp/review-pr-$0`.
 

@@ -20,7 +20,7 @@ Start both simultaneously — do not wait between them:
 
 **A) `pr-review-bootstrap` agent (Haiku):** Spawn with PR #$0 and Jira key if present. Output: `{bootstrap_context}` (diff summary, file groupings, AC checklist).
 
-**B) Jira fetch** (only if Jira key found in `$ARGUMENTS`): Follow [jira-integration](../../jira-integration/SKILL.md) §review while bootstrap agent runs:
+**B) Jira fetch** (only if Jira key found in `$ARGUMENTS`): Follow [jira-integration](../../df-jira-integration/SKILL.md) §review while bootstrap agent runs:
 
 1. Fetch ticket → summarize Problem / Value / Scope
 2. Parse AC → numbered checklist
@@ -37,7 +37,7 @@ Run Scope Assessment while A and B are in flight — it reads only the diff stat
 
 ### Scope Assessment
 
-Parse `Diff stat` from header. Classify per [review-conventions](../../review-conventions/SKILL.md) size thresholds:
+Parse `Diff stat` from header. Classify per [review-conventions](../../df-review-conventions/SKILL.md) size thresholds:
 
 | Size | Lines | Behavior |
 | --- | --- | --- |

@@ -1,7 +1,7 @@
 # review — Output Quality Examples
 
 Examples of what high-quality vs low-quality **review output** looks like.
-For code pattern examples (what each rule flags), see [`review-examples`](../../review-examples/SKILL.md).
+For code pattern examples (what each rule flags), see [`review-examples`](../../df-review-examples/SKILL.md).
 
 ---
 

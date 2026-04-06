@@ -1,6 +1,6 @@
 # Phase 3: Reply to Threads
 
-Post a reply for each thread. Comment labels per [../../review-conventions/SKILL.md](../../review-conventions/SKILL.md).
+Post a reply for each thread. Comment labels per [../../df-review-conventions/SKILL.md](../../df-review-conventions/SKILL.md).
 
 ```bash
 gh api repos/{owner}/{repo}/pulls/comments/{comment_id}/replies \

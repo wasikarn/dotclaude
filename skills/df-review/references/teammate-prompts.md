@@ -33,7 +33,7 @@ Diff size gate (from SKILL.md Phase 2):
 
 ## Shared Rules Block
 
-See [reviewer-shared-rules.md](../../build/references/reviewer-shared-rules.md) for shared rules injected into each teammate.
+See [reviewer-shared-rules.md](../../df-build/references/reviewer-shared-rules.md) for shared rules injected into each teammate.
 
 > **review divergence from build:** Use a flat confidence threshold of **80** for all teammates (not per-role). Review uses adversarial debate to filter noise post-review, so a uniform threshold is sufficient.
 

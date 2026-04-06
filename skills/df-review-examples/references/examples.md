@@ -1,6 +1,6 @@
 # Review Examples — 12-Point Canonical Examples
 
-✅/❌ code examples for each rule in [`review-rules`](../../review-rules/SKILL.md). TypeScript examples — patterns apply to other stacks.
+✅/❌ code examples for each rule in [`review-rules`](../../df-review-rules/SKILL.md). TypeScript examples — patterns apply to other stacks.
 
 ---
 

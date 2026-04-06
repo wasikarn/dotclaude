@@ -54,7 +54,7 @@ Devflow skills consume significant tokens through:
 **Implementation:**
 
 ```markdown
-// skills/jira-integration/SKILL.md (enhancement)
+// skills/df-jira-integration/SKILL.md (enhancement)
 // Add field presets:
 
 // Presets (recommended):
@@ -72,7 +72,7 @@ Devflow skills consume significant tokens through:
 **Token Savings:** 2,000-6,000 per skill invocation (30-50% reduction)
 
 **Files Changed:**
-- `skills/jira-integration/SKILL.md` — Add preset detection logic
+- `skills/df-jira-integration/SKILL.md` — Add preset detection logic
 - `agents/devflow-build-bootstrap.md` — Pass `--preset=build`
 - `agents/devflow-debug-bootstrap.md` — Pass `--preset=debug`
 - `agents/pr-review-bootstrap.md` — Pass `--preset=review`
@@ -362,5 +362,5 @@ before_review → review → after_review →
 
 - [skills-best-practices.md](../../references/skills-best-practices.md) — Skill authoring guidelines
 - [agent-hook-pattern.md](../../references/agent-hook-pattern.md) — Agent architecture
-- [jira-integration/SKILL.md](../../../skills/jira-integration/SKILL.md) — Current Jira integration
+- [jira-integration/SKILL.md](../../../skills/df-jira-integration/SKILL.md) — Current Jira integration
 - [atlassian-pm plugin docs](https://github.com/wasikarn/atlassian-pm) — MCP field filtering verification

@@ -6,7 +6,7 @@ user-invocable: false
 
 # Review Rules — 12-Point Canonical Definition
 
-Single source of truth for the 12-point review framework used across `code-reviewer`, `build`, and `review`. Code examples: [`review-examples`](../review-examples/SKILL.md)
+Single source of truth for the 12-point review framework used across `code-reviewer`, `build`, and `review`. Code examples: [`review-examples`](../df-review-examples/SKILL.md)
 
 | # | Rule | Category | Look for |
 | --- | --- | --- | --- |

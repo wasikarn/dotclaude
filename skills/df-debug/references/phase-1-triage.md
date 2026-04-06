@@ -8,7 +8,7 @@ Check for project-specific Hard Rules at `{project_root}/.claude/skills/review-r
 
 ## Step 2: Jira Context (skip if no Jira)
 
-Scan `$ARGUMENTS` for Jira key (`ABC-\d+`). If found, follow [jira-integration](../../jira-integration/SKILL.md) §debug:
+Scan `$ARGUMENTS` for Jira key (`ABC-\d+`). If found, follow [jira-integration](../../df-jira-integration/SKILL.md) §debug:
 
 1. Fetch ticket — enrich bug description with ticket details
 2. Check linked issues — related bugs may share root cause

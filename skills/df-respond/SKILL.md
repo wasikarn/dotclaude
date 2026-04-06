@@ -50,8 +50,8 @@ Read CLAUDE.md first — auto-loaded, contains project patterns and conventions.
 | [references/teammate-prompts.md](references/teammate-prompts.md) | Phase 2: creating Fixer teammates |
 | [references/phase-gates.md](references/phase-gates.md) | Any gate transition |
 | [references/operational.md](references/operational.md) | Mode detection, compression recovery, success criteria |
-| [../review-conventions/SKILL.md](../review-conventions/SKILL.md) | Phase 3: reply format and comment labels |
-| [../jira-integration/SKILL.md](../jira-integration/SKILL.md) | Phase 1 Step 2: when Jira key detected in `$1` |
+| [../df-review-conventions/SKILL.md](../df-review-conventions/SKILL.md) | Phase 3: reply format and comment labels |
+| [../df-jira-integration/SKILL.md](../df-jira-integration/SKILL.md) | Phase 1 Step 2: when Jira key detected in `$1` |
 | [references/examples.md](references/examples.md) | When calibrating reply quality, fix scope, or triage table format |
 
 ---

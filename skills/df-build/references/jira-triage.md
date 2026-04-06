@@ -6,7 +6,7 @@ Loaded by [phase-1-triage.md](phase-1-triage.md) Steps 2c/2d/2e and Step 4 when 
 
 ## Step 2c — Fetch Jira Context
 
-Follow [jira-integration](../../jira-integration/SKILL.md) §build:
+Follow [jira-integration](../../df-jira-integration/SKILL.md) §build:
 
 1. Use `issue-bootstrap` (atlassian-pm) or `mcp__mcp-atlassian__jira_get_issue` (direct MCP) — record which path succeeded; Step 4 uses it.
 2. Extract: status, AC items, subtasks, assignee.

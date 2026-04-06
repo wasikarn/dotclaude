@@ -6,7 +6,7 @@ Use the `Project` JSON from the header. Load project-specific Hard Rules from `{
 
 ## Step 2: Jira Context (if `$1` present)
 
-If `$1` matches `ABC-\d+`, follow `## respond` section in [../../jira-integration/SKILL.md](../../jira-integration/SKILL.md) to fetch AC and enrich thread prioritization.
+If `$1` matches `ABC-\d+`, follow `## respond` section in [../../df-jira-integration/SKILL.md](../../df-jira-integration/SKILL.md) to fetch AC and enrich thread prioritization.
 
 ## Step 3: Fetch Threads
 

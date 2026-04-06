@@ -7,7 +7,7 @@
 
 # Phase 4: Adversarial Debate
 
-Follow [debate-protocol](../../debate-protocol/SKILL.md) exactly:
+Follow [debate-protocol](../../df-debate-protocol/SKILL.md) exactly:
 
 1. **Pre-Debate Triage:** Auto-pass (Hard Rule + conf ≥90), auto-drop (Info + conf <80), must-debate (all others). Only must-debate findings enter round-robin.
 2. **Broadcast** must-debate findings to teammates in compact format — one line per finding: `[T{n}-F{n}] file:line — issue summary (conf:{score})`. Omit full evidence and fix suggestion from broadcast; teammates re-read code at file:line as needed during their debate response.

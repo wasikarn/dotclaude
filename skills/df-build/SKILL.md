@@ -73,9 +73,9 @@ See [references/operational.md](references/operational.md) for prerequisites, co
 | [references/review-lenses/frontend.md](references/review-lenses/frontend.md) · [security.md](references/review-lenses/security.md) · [database.md](references/review-lenses/database.md) · [performance.md](references/review-lenses/performance.md) · [typescript.md](references/review-lenses/typescript.md) · [error-handling.md](references/review-lenses/error-handling.md) · [api-design.md](references/review-lenses/api-design.md) · [observability.md](references/review-lenses/observability.md) | Phase 6 — domain lenses injected per diff content (see Lens Selection in reviewer-prompts.md) |
 | `build-research-summarizer` agent | Phase 2 Step 5b (Full mode) — compress research.md to summary written to devflow-context.md |
 | `review-consolidator` agent | Phase 6 iter 1 (3 reviewers) and iter 2+ (2 reviewers) — consolidate findings |
-| [review-conventions](../review-conventions/SKILL.md) | Entering Phase 6 |
-| [review-output-format](../review-output-format/SKILL.md) | Entering Phase 6 |
-| [debate-protocol](../debate-protocol/SKILL.md) | Phase 6 iter 1 debate only (fallback in phase-6-review.md) |
-| [jira-integration](../jira-integration/SKILL.md) | Jira key in `$ARGUMENTS` |
+| [review-conventions](../df-review-conventions/SKILL.md) | Entering Phase 6 |
+| [review-output-format](../df-review-output-format/SKILL.md) | Entering Phase 6 |
+| [debate-protocol](../df-debate-protocol/SKILL.md) | Phase 6 iter 1 debate only (fallback in phase-6-review.md) |
+| [jira-integration](../df-jira-integration/SKILL.md) | Jira key in `$ARGUMENTS` |
 | [references/pr-template.md](references/pr-template.md) | Entering Phase 9 |
 | [references/examples.md](references/examples.md) | When assessing research/plan/implementation quality or checking for YAGNI violations |

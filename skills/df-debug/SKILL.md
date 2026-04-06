@@ -43,8 +43,8 @@ Invoke as `/debug [bug-description-or-jira-key] [--quick?] [--review?]`
 | [phase-5-ship.md](references/phase-5-ship.md) | Entering Phase 5 |
 | [dx-checklist.md](references/dx-checklist.md) | Quick mode confirmed in Phase 1 — inject condensed checklist section into Quick Mode Fixer prompt |
 | [phase-gates.md](references/phase-gates.md) | At gate transitions — if unsure about conditions |
-| [review-conventions](../review-conventions/SKILL.md) | If adding Fix Review pass |
-| [jira-integration](../jira-integration/SKILL.md) | When Jira key detected in arguments |
+| [review-conventions](../df-review-conventions/SKILL.md) | If adding Fix Review pass |
+| [jira-integration](../df-jira-integration/SKILL.md) | When Jira key detected in arguments |
 | [references/operational.md](references/operational.md) | On graceful degradation or context compression recovery |
 | [artifact-templates.md](references/artifact-templates.md) | Phase 1 Step 5, Phase 2 Step 3, Phase 5 — artifact format reference |
 | [references/examples.md](references/examples.md) | When assessing investigation quality, root cause vs symptom, or DX finding depth |
