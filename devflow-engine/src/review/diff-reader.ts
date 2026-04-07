@@ -78,6 +78,23 @@ function parseDiffOutput(output: string): FileDiff[] {
 
 const SAFE_REF = /^[\w/.-]+$/
 
+const LARGE_DIFF_FILE_THRESHOLD = 300
+const LARGE_DIFF_LINE_THRESHOLD = 10_000
+
+function warnIfLargeDiff(files: FileDiff[], rawByteLength: number): void {
+  const totalLines = files.reduce((sum, f) => sum + f.diffLineCount, 0)
+  if (files.length > LARGE_DIFF_FILE_THRESHOLD) {
+    console.warn(`[diff-reader] large diff: ${files.length} files (>${LARGE_DIFF_FILE_THRESHOLD}) — review quality may degrade`)
+  }
+  if (totalLines > LARGE_DIFF_LINE_THRESHOLD) {
+    console.warn(`[diff-reader] large diff: ${totalLines} diff lines (>${LARGE_DIFF_LINE_THRESHOLD}) — review quality may degrade`)
+  }
+  const mb = (rawByteLength / (1024 * 1024)).toFixed(1)
+  if (rawByteLength > 50 * 1024 * 1024) {
+    console.warn(`[diff-reader] very large diff: ${mb}MB raw — approaching buffer limits`)
+  }
+}
+
 /**
  * Reads git diff for the current branch and returns parsed file diffs.
  * Caller is responsible for checking out the branch/PR before calling.
@@ -103,13 +120,15 @@ export function readDiff(target: { branch?: string; baseBranch?: string }): File
 
   let output: string
   try {
-    output = execSync(`git diff ${mergeBase}...HEAD`, { encoding: 'utf8', maxBuffer: 100 * 1024 * 1024 })
+    output = execSync(`git diff ${mergeBase}...HEAD`, { encoding: 'utf8', maxBuffer: 250 * 1024 * 1024 })
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err)
     throw new Error(`git diff failed: ${message}`)
   }
 
-  return parseDiffOutput(output)
+  const files = parseDiffOutput(output)
+  warnIfLargeDiff(files, output.length)
+  return files
 }
 
 /**
@@ -123,11 +142,13 @@ export function readPrDiff(prNumber: number): FileDiff[] {
 
   let output: string
   try {
-    output = execSync(`gh pr diff ${prNumber}`, { encoding: 'utf8', maxBuffer: 100 * 1024 * 1024 })
+    output = execSync(`gh pr diff ${prNumber}`, { encoding: 'utf8', maxBuffer: 250 * 1024 * 1024 })
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err)
     throw new Error(`gh pr diff ${prNumber} failed: ${message}`)
   }
 
-  return parseDiffOutput(output)
+  const files = parseDiffOutput(output)
+  warnIfLargeDiff(files, output.length)
+  return files
 }
