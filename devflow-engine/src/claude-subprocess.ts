@@ -68,7 +68,6 @@ const RETRYABLE_SUBTYPES = new Set([
 ])
 
 const MAX_RETRIES = 3
-const BASE_RETRY_DELAY_MS = 1_000
 
 function sleep(ms: number): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, ms))
@@ -160,7 +159,9 @@ export async function runClaudeSubprocess(params: SubprocessParams): Promise<Sub
     let lastError: Error | undefined
     for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
       if (attempt > 0) {
-        const delay = BASE_RETRY_DELAY_MS * Math.pow(2, attempt - 1) // 1s, 2s
+        // Read at call time so tests can override via DEVFLOW_RETRY_DELAY_MS=0
+        const baseMs = Number(process.env['DEVFLOW_RETRY_DELAY_MS'] ?? '1000')
+        const delay = baseMs * Math.pow(2, attempt - 1) // 1s, 2s (or 0 in tests)
         console.warn(`[claude-subprocess] attempt ${attempt + 1}/${MAX_RETRIES} after ${delay}ms`)
         await sleep(delay)
       }

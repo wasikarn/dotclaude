@@ -117,6 +117,11 @@ export async function runReviewer(params: {
     return { findings: [], strengths: [], cost: 0, tokens: 0 }
   }
 
+  if (result.budgetExceeded === true) {
+    console.warn(`[sdk-review] reviewer (${params.bucket.role}) hit budget limit — skipping findings`)
+    return { findings: [], strengths: [], cost: result.costUsd, tokens: result.tokens }
+  }
+
   const raw = result.structuredOutput
   if (raw === undefined || raw === null) {
     console.warn(`[sdk-review] reviewer (${params.bucket.role}) returned no structured output — skipping`)
