@@ -18,6 +18,8 @@ Idempotent design: Phase 1 detects state via bash flags (`BUN_OK`, `NODE_MODULES
 
 `devflow-engine/smoke-test.ts` — validates all non-LLM components (diff-reader, domain-mapper, triage, consolidator, output, schemas, CLI args). Failures are warnings, not hard stops — skills degrade gracefully.
 
+Run: `cd devflow-engine && bun smoke-test.ts`
+
 ## Validate
 
 ```bash
