@@ -40,6 +40,7 @@ Invoke as `/review [pr-number] [jira-key?] [--micro|--quick|--full|--focused are
 | [references/phase-4.md](references/phase-4.md) | Entering Phase 4 (adversarial debate) |
 | [references/phase-5.md](references/phase-5.md) | Entering Phase 5 (convergence, falsification, log schemas) |
 | [references/phase-6.md](references/phase-6.md) | Entering Phase 6 (action, comprehension gate) |
+| [references/phase-advisor.md](references/phase-advisor.md) | When `--advisor` flag detected — cost-intelligent review with model escalation |
 | [jira-integration](../df-jira-integration/SKILL.md) | When Jira key detected in arguments |
 | [references/operational.md](references/operational.md) | Graceful degradation, compression recovery, gotchas |
 | [references/examples.md](references/examples.md) | When calibrating finding quality, debate depth, or output format |
@@ -55,8 +56,8 @@ Invoke as `/review [pr-number] [jira-key?] [--micro|--quick|--full|--focused are
 **PR title:** !`gh pr view $0 --json title,body,labels,author --jq '{title,body,labels: [.labels[].name],author: .author.login}' 2>/dev/null || true`
 **Changed files:** !`gh pr diff $0 --name-only 2>/dev/null || true`
 
-**Args:** `$0`=PR# (required) · `$1`=Jira key or Author/Reviewer · `$2`=Author/Reviewer · `--micro`=engine-only fast path · `--quick`=2 reviewers no debate · `--full`=force 3-reviewer debate · `--focused [area]`=specialist only · `--exclude pattern`=exclude files from diff (can repeat). Flags (`--micro`/`--quick`/`--full`/`--focused`/`--exclude`) are detected by pattern matching — position-independent.
-**Modes:** Author = fix code · Reviewer = comment only (in Thai) · --micro = engine-only, no Agent Teams · --quick = 2 reviewers, no debate · --focused [area] = specialist only (errors/types/tests/api/migrations)
+**Args:** `$0`=PR# (required) · `$1`=Jira key or Author/Reviewer · `$2`=Author/Reviewer · `--micro`=engine-only fast path · `--quick`=2 reviewers no debate · `--full`=force 3-reviewer debate · `--focused [area]`=specialist only · `--exclude pattern`=exclude files from diff (can repeat) · `--advisor`=cost-intelligent review with model escalation. Flags (`--micro`/`--quick`/`--full`/`--focused`/`--exclude`/`--advisor`) are detected by pattern matching — position-independent.
+**Modes:** Author = fix code · Reviewer = comment only (in Thai) · --micro = engine-only, no Agent Teams · --quick = 2 reviewers, no debate · --focused [area] = specialist only (errors/types/tests/api/migrations) · --advisor = fast executor (Sonnet/Haiku) + Opus advisor on uncertain findings
 **Role:** Tech Lead — improve code health via architecture, mentoring, team standards.
 **Output format:** Follow [review-output-format](../df-review-output-format/SKILL.md) with debate additions described in phase files.
 
@@ -70,6 +71,39 @@ After Phase 6 completes:
 Output final verdict per [review-output-format](../df-review-output-format/SKILL.md).
 
 In Reviewer mode: `git worktree remove /tmp/review-pr-$0`.
+
+---
+
+## Advisor Mode (--advisor)
+
+Cost-intelligent review using the Advisor Strategy pattern from Anthropic.
+
+**Pattern:** Fast executor (Sonnet/Haiku) → Confidence Gate → Opus advisor → Final report
+
+**Usage:**
+```bash
+/review 123 --advisor              # Balanced: Sonnet + Opus on uncertainty
+/review 123 --advisor --mode=fast  # Fast: Haiku + Opus on security only
+```
+
+**When to use:**
+- Large PRs (30+ files) — executor parallel dispatch is faster
+- Budget-conscious review cycles — 35-80% cost savings
+- Clear separation expected between obvious and complex findings
+
+**How it works:**
+1. **Executor pass** — Fast reviewers (Sonnet or Haiku) score confidence on each finding
+2. **Escalation gate** — Findings with confidence < threshold OR security/arch patterns → advisor
+3. **Advisor consultation** — Opus provides deep analysis for uncertain items
+4. **Synthesis** — Executor combines findings + advisor guidance into final report
+
+**Cost comparison:**
+| PR Size | Standard | Advisor | Savings |
+|---------|----------|---------|---------|
+| 10 files | ~$4.50 | ~$1.50 | 67% |
+| 50 files | ~$22.50 | ~$4.50 | 80% |
+
+See [references/phase-advisor.md](references/phase-advisor.md) for full implementation details.
 
 ## Constraints
 

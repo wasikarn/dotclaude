@@ -143,6 +143,40 @@ Evaluate in priority order — spawn the **first matching condition only** from 
 
 **Severity mapping:** `silent-failure-hunter` uses `CRITICAL/HIGH/MEDIUM` — map to pipeline labels before consolidation: `CRITICAL → Critical`, `HIGH → Warning`, `MEDIUM → Suggestion`.
 
+## Advisor Mode (--advisor)
+
+ถ้า `--advisor` flag ระบุมา → ใช้ cost-intelligent review pattern:
+
+**Phase 3-Advisor Flow:**
+
+1. **Detect mode** — fast, balanced (default), or conservative
+2. **Spawn fast reviewers** — same 3 teammates but with confidence scoring enabled
+3. **Collect findings with confidence** — each finding includes 0.0-1.0 score
+4. **Escalation gate** — findings with confidence < threshold OR security/arch patterns → advisor-consultant (Opus)
+5. **Advisor consultation** — Opus analyzes uncertain findings, returns verdict
+6. **Skip Phase 4 (debate)** — advisor replaces debate for uncertain items
+7. **Proceed to Phase 5** — falsification agent still runs on all findings
+
+**Configuration by mode:**
+
+| Mode | Executor | Threshold | Escalate On |
+|------|----------|-----------|-------------|
+| fast | Haiku | 0.6 | Security patterns only |
+| balanced | Sonnet | 0.7 | Security + Architecture + confidence < 0.7 |
+| conservative | Sonnet | 0.8 | Any confidence < 0.8 |
+
+**Auto-escalate patterns (always to advisor):**
+- Security: `sql-injection`, `xss`, `auth-bypass`, `secrets`
+- Architecture: `breaking-change`, `api-contract`, `circular-dependency`
+- Complexity: Files with >500 changed lines
+
+**Cost impact:**
+- Escalation rate typically 10-30%
+- Cost savings 35-80% vs standard 3×Opus review
+- Latency +10-20% due to advisor round-trip
+
+See [phase-advisor.md](phase-advisor.md) for full implementation.
+
 ## --focused Mode: Specialist-Only Review
 
 ถ้า `--focused [area]` flag ระบุมา → ข้าม 3 main reviewers, spawn เฉพาะ specialist ที่ตรงกับ area:
